@@ -1,0 +1,12 @@
+ASM := nasm
+CC := gcc
+LD := ld
+OBJCOPY := objcopy
+STRIP = strip
+RM := rm -rf
+
+LDFLAGS = -m elf_i386
+CFLAGS  = -g -m32 -fno-builtin -fno-stack-protector -fomit-frame-pointer -fstrength-reduce
+OBJCOPYFLAGS := -R .pdr -R .comment -R.note -S -O binary
+
+IMAGE_NAME := fd.img
