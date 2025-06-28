@@ -6,7 +6,7 @@ STRIP = strip
 RM := rm -rf
 
 LDFLAGS = -m elf_i386
-CFLAGS  = -g -m32 -fno-builtin -fno-stack-protector -fomit-frame-pointer -fstrength-reduce
+CFLAGS  = -g -m32 -fno-builtin -fno-stack-protector -fomit-frame-pointer -fstrength-reduce -fno-pic -nostdinc
 OBJCOPYFLAGS := -R .pdr -R .comment -R.note -S -O binary
 
 IMAGE_NAME := fd.img

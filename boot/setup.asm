@@ -50,6 +50,12 @@ DisableMotor: ; FLoppy motor killer
     pop dx
     ret
 
+DisableCursor:
+    mov ah, 0x01
+    mov ch, 0x3F
+    int 0x10
+    ret
+
 EnableA20:
     in al, 0x92
     or al, 2
@@ -71,6 +77,7 @@ start:
 	mov	sp, 0xFFFF
 	
 	call DisableMotor
+    call DisableCursor
 
 	lgdt [GDT_PTR]
     lidt [IDT_PTR]

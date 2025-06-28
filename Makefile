@@ -2,7 +2,7 @@ include cfg/Makefile.header
 
 LDFLAGS += -Ttext 0
 
-.PHONY: all clean boot init
+.PHONY: all clean boot init drivers
 
 all: image
 
@@ -12,8 +12,12 @@ boot:
 init:
 	@make -C init/
 
-kernel: boot init
-	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o boot/KERNEL.BIN boot/KERNEL_ENTRY.o init/init.o
+drivers:
+	@make -C drivers/
+
+kernel: boot init drivers
+	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o boot/KERNEL.BIN boot/*.o init/*.o drivers/*.o
+	@$(STRIP) boot/KERNEL.BIN
 	@$(OBJCOPY) $(OBJCOPYFLAGS) boot/KERNEL.BIN
 
 image: kernel
@@ -26,4 +30,5 @@ image: kernel
 clean:
 	@make clean -C boot/
 	@make clean -C init/
+	@make clean -C drivers/
 	@$(RM) fd.img

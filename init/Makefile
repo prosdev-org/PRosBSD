@@ -1,5 +1,6 @@
 include ../cfg/Makefile.header
 
+CFLAGS += -I../include
 LDFLAGS += -Ttext 0
 
 .PHONY: all clean

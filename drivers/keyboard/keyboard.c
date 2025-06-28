@@ -1,0 +1,103 @@
+#include <stdint.h>
+#include <io.h>
+#include "keyboard.h"
+
+uint8_t shift_active = 0;
+uint8_t caps_lock_active = 0;
+
+// US QWERTY scancode maps
+const char scancode_map_normal[] = {
+    0, 0, '1', '2', '3', '4', '5', '6',  // 00-07
+    '7', '8', '9', '0', '-', '=', '\b', '\t',  // 08-0F
+    'q', 'w', 'e', 'r', 't', 'y', 'u', 'i',  // 10-17
+    'o', 'p', '[', ']', '\n', 0, 'a', 's',  // 18-1F
+    'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',  // 20-27
+    '\'', '`', 0, '\\', 'z', 'x', 'c', 'v',  // 28-2F
+    'b', 'n', 'm', ',', '.', '/', 0, '*',  // 30-37
+    0, ' ', 0, 0, 0, 0, 0, 0,  // 38-3F
+    0, 0, 0, 0, 0, 0, 0, '7',  // 40-47
+    '8', '9', '-', '4', '5', '6', '+', '1',  // 48-4F
+    '2', '3', '0', '.', 0, 0, 0, 0   // 50-57
+};
+
+const char scancode_map_shifted[] = {
+    0, 0, '!', '@', '#', '$', '%', '^',  // 00-07
+    '&', '*', '(', ')', '_', '+', '\b', '\t',  // 08-0F
+    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I',  // 10-17
+    'O', 'P', '{', '}', '\n', 0, 'A', 'S',  // 18-1F
+    'D', 'F', 'G', 'H', 'J', 'K', 'L', ':',  // 20-27
+    '"', '~', 0, '|', 'Z', 'X', 'C', 'V',  // 28-2F
+    'B', 'N', 'M', '<', '>', '?', 0, '*',  // 30-37
+    0, ' ', 0, 0, 0, 0, 0, 0,  // 38-3F
+    0, 0, 0, 0, 0, 0, 0, '7',  // 40-47
+    '8', '9', '-', '4', '5', '6', '+', '1',  // 48-4F
+    '2', '3', '0', '.', 0, 0, 0, 0   // 50-57
+};
+
+void keyboard_init() {
+    // wait for input buffer to be clear
+    while (inb(KEYBOARD_STATUS_PORT) & 0x02);
+    
+    // Enable keyboard
+    outb(0xAE, KEYBOARD_STATUS_PORT);
+}
+
+uint8_t keyboard_status() {
+    return inb(KEYBOARD_STATUS_PORT);
+}
+
+uint8_t read_scancode() {
+    while (!(keyboard_status() & OUTPUT_BUFFER_FULL));
+    return inb(KEYBOARD_DATA_PORT);
+}
+
+// convert scancode to ASCII character
+char scancode_to_ascii(uint8_t scancode) {
+    // handle key releases
+    if (scancode & RELEASE_CODE_OFFSET) {
+        uint8_t released_key = scancode & ~RELEASE_CODE_OFFSET;
+        
+        if (released_key == LEFT_SHIFT || 
+            released_key == RIGHT_SHIFT) {
+            shift_active = 0;
+        }
+        return 0;
+    }
+
+    // handle special keys
+    switch(scancode) {
+        case LEFT_SHIFT:
+        case RIGHT_SHIFT:
+            shift_active = 1;
+            return 0;
+        case CAPS_LOCK:
+            caps_lock_active = !caps_lock_active;
+            return 0;
+        case BACKSPACE:
+            return '\b';
+        case ENTER:
+            return '\n';
+    }
+
+    // handle character mapping
+    uint8_t effective_shift = shift_active ^ caps_lock_active;
+    char result = 0;
+
+    if (scancode < sizeof(scancode_map_normal)) {
+        if (effective_shift) {
+            result = scancode_map_shifted[scancode];
+        } else {
+            result = scancode_map_normal[scancode];
+        }
+    }
+
+    return result;
+}
+
+char getchar() {
+    while (1) {
+        uint8_t scancode = read_scancode();
+        char c = scancode_to_ascii(scancode);
+        if (c != 0) return c;
+    }
+}

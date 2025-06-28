@@ -1,0 +1,43 @@
+#ifndef IO_H
+#define IO_H
+
+#include <stdint.h>
+
+void io_delay(void)
+{
+    __asm__ volatile ("outb %%al, $0x80"
+                      :
+                      : "a"(0));
+}
+
+void outb(uint8_t value, uint16_t port)
+{
+    __asm__ volatile ("outb %0, %1"
+                      :
+                      : "a"(value), "d"(port));
+}
+
+uint8_t inb(uint16_t port)
+{
+    uint8_t ret;
+    __asm__ volatile ("inb %1, %0"
+                      : "=a"(ret)
+                      : "d"(port));
+    return ret;
+}
+
+void outb_p(uint8_t value, uint16_t port)
+{
+    outb(value, port);
+    io_delay();
+}
+
+
+uint8_t inb_p(uint16_t port)
+{
+    uint8_t ret = inb(port);
+    io_delay();
+    return ret;
+}
+
+#endif // IO_H

@@ -1,0 +1,14 @@
+*.o
+
+*.BIN
+*.bin
+
+*.img
+
+.vscode/
+
+*~
+*.swp
+*.swo
+.*.swp
+.*.swo
