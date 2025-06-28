@@ -95,7 +95,7 @@ PmodeEntry:
 	mov es, ax
     mov fs, ax
     mov gs, ax
-    mov esp, 0x9FC00
+    mov esp, 0xA000
     mov ss, ax
 
     call setup_paging
@@ -105,32 +105,47 @@ PmodeEntry:
 	hlt
 
 setup_paging:
-    mov edi, 0x10000
-    mov ecx, 5*1024
+    mov edi, 0x20000
+    mov ecx, 4096        ; 4KB (1 page) - Page Directory
     xor eax, eax
     cld
     rep stosd
 
-    mov dword [0x10000], 0x11007
-    mov dword [0x10004], 0x12007
-    mov dword [0x10008], 0x13007
-    mov dword [0x1000C], 0x14007
+    mov edi, 0x21000
+    mov ecx, 4096        ; 4KB (1 page) - Page Table 1
+    rep stosd
 
-    mov edi, 0x14FFC
-    mov eax, 0x00FFF007
-    std
-.loop:
+    mov edi, 0x22000
+    mov ecx, 4096        ; 4KB (1 page) - Page Table 2
+    rep stosd
+
+    mov edi, 0x23000
+    mov ecx, 4096        ; 4KB (1 page) - Page Table 3
+    rep stosd
+
+    mov edi, 0x24000
+    mov ecx, 4096        ; 4KB (1 page) - Page Table 4
+    rep stosd
+
+    mov dword [0x20000], 0x21007
+
+    mov edi, 0x21000
+    mov eax, 0x00000007
+.pte_loop:
     stosd
-    sub eax, 0x1000
-    jge .loop
-    cld
+    add eax, 0x1000 ; increment physical address by 4KB
+    cmp eax, 0x400000
+    jl .pte_loop
 
-    mov eax, 0x10000
+    mov eax, 0x20000
     mov cr3, eax
+
     mov eax, cr0
-    or eax, 0x80000000
+    or eax, 0x80000000 ; set the PG bit
     mov cr0, eax
+
     ret
+
 
 EnableKRNL:
     jmp CODE_SEG:0x7E00
