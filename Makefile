@@ -2,7 +2,7 @@ include cfg/Makefile.header
 
 LDFLAGS += -Ttext 0
 
-.PHONY: all clean boot init drivers
+.PHONY: all clean boot init drivers multiboot
 
 all: image
 
@@ -19,6 +19,10 @@ kernel: boot init drivers
 	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o boot/KERNEL.BIN boot/*.o init/*.o drivers/*.o
 	@$(STRIP) boot/KERNEL.BIN
 	@$(OBJCOPY) $(OBJCOPYFLAGS) boot/KERNEL.BIN
+
+multiboot: init drivers
+	@make KERNEL_ENTRY -C boot/
+	@$(LD) $(LDFLAGS) -T cfg/multiboot.ld -o multiboot.o boot/*.o init/*.o drivers/*.o
 
 image: kernel
 	@dd if=/dev/zero of=$(IMAGE_NAME) count=2880 bs=512
