@@ -10,3 +10,5 @@ CFLAGS  = -g -m32 -fno-builtin -fno-stack-protector -fomit-frame-pointer -fstren
 OBJCOPYFLAGS := -R .pdr -R .comment -R.note -S -O binary
 
 IMAGE_NAME := fd.img
+HDD_IMAGE ?= pros.img
+GRUB_MOUNT ?= /mnt/disk
