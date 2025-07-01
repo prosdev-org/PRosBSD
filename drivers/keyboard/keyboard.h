@@ -5,5 +5,12 @@
 #define LEFT_SHIFT 0x2A
 #define RIGHT_SHIFT 0x36
 #define CAPS_LOCK 0x3A
+#define NUM_LOCK 0x45
+#define SCROLL_LOCK 0x46
 #define BACKSPACE 0x0E
 #define ENTER 0x1C
+#define INPUT_BUFFER_FULL 0x02
+#define KEYBOARD_CMD_SET_LEDS 0xED
+#define LED_SCROLL_LOCK   0x01
+#define LED_NUM_LOCK      0x02
+#define LED_CAPS_LOCK     0x04

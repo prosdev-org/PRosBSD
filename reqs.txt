@@ -1,0 +1,1 @@
+build-essential mtools dosfstools parted multipath-tools grub2-common grub-pc-bin wget e2fsprogs nasm

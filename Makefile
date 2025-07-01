@@ -1,8 +1,9 @@
 include cfg/Makefile.header
 
+CFLAGS += -I./include 
 LDFLAGS += -Ttext 0
 
-.PHONY: all clean boot init drivers multiboot kernel image hdd_image
+.PHONY: all clean boot init drivers kernel_ kernel image hdd_image
 
 all: hdd_image
 
@@ -10,13 +11,21 @@ boot:
 	@make -C boot/
 
 init:
-	@make -C init/
+	@echo "\033[0;32mCompiling init..\033[0m"
+	@$(CC) $(CFLAGS) -c init/main.c -o init/init.o
 
 drivers:
-	@make -C drivers/
+	@for f in $(wildcard drivers/cmos/*.c); do echo "\033[0;32mCompiling CMOS driver..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard drivers/keyboard/*.c); do echo "\033[0;32mCompiling keyboard driver..\033[ \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard drivers/vga_tty/*.c); do echo "\033[0;32mCompiling VGA TTY driver..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
 
-kernel: boot init drivers
-	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o boot/KERNEL.BIN boot/*.o init/*.o drivers/*.o
+kernel_:
+	@for f in $(wildcard kernel/*.c); do echo "\033[0;32mCompiling kernel piece..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard kernel/memory/*.c); do echo "\033[0;32mCompiling memory operations..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
+
+kernel: boot init drivers kernel_
+	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o boot/KERNEL_.BIN boot/KERNEL_ENTRY.o init/*.o *.o
+	@cp boot/KERNEL_.BIN boot/KERNEL.BIN
 	@$(STRIP) boot/KERNEL.BIN
 	@$(OBJCOPY) $(OBJCOPYFLAGS) boot/KERNEL.BIN
 
@@ -28,9 +37,7 @@ image: kernel
 	@mcopy -i $(IMAGE_NAME) boot/KERNEL.BIN ::/
 
 hdd_image: image
-	@if [ ! -f "memdisk" ]; then \
-		wget -O memdisk https://github.com/redox-os/isolinux/raw/refs/heads/master/memdisk; \
-	fi
+	@if [ ! -f "memdisk" ]; then wget -O memdisk https://github.com/redox-os/isolinux/raw/refs/heads/master/memdisk; fi
 	@dd if=/dev/zero of=$(HDD_IMAGE) bs=1M count=35
 	@parted -s $(HDD_IMAGE) mklabel msdos
 	@parted -s $(HDD_IMAGE) mkpart primary 1MiB 8MiB
@@ -58,7 +65,5 @@ hdd_image: image
 	@parted -s $(HDD_IMAGE) unit B print
 
 clean:
-	@make clean -C boot/
-	@make clean -C init/
-	@make clean -C drivers/
 	@$(RM) $(IMAGE_NAME) $(HDD_IMAGE) memdisk
+	@find . -type f \( -name "*.o" -o -name "*.BIN" \) -exec rm -f {} +

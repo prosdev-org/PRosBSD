@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <extrns.h>
 #include "tty.h"
 
 uint32_t cursor_row = 0;
@@ -74,6 +75,9 @@ void putck(char c) {
         default: // printable character
             if (c >= ' ') {
                 uint32_t idx = cursor_row * COLS + cursor_col;
+                if (idx >= COLS * ROWS) {
+                    panic("tty: buffer overflow");
+                }
                 vga[idx] = (ATTRIBUTE << 8) | c;
                 cursor_col++;
             }

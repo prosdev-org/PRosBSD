@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <extrns.h>
 #include <io.h>
 #include "cmos.h"
 
@@ -29,6 +30,10 @@ void get_rtc_time(uint8_t *seconds, uint8_t *minutes, uint8_t *hours) {
         *minutes = bcd_to_binary(*minutes);
         *hours = bcd_to_binary(*hours);
     }
+
+    if (*seconds > 59 || *minutes > 59 || *hours > 23) {
+        panic("cmos: invalid time values");
+    }
 }
 
 void get_rtc_date(uint8_t *day, uint8_t *month, uint8_t *year) {
@@ -43,5 +48,9 @@ void get_rtc_date(uint8_t *day, uint8_t *month, uint8_t *year) {
         *day = bcd_to_binary(*day);
         *month = bcd_to_binary(*month);
         *year = bcd_to_binary(*year);
+    }
+
+    if (*day == 0 || *day > 31 || *month == 0 || *month > 12) {
+        panic("cmos: invalid date values");
     }
 }

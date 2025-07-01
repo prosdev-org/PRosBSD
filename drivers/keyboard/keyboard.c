@@ -1,9 +1,12 @@
 #include <stdint.h>
 #include <io.h>
+#include <extrns.h>
 #include "keyboard.h"
 
 uint8_t shift_active = 0;
 uint8_t caps_lock_active = 0;
+uint8_t num_lock_active = 0;
+uint8_t scroll_lock_active = 0;
 
 // US QWERTY scancode maps
 const char scancode_map_normal[] = {
@@ -17,7 +20,8 @@ const char scancode_map_normal[] = {
     0, ' ', 0, 0, 0, 0, 0, 0,  // 38-3F
     0, 0, 0, 0, 0, 0, 0, '7',  // 40-47
     '8', '9', '-', '4', '5', '6', '+', '1',  // 48-4F
-    '2', '3', '0', '.', 0, 0, 0, 0   // 50-57
+    '2', '3', '0', '.', 0, 0, 0, 0,   // 50-57
+    0
 };
 
 const char scancode_map_shifted[] = {
@@ -31,15 +35,41 @@ const char scancode_map_shifted[] = {
     0, ' ', 0, 0, 0, 0, 0, 0,  // 38-3F
     0, 0, 0, 0, 0, 0, 0, '7',  // 40-47
     '8', '9', '-', '4', '5', '6', '+', '1',  // 48-4F
-    '2', '3', '0', '.', 0, 0, 0, 0   // 50-57
+    '2', '3', '0', '.', 0, 0, 0, 0,   // 50-57
+    0
 };
+
+void set_keyboard_leds() {
+    uint8_t led_status = 0;
+    led_status |= scroll_lock_active ? LED_SCROLL_LOCK : 0;
+    led_status |= num_lock_active    ? LED_NUM_LOCK    : 0;
+    led_status |= caps_lock_active   ? LED_CAPS_LOCK   : 0;
+
+    while (inb(KEYBOARD_STATUS_PORT) & INPUT_BUFFER_FULL);
+
+    outb(KEYBOARD_CMD_SET_LEDS, KEYBOARD_DATA_PORT);
+    
+    while (!(inb(KEYBOARD_STATUS_PORT) & OUTPUT_BUFFER_FULL));
+    uint8_t ack = inb(KEYBOARD_DATA_PORT);
+    if (ack != 0xFA) return;
+
+    // wait for free
+    while (inb(KEYBOARD_STATUS_PORT) & INPUT_BUFFER_FULL);
+    
+    outb(led_status, KEYBOARD_DATA_PORT);
+    
+    while (!(inb(KEYBOARD_STATUS_PORT) & OUTPUT_BUFFER_FULL));
+    inb(KEYBOARD_DATA_PORT);
+}
 
 void keyboard_init() {
     // wait for input buffer to be clear
     while (inb(KEYBOARD_STATUS_PORT) & 0x02);
     
-    // Enable keyboard
+    // enable keyboard
     outb(0xAE, KEYBOARD_STATUS_PORT);
+
+    set_keyboard_leds();
 }
 
 uint8_t keyboard_status() {
@@ -73,6 +103,14 @@ char scancode_to_ascii(uint8_t scancode) {
         case CAPS_LOCK:
             caps_lock_active = !caps_lock_active;
             return 0;
+        case NUM_LOCK:
+            num_lock_active = !num_lock_active;
+            set_keyboard_leds();
+            return 0;
+        case SCROLL_LOCK:
+            scroll_lock_active = !scroll_lock_active;
+            set_keyboard_leds();
+            return 0;
         case BACKSPACE:
             return '\b';
         case ENTER:
@@ -89,6 +127,8 @@ char scancode_to_ascii(uint8_t scancode) {
         } else {
             result = scancode_map_normal[scancode];
         }
+    } else {
+        panic("keyboard: invalid scancode");
     }
 
     return result;
