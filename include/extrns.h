@@ -19,6 +19,13 @@ void cmos_write(uint8_t reg, uint8_t value);
 void get_rtc_time(uint8_t *seconds, uint8_t *minutes, uint8_t *hours);
 void get_rtc_date(uint8_t *day, uint8_t *month, uint8_t *year);
 
+// mouse driver
+void mouse_init();
+void mouse_poll();
+void mouse_set_sample_rate(uint8_t rate);
+void mouse_set_resolution(uint8_t res);
+void mouse_handler();
+
 /////////
 
 int printf(const char *restrict format, ...);
