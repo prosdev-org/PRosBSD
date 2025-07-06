@@ -52,7 +52,7 @@ hdd_image: image
 	@sudo mkdir -p $(GRUB_MOUNT)
 	@sudo mount /dev/mapper/loop0p1 $(GRUB_MOUNT)
 	@sudo mkdir -p $(GRUB_MOUNT)/boot/grub
-	@echo 'set timeout=0\nset default=0\n\nmenuentry "Pros" {\n  insmod part_msdos\n  insmod fat\n  set root='"'(hd0,msdos1)'"'\n  linux16 /memdisk silent\n  initrd16 /fd.img\n  boot\n}' | sudo tee $(GRUB_MOUNT)/boot/grub/grub.cfg > /dev/null
+	@echo 'set timeout=0\nset default=0\n\nmenuentry "Pros32" {\n  insmod part_msdos\n  insmod fat\n  set root='"'(hd0,msdos1)'"'\n  linux16 /memdisk silent\n  initrd16 /fd.img\n  boot\n}' | sudo tee $(GRUB_MOUNT)/boot/grub/grub.cfg > /dev/null
 	@sudo grub-install \
 		--target=i386-pc \
 		--boot-directory=$(GRUB_MOUNT)/boot \

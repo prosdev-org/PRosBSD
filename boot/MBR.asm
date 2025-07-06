@@ -24,7 +24,7 @@ FAT_DIRECTORY_TABLE_OFFSET equ FAT_TABLE_OFFSET + FAT12_FAT_TABLE_SIZE
 jmp boot
 
 times 3-($-$$) db 0
-bpbOEM db "    PRos"
+bpbOEM db "  PRos32"
 bpbBytesPerSector DW 512
 bpbSectorsPerCluster DB 1
 bpbReservedSectors DW 1
