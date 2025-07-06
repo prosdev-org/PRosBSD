@@ -38,11 +38,12 @@ image: kernel
 	@mcopy -i $(IMAGE_NAME) boot/KERNEL.BIN ::/
 
 hdd_image: image
+	@make unmount_image
 	@if [ ! -f "memdisk" ]; then wget -O memdisk https://github.com/redox-os/isolinux/raw/refs/heads/master/memdisk; fi
-	@dd if=/dev/zero of=$(HDD_IMAGE) bs=1M count=35
+	@dd if=/dev/zero of=$(HDD_IMAGE) bs=1M count=50
 	@parted -s $(HDD_IMAGE) mklabel msdos
-	@parted -s $(HDD_IMAGE) mkpart primary 1MiB 8MiB
-	@parted -s $(HDD_IMAGE) mkpart primary 9MiB 34MiB
+	@parted -s $(HDD_IMAGE) mkpart primary 1MiB 15MiB
+	@parted -s $(HDD_IMAGE) mkpart primary 16MiB 49MiB
 	@sudo kpartx -av $(HDD_IMAGE)
 	@sleep 2
 	@sudo mkfs.fat -F 32 /dev/mapper/loop0p1
@@ -51,19 +52,23 @@ hdd_image: image
 	@sudo mcopy -i /dev/mapper/loop0p1 $(IMAGE_NAME) ::/fd.img
 	@sudo mkdir -p $(GRUB_MOUNT)
 	@sudo mount /dev/mapper/loop0p1 $(GRUB_MOUNT)
-	@sudo mkdir -p $(GRUB_MOUNT)/boot/grub
-	@echo 'set timeout=0\nset default=0\n\nmenuentry "Pros32" {\n  insmod part_msdos\n  insmod fat\n  set root='"'(hd0,msdos1)'"'\n  linux16 /memdisk silent\n  initrd16 /fd.img\n  boot\n}' | sudo tee $(GRUB_MOUNT)/boot/grub/grub.cfg > /dev/null
-	@sudo grub-install \
+	@sudo mkdir -p $(GRUB_MOUNT)/boot/grub2/
+	@sudo cp grub.cfg $(GRUB_MOUNT)/boot/grub2/grub.cfg
+	@sudo grub2-install \
 		--target=i386-pc \
 		--boot-directory=$(GRUB_MOUNT)/boot \
 		--modules="part_msdos fat" \
 		--recheck \
 		--force \
 		/dev/loop0
-	@sudo umount $(GRUB_MOUNT)
-	@sudo $(RM) $(GRUB_MOUNT)
-	@sudo kpartx -d $(HDD_IMAGE)
+	@make unmount_image
 	@parted -s $(HDD_IMAGE) unit B print
+
+unmount_image:
+	-@sudo umount $(GRUB_MOUNT)
+	-@sudo $(RM) $(GRUB_MOUNT)
+	-@sudo kpartx -d /dev/loop0
+	-@sudo losetup -d /dev/loop0
 
 clean:
 	@$(RM) $(IMAGE_NAME) $(HDD_IMAGE) memdisk
