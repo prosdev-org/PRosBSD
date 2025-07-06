@@ -8,6 +8,7 @@ memdisk
 *.img
 
 .vscode/
+.idea/
 
 *~
 *.swp
