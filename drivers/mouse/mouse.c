@@ -1,19 +1,9 @@
+#include "mouse.h"
+#include <mouse.h>
 #include <io.h>
 #include <stdint.h>
-#include <mouse.h>
 
 mouse_state mouse;
-
-void mouse_init();
-void mouse_wait(uint8_t type);
-void mouse_write(uint8_t command);
-void mouse_poll();
-uint8_t mouse_read();
-void mouse_handler();
-void mouse_parse_packet();
-void mouse_set_sample_rate(uint8_t rate);
-void mouse_set_resolution(uint8_t res);
-uint8_t mouse_get_id();
 
 void mouse_init() {
     outb(PS2_CMD_DISABLE_PORT2, PS2_CTRL_PORT);
@@ -28,9 +18,9 @@ void mouse_init() {
     mouse_read();
     mouse_read();
     
-    mouse_set_sample_rate(MOUSE_SAMPLE_200);
-    mouse_set_sample_rate(MOUSE_SAMPLE_100);
-    mouse_set_sample_rate(MOUSE_SAMPLE_80);
+    mouse_set_sample_rate(MOUSE_SAMPLE_RATE_200);
+    mouse_set_sample_rate(MOUSE_SAMPLE_RATE_100);
+    mouse_set_sample_rate(MOUSE_SAMPLE_RATE_80);
     uint8_t id = mouse_get_id();
     
     // set packet size based on mouse ID
@@ -44,7 +34,7 @@ void mouse_init() {
     
     // make it default
     mouse_set_resolution(MOUSE_RES_4_COUNT_MM);
-    mouse_set_sample_rate(MOUSE_SAMPLE_100);
+    mouse_set_sample_rate(MOUSE_SAMPLE_RATE_100);
     
     // data reporting
     mouse_write(MOUSE_CMD_ENABLE);
