@@ -1,5 +1,3 @@
-#include <stdint.h>
-
 #define PS2_CMD_WRITE_PORT2   0xD4
 #define PS2_CMD_DISABLE_PORT2 0xA7
 #define PS2_CMD_ENABLE_PORT2  0xA8
@@ -29,14 +27,3 @@
 #define PS2_CTRL_PORT         0x64
 #define STATUS_OUTPUT_FULL    0x01
 #define STATUS_INPUT_FULL     0x02
-
-void mouse_init();
-void mouse_wait(uint8_t type);
-void mouse_write(uint8_t command);
-void mouse_poll();
-uint8_t mouse_read();
-void mouse_handler();
-void mouse_parse_packet();
-void mouse_set_sample_rate(uint8_t rate);
-void mouse_set_resolution(uint8_t res);
-uint8_t mouse_get_id();

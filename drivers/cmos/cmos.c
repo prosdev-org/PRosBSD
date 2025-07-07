@@ -1,4 +1,5 @@
 #include "cmos.h"
+#include <cmos.h>
 #include <extrns.h>
 #include <io.h>
 #include <stdint.h>

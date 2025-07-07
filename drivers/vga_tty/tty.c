@@ -1,6 +1,7 @@
 #include "tty.h"
 #include <extrns.h>
 #include <stdint.h>
+#include <tty.h>
 
 uint32_t cursor_row = 0;
 uint32_t cursor_col = 0;

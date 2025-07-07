@@ -1,6 +1,8 @@
 #ifndef MOUSE_H
 #define MOUSE_H
 
+#include <stdint.h>
+
 #define MOUSE_MIDDLE_BTN      0x04
 #define MOUSE_RIGHT_BTN       0x02
 #define MOUSE_LEFT_BTN        0x01
@@ -28,5 +30,16 @@ typedef struct {
 } mouse_state;
 
 extern mouse_state mouse;
+
+void mouse_init();
+void mouse_wait(uint8_t type);
+void mouse_write(uint8_t command);
+void mouse_poll();
+uint8_t mouse_read();
+void mouse_handler();
+void mouse_parse_packet();
+void mouse_set_sample_rate(uint8_t rate);
+void mouse_set_resolution(uint8_t res);
+uint8_t mouse_get_id();
 
 #endif

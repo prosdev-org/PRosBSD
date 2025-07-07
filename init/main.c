@@ -1,7 +1,8 @@
 #include <extrns.h>
+#include <keyboard.h>
 #include <mouse.h>
 #include <stdbool.h>
-#include <stdint.h>
+#include <tty.h>
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -16,7 +17,6 @@ int main() {
     int cursor_x = 400;
     int cursor_y = 300;
 
-    char c;
     while (true) {
         mouse_poll();
         if (mouse.x != 0 || mouse.y != 0) {
@@ -45,6 +45,4 @@ int main() {
             mouse.z = 0;
         }
     }
-
-    return 0;
 }

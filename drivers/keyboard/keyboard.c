@@ -1,6 +1,7 @@
 #include "keyboard.h"
 #include <extrns.h>
 #include <io.h>
+#include <keyboard.h>
 #include <stdint.h>
 
 uint8_t shift_active = 0;
