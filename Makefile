@@ -19,6 +19,7 @@ drivers:
 	@for f in $(wildcard drivers/keyboard/*.c); do echo "\033[0;32mCompiling keyboard driver..\033[ \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
 	@for f in $(wildcard drivers/vga_tty/*.c); do echo "\033[0;32mCompiling VGA TTY driver..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
 	@for f in $(wildcard drivers/mouse/*.c); do echo "\033[0;32mCompiling mouse driver..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard drivers/pata_pio/*.c); do echo "\033[0;32mCompiling PATA PIO driver..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
 
 kernel_:
 	@for f in $(wildcard kernel/*.c); do echo "\033[0;32mCompiling kernel piece..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done

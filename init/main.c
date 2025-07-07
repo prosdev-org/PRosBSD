@@ -1,48 +1,31 @@
 #include <extrns.h>
 #include <keyboard.h>
-#include <mouse.h>
-#include <stdbool.h>
+#include <pata_pio.h>
 #include <tty.h>
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
+#pragma pack(push, 1)
+
+typedef struct {
+    uint8_t _unused[8];
+    uint32_t lba_start;
+    uint32_t num_sectors;
+} mbr_part_t;
+
+#pragma pack(pop)
+
 int main() {
     keyboard_init();
-    mouse_init();
     cleark();
 
     printf("Main protected mode kernel is loaded!\n");
 
-    int cursor_x = 400;
-    int cursor_y = 300;
+    uint8_t sector[512];
+    pata_pio_read_sector(0, sector);
 
-    while (true) {
-        mouse_poll();
-        if (mouse.x != 0 || mouse.y != 0) {
-            cursor_x += mouse.x;
-            cursor_y += mouse.y;
-
-            cursor_x = MAX(0, MIN(cursor_x, 799));
-            cursor_y = MAX(0, MIN(cursor_y, 599));
-
-            mouse.x = 0;
-            mouse.y = 0;
-
-            printf("Cursor at %d.%d.\n", cursor_x, cursor_y);
-        }
-
-        if (mouse.buttons & MOUSE_LEFT_BTN) {
-            printf("Left button pressed at (%d, %d)\n", cursor_x, cursor_y);
-        }
-
-        if (mouse.buttons & MOUSE_RIGHT_BTN) {
-            printf("Right button pressed at (%d, %d)\n", cursor_x, cursor_y);
-        }
-
-        if (mouse.z != 0) {
-            printf("Scrolled: %d\n", mouse.z);
-            mouse.z = 0;
-        }
+    for (int i = 0; i < 512; i++) {
+        printf("%d ", sector[i]);
     }
 }

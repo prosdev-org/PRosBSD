@@ -1,9 +1,8 @@
 #ifndef EXTRNS_H
 #define EXTRNS_H
+
 #include <stdarg.h>
 #include <stddef.h>
-
-/////////
 
 int printf(const char *restrict format, ...);
 int sprintf(char *restrict str, const char *restrict format, ...);
