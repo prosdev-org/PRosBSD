@@ -70,6 +70,9 @@ unmount_image:
 	-@sudo kpartx -d /dev/loop0
 	-@sudo losetup -d /dev/loop0
 
+format:
+	@find . -name '*.h' -o -name '*.c' | xargs clang-format -i
+
 clean:
 	@$(RM) $(IMAGE_NAME) $(HDD_IMAGE) memdisk
 	@find . -type f \( -name "*.o" -o -name "*.BIN" \) -exec rm -f {} +

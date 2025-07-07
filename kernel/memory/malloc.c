@@ -1,12 +1,12 @@
+#include <extrns.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <extrns.h>
 #include <string.h>
 
-#define HEAP_START   0x200000
-#define HEAP_END     0x600000
-#define ALIGNMENT    16
-#define MIN_BLOCK    (sizeof(block_t) * 2)
+#define HEAP_START 0x200000
+#define HEAP_END   0x600000
+#define ALIGNMENT  16
+#define MIN_BLOCK  (sizeof(block_t) * 2)
 
 typedef struct block {
     size_t size;
@@ -17,19 +17,20 @@ typedef struct block {
 static block_t *free_list = NULL;
 
 static void heap_init() {
-    if (free_list) return;
+    if (free_list)
+        return;
 
-    free_list = (block_t *)HEAP_START;
+    free_list = (block_t *) HEAP_START;
     free_list->size = HEAP_END - HEAP_START - sizeof(block_t);
     free_list->next = NULL;
     free_list->free = 1;
 }
 
 static void split_block(block_t *block, size_t size) {
-    if (block->size <= size + sizeof(block_t) + MIN_BLOCK) 
+    if (block->size <= size + sizeof(block_t) + MIN_BLOCK)
         return; // not enough
 
-    block_t *new_block = (block_t *)((uint8_t *)block + sizeof(block_t) + size);
+    block_t *new_block = (block_t *) ((uint8_t *) block + sizeof(block_t) + size);
     new_block->size = block->size - size - sizeof(block_t);
     new_block->free = 1;
     new_block->next = block->next;
@@ -41,8 +42,8 @@ static void split_block(block_t *block, size_t size) {
 static void coalesce_blocks() {
     block_t *current = free_list;
     while (current && current->next) {
-        if (current->free && current->next->free && 
-            (uint8_t *)current + sizeof(block_t) + current->size == (uint8_t *)current->next) {
+        if (current->free && current->next->free &&
+            (uint8_t *) current + sizeof(block_t) + current->size == (uint8_t *) current->next) {
             current->size += sizeof(block_t) + current->next->size;
             current->next = current->next->next;
         } else {
@@ -52,7 +53,8 @@ static void coalesce_blocks() {
 }
 
 void *malloc(size_t size) {
-    if (size == 0) return NULL;
+    if (size == 0)
+        return NULL;
     size = (size + ALIGNMENT - 1) & ~(ALIGNMENT - 1);
 
     heap_init();
@@ -86,14 +88,15 @@ void *malloc(size_t size) {
 
     best->free = 0;
     *best_prev = best->next;
-    return (void *)(best + 1);
+    return (void *) (best + 1);
 }
 
 void free(void *ptr) {
-    if (!ptr) return;
+    if (!ptr)
+        return;
 
-    block_t *block = ((block_t *)ptr) - 1;
-    if (block < (block_t *)HEAP_START || block >= (block_t *)HEAP_END) {
+    block_t *block = ((block_t *) ptr) - 1;
+    if (block < (block_t *) HEAP_START || block >= (block_t *) HEAP_END) {
         panic("free: invalid pointer");
         return;
     }

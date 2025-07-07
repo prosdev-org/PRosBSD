@@ -15,7 +15,7 @@ int isblank(const int c) {
 }
 
 int iscntrl(const int c) {
-    return (unsigned)c < 0x20 || c == 0x7f;
+    return (unsigned) c < 0x20 || c == 0x7f;
 }
 
 int isdigit(const int c) {

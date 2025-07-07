@@ -1,8 +1,8 @@
 // part of x16-pros-libc
 
-#include <stdlib.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 int atoi(const char *str) {
     int n = 0, neg = 0;
@@ -10,9 +10,11 @@ int atoi(const char *str) {
         str++;
     }
     switch (*str) {
-        case '-': neg = 1;
-        case '+': str++;
-        default: ;
+        case '-':
+            neg = 1;
+        case '+':
+            str++;
+        default:;
     }
     // Compute n as a negative number to avoid overflow on INT_MIN
     while (isdigit(*str)) {
@@ -28,9 +30,11 @@ long atol(const char *str) {
         str++;
     }
     switch (*str) {
-        case '-': neg = 1;
-        case '+': str++;
-        default: ;
+        case '-':
+            neg = 1;
+        case '+':
+            str++;
+        default:;
     }
     // Compute n as a negative number to avoid overflow on LONG_MIN
     while (isdigit(*str)) {
@@ -46,9 +50,11 @@ long long atoll(const char *str) {
         str++;
     }
     switch (*str) {
-        case '-': neg = 1;
-        case '+': str++;
-        default: ;
+        case '-':
+            neg = 1;
+        case '+':
+            str++;
+        default:;
     }
     // Compute n as a negative number to avoid overflow on LLONG_MIN
     while (isdigit(*str)) {
@@ -70,21 +76,15 @@ long long llabs(const long long x) {
 }
 
 div_t div(const int num, const int den) {
-    return (div_t) {
-        num / den, num % den
-    };
+    return (div_t) {num / den, num % den};
 }
 
 ldiv_t ldiv(const long num, const long den) {
-    return (ldiv_t) {
-        num / den, num % den
-    };
+    return (ldiv_t) {num / den, num % den};
 }
 
 lldiv_t lldiv(const long long num, const long long den) {
-    return (lldiv_t) {
-        num / den, num % den
-    };
+    return (lldiv_t) {num / den, num % den};
 }
 
 int64_t __divdi3(const int64_t numerator, const int64_t denominator) {
@@ -93,11 +93,13 @@ int64_t __divdi3(const int64_t numerator, const int64_t denominator) {
     if (numerator < 0) {
         ua = -(uint64_t) numerator;
         neg ^= 1;
-    } else ua = (uint64_t) numerator;
+    } else
+        ua = (uint64_t) numerator;
     if (denominator < 0) {
         ub = -(uint64_t) denominator;
         neg ^= 1;
-    } else ub = (uint64_t) denominator;
+    } else
+        ub = (uint64_t) denominator;
 
     const uint64_t uq = ua / ub;
     const int64_t q = (int64_t) uq;
@@ -124,7 +126,7 @@ uint64_t __udivdi3(const uint64_t numerator, const uint64_t denominator) {
         r = (r << 1) | ((numerator >> i) & 1);
         if (r >= denominator) {
             r -= denominator;
-            q |= (uint64_t)1 << i;
+            q |= (uint64_t) 1 << i;
         }
     }
     return q;

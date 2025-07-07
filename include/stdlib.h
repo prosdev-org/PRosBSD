@@ -68,4 +68,4 @@ lldiv_t lldiv(long long, long long);
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
 
-#endif //STDLIB_H
+#endif // STDLIB_H

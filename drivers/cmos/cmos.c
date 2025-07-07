@@ -1,7 +1,7 @@
-#include <stdint.h>
+#include "cmos.h"
 #include <extrns.h>
 #include <io.h>
-#include "cmos.h"
+#include <stdint.h>
 
 uint8_t cmos_read(uint8_t reg) {
     outb(reg, CMOS_ADDRESS_PORT);

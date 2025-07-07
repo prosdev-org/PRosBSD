@@ -1,7 +1,7 @@
 // part of x16-pros-libc
 
-#include <string.h>
 #include <stddef.h>
+#include <string.h>
 
 void *memcpy(void *restrict dst, const void *restrict src, size_t const n) {
     unsigned char *d = dst;
@@ -95,13 +95,14 @@ char *strncat(char *restrict dst, const char *restrict src, const size_t n) {
 int strcmp(const char *lhs, const char *rhs) {
     for (; *lhs == *rhs && *lhs; lhs++, rhs++) {
     }
-    return *(unsigned char *)lhs - *(unsigned char *)rhs;
+    return *(unsigned char *) lhs - *(unsigned char *) rhs;
 }
 
 int strncmp(const char *lhs, const char *rhs, size_t n) {
-    const unsigned char *l = (void *)lhs, *r = (void *)rhs;
-    if (!n--) return 0;
-    for (; *l && *r && n && *l == *r ; l++, r++, n--) {
+    const unsigned char *l = (void *) lhs, *r = (void *) rhs;
+    if (!n--)
+        return 0;
+    for (; *l && *r && n && *l == *r; l++, r++, n--) {
     }
     return *l - *r;
 }
@@ -136,7 +137,7 @@ char *strrchr(const char *src, const int ch) {
             c = s;
         }
     }
-    return (char *)c;
+    return (char *) c;
 }
 
 size_t strcspn(const char *dst, const char *src) {
@@ -152,7 +153,7 @@ char *strpbrk(const char *dst, const char *brkset) {
     const char *d = dst;
     while (*dst != '\0') {
         if (*dst == *brkset) {
-            return (char *)d;
+            return (char *) d;
         }
     }
     return NULL;
@@ -168,7 +169,7 @@ char *strstr(const char *str, const char *substr) {
             s2++;
         }
         if (*s2 == '\0') {
-            return (char *)s;
+            return (char *) s;
         }
         s++;
     }

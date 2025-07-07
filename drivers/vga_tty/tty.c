@@ -1,12 +1,12 @@
-#include <stdint.h>
-#include <extrns.h>
 #include "tty.h"
+#include <extrns.h>
+#include <stdint.h>
 
 uint32_t cursor_row = 0;
 uint32_t cursor_col = 0;
 
 void cleark() {
-    volatile uint16_t *vga = (volatile uint16_t *)VGA_BUFFER;
+    volatile uint16_t *vga = (volatile uint16_t *) VGA_BUFFER;
     for (uint32_t i = 0; i < COLS * ROWS; i++) {
         vga[i] = (ATTRIBUTE << 8) | ' ';
     }
@@ -15,49 +15,49 @@ void cleark() {
 }
 
 void scroll() {
-    volatile uint16_t *vga = (volatile uint16_t *)VGA_BUFFER;
-    
+    volatile uint16_t *vga = (volatile uint16_t *) VGA_BUFFER;
+
     // shift lines 1-24 up to lines 0-23
-    for (uint32_t row = 0; row < ROWS-1; row++) {
+    for (uint32_t row = 0; row < ROWS - 1; row++) {
         for (uint32_t col = 0; col < COLS; col++) {
             uint32_t dst_idx = row * COLS + col;
             uint32_t src_idx = (row + 1) * COLS + col;
             vga[dst_idx] = vga[src_idx];
         }
     }
-    
+
     // clear the last line (row 24)
     uint32_t last_row = (ROWS - 1) * COLS;
     for (uint32_t col = 0; col < COLS; col++) {
         vga[last_row + col] = (ATTRIBUTE << 8) | ' ';
     }
-    
+
     cursor_row = ROWS - 1; // move cursor to start of last line
     cursor_col = 0;
 }
 
 void handle_backspace() {
-    volatile uint16_t *vga = (volatile uint16_t *)VGA_BUFFER;
-    
+    volatile uint16_t *vga = (volatile uint16_t *) VGA_BUFFER;
+
     if (cursor_row == 0 && cursor_col == 0) {
-        return;  // already at top-left, nothing to delete
+        return; // already at top-left, nothing to delete
     }
-    
+
     if (cursor_col > 0) {
         cursor_col--;
     } else {
         cursor_row--;
         cursor_col = COLS - 1;
     }
-    
+
     // overwrite character with space
     uint32_t idx = cursor_row * COLS + cursor_col;
     vga[idx] = (ATTRIBUTE << 8) | ' ';
 }
 
 void putck(char c) {
-    volatile uint16_t *vga = (volatile uint16_t *)VGA_BUFFER;
-    
+    volatile uint16_t *vga = (volatile uint16_t *) VGA_BUFFER;
+
     switch (c) {
         case '\n': // newline: move to next line
             cursor_col = 0;
@@ -83,13 +83,13 @@ void putck(char c) {
             }
             break;
     }
-    
+
     // handle line wrap
     if (cursor_col >= COLS) {
         cursor_col = 0;
         cursor_row++;
     }
-    
+
     // scroll if at the bottom
     if (cursor_row >= ROWS) {
         scroll();

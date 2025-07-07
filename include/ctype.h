@@ -31,4 +31,4 @@ int tolower(int);
 
 int toupper(int);
 
-#endif //CTYPE_H
+#endif // CTYPE_H

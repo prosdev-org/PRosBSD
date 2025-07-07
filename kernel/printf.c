@@ -1,29 +1,19 @@
 // part of x16-pros-libc
 
-#include <extrns.h>
 #include <ctype.h>
-#include <stdlib.h>
-#include <stdbool.h>
+#include <extrns.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 char printbuf[2048];
 
 // helper function
-char *__number_conversion(
-    char *buf,
-    unsigned long num,
-    const int base,
-    const int width,
-    const int precision,
-    const bool left_align,
-    const bool zero_pad,
-    const bool upper_case,
-    const bool negative,
-    const bool space_if_no_sign,
-    const bool alternate_form
-) {
+char *__number_conversion(char *buf, unsigned long num, const int base, const int width, const int precision,
+                          const bool left_align, const bool zero_pad, const bool upper_case, const bool negative,
+                          const bool space_if_no_sign, const bool alternate_form) {
     const char *digits = upper_case ? "0123456789ABCDEF" : "0123456789abcdef";
     char tmp[32];
     int pos = 0;
@@ -47,8 +37,10 @@ char *__number_conversion(
 
     // Calculate padding
     int pad_len = width - pos;
-    if (negative || space_if_no_sign) pad_len--;
-    if (alternate_form && base == 16) pad_len -= 2;
+    if (negative || space_if_no_sign)
+        pad_len--;
+    if (alternate_form && base == 16)
+        pad_len -= 2;
 
     // Right alignment padding
     if (!left_align && pad_len > 0) {
@@ -147,19 +139,24 @@ int vsprintf(char *restrict buf, const char *restrict format, const va_list args
 
         while (true) {
             switch (*format) {
-                case '-': left_align = true;
+                case '-':
+                    left_align = true;
                     format++;
                     continue;
-                case '+': show_sign = true;
+                case '+':
+                    show_sign = true;
                     format++;
                     continue;
-                case ' ': space_if_no_sign = true;
+                case ' ':
+                    space_if_no_sign = true;
                     format++;
                     continue;
-                case '#': alternate_form = true;
+                case '#':
+                    alternate_form = true;
                     format++;
                     continue;
-                case '0': zero_pad = true;
+                case '0':
+                    zero_pad = true;
                     format++;
                     continue;
                 default:
@@ -191,7 +188,8 @@ int vsprintf(char *restrict buf, const char *restrict format, const va_list args
                 precision = va_arg(args, int);
                 format++;
             }
-            if (precision < 0) precision = 0;
+            if (precision < 0)
+                precision = 0;
         }
 
         // Handle conversion specifier
@@ -232,13 +230,8 @@ int vsprintf(char *restrict buf, const char *restrict format, const va_list args
                 const bool negative = num < 0;
                 const unsigned long unum = negative ? -num : num;
 
-                buf = __number_conversion(
-                    buf, unum, 10, width, precision,
-                    left_align, zero_pad, 0,
-                    negative,
-                    space_if_no_sign && !negative && !show_sign,
-                    alternate_form
-                );
+                buf = __number_conversion(buf, unum, 10, width, precision, left_align, zero_pad, 0, negative,
+                                          space_if_no_sign && !negative && !show_sign, alternate_form);
                 break;
             }
 
@@ -246,15 +239,18 @@ int vsprintf(char *restrict buf, const char *restrict format, const va_list args
             case 'F': {
                 float f = (float) va_arg(args, double);
                 char temp[1024];
-                if (precision < 0) precision = 6;
+                if (precision < 0)
+                    precision = 6;
 
                 // Handle negative numbers properly
                 const int is_negative = f < 0;
-                if (is_negative) f = -f;
+                if (is_negative)
+                    f = -f;
 
                 // Round the number according to precision
                 float round_offset = 0.5f;
-                for (int i = 0; i < precision; i++) round_offset /= 10.0f;
+                for (int i = 0; i < precision; i++)
+                    round_offset /= 10.0f;
                 f += round_offset;
 
                 int whole = (int) f;
@@ -320,47 +316,30 @@ int vsprintf(char *restrict buf, const char *restrict format, const va_list args
 
             case 'u': {
                 const unsigned long num = va_arg(args, unsigned long);
-                buf = __number_conversion(
-                    buf, num, 10, width, precision,
-                    left_align, zero_pad, 0,
-                    show_sign, space_if_no_sign,
-                    alternate_form
-                );
+                buf = __number_conversion(buf, num, 10, width, precision, left_align, zero_pad, 0, show_sign,
+                                          space_if_no_sign, alternate_form);
                 break;
             }
 
             case 'x':
             case 'X': {
                 const unsigned long num = va_arg(args, unsigned long);
-                buf = __number_conversion(
-                    buf, num, 16, width, precision,
-                    left_align, zero_pad, (*format == 'X'),
-                    show_sign, space_if_no_sign,
-                    alternate_form
-                );
+                buf = __number_conversion(buf, num, 16, width, precision, left_align, zero_pad, (*format == 'X'),
+                                          show_sign, space_if_no_sign, alternate_form);
                 break;
             }
 
             case 'o': {
                 const unsigned long num = va_arg(args, unsigned long);
-                buf = __number_conversion(
-                    buf, num, 8, width, precision,
-                    left_align, zero_pad, 0,
-                    show_sign, space_if_no_sign,
-                    alternate_form
-                );
+                buf = __number_conversion(buf, num, 8, width, precision, left_align, zero_pad, 0, show_sign,
+                                          space_if_no_sign, alternate_form);
                 break;
             }
 
             case 'p': {
                 void *ptr = va_arg(args, void *);
-                buf = __number_conversion(
-                    buf, (unsigned long) ptr, 16,
-                    width >= 0 ? width : 2 * sizeof(void *),
-                    precision,
-                    left_align, 1, 0,
-                    0, 0, 1
-                );
+                buf = __number_conversion(buf, (unsigned long) ptr, 16, width >= 0 ? width : 2 * sizeof(void *),
+                                          precision, left_align, 1, 0, 0, 0, 1);
                 break;
             }
 
@@ -375,7 +354,8 @@ int vsprintf(char *restrict buf, const char *restrict format, const va_list args
                 break;
         }
 
-        if (*format) format++;
+        if (*format)
+            format++;
     }
 
     *buf = '\0';

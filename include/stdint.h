@@ -56,8 +56,8 @@ typedef unsigned int uintptr_t;
 #define UINT64_MAX 18446744073709551615ULL
 
 #define INT32_C(x)  x
-#define UINT32_C(x) x ## U
-#define INT64_C(x)  x ## LL
-#define UINT64_C(x) x ## ULL
+#define UINT32_C(x) x##U
+#define INT64_C(x)  x##LL
+#define UINT64_C(x) x##ULL
 
-#endif //STDINT_H
+#endif // STDINT_H
