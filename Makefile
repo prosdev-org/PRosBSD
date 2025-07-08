@@ -40,22 +40,21 @@ image: kernel
 
 hdd_image: image
 	@make unmount_image
-	@if [ ! -f "memdisk" ]; then wget -O memdisk https://github.com/redox-os/isolinux/raw/refs/heads/master/memdisk; fi
-	@dd if=/dev/zero of=$(HDD_IMAGE) bs=1M count=50
+	@dd if=/dev/zero of=$(HDD_IMAGE) bs=1M count=70
 	@parted -s $(HDD_IMAGE) mklabel msdos
-	@parted -s $(HDD_IMAGE) mkpart primary 1MiB 15MiB
-	@parted -s $(HDD_IMAGE) mkpart primary 16MiB 49MiB
+	@parted -s $(HDD_IMAGE) mkpart primary 1MiB 34MiB
+	@parted -s $(HDD_IMAGE) mkpart primary 35MiB 69MiB
 	@sudo kpartx -av $(HDD_IMAGE)
 	@sleep 2
 	@sudo mkfs.fat -F 32 /dev/mapper/loop0p1
 	@sudo mkfs.ext2 /dev/mapper/loop0p2
-	@sudo mcopy -i /dev/mapper/loop0p1 memdisk ::/
+	@sudo mcopy -i /dev/mapper/loop0p1 /opt/memdisk ::/
 	@sudo mcopy -i /dev/mapper/loop0p1 $(IMAGE_NAME) ::/fd.img
 	@sudo mkdir -p $(GRUB_MOUNT)
 	@sudo mount /dev/mapper/loop0p1 $(GRUB_MOUNT)
-	@sudo mkdir -p $(GRUB_MOUNT)/boot/grub2/
-	@sudo cp grub.cfg $(GRUB_MOUNT)/boot/grub2/grub.cfg
-	@sudo grub2-install \
+	@sudo mkdir -p $(GRUB_MOUNT)/boot/grub/
+	@sudo cp grub.cfg $(GRUB_MOUNT)/boot/grub/grub.cfg
+	@sudo grub-install \
 		--target=i386-pc \
 		--boot-directory=$(GRUB_MOUNT)/boot \
 		--modules="part_msdos fat" \
@@ -75,5 +74,5 @@ format:
 	@find . -name '*.h' -o -name '*.c' | xargs clang-format -i
 
 clean:
-	@$(RM) $(IMAGE_NAME) $(HDD_IMAGE) memdisk
+	@$(RM) $(IMAGE_NAME) $(HDD_IMAGE)
 	@find . -type f \( -name "*.o" -o -name "*.BIN" \) -exec rm -f {} +
