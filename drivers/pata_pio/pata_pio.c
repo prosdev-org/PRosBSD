@@ -101,3 +101,11 @@ bool pata_pio_write_sector(const uint32_t lba, const uint8_t *buffer) {
 
     return true;
 }
+
+void pata_pio_standby() {
+    wait_bsy();
+    outb(PATA_PIO_MASTER, PATA_PIO_REG_DRIVE);
+    io_wait();
+    outb(PATA_PIO_CMD_STANDBY, PATA_PIO_REG_COMMAND);
+    wait_bsy();
+}
