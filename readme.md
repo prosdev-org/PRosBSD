@@ -41,6 +41,10 @@ Here is Debian's dependencies's packages:
 - `nasm`
 - `syslinux`
 
+```bash
+make
+```
+
 In both methods, you will get two images:
 
 - one of them `fd.img` _kernel floppy disk image_
