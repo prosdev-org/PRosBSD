@@ -4,6 +4,7 @@ LD := ld
 OBJCOPY := objcopy
 STRIP = strip
 RM := rm -rf
+MEMDISK := /usr/lib/syslinux/memdisk
 
 LDFLAGS = -m elf_i386
 CFLAGS  = -g -m32 -fno-builtin -fno-stack-protector -fomit-frame-pointer -fstrength-reduce -fno-pic -nostdinc

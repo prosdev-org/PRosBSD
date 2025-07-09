@@ -10,10 +10,9 @@ RUN apt update && apt install -y \
     wget \
     e2fsprogs \
     nasm \
+    syslinux \
     sudo \
     && rm -rf /var/lib/apt/lists/*
-
-RUN wget -O /opt/memdisk https://github.com/redox-os/isolinux/raw/refs/heads/master/memdisk
 
 ARG HOST_UID=0
 ARG HOST_GID=0

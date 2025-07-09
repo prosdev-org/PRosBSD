@@ -48,7 +48,7 @@ hdd_image: image
 	@sleep 2
 	@sudo mkfs.fat -F 32 /dev/mapper/loop0p1
 	@sudo mkfs.ext2 /dev/mapper/loop0p2
-	@sudo mcopy -i /dev/mapper/loop0p1 /opt/memdisk ::/
+	@sudo mcopy -i /dev/mapper/loop0p1 $(MEMDISK) ::/
 	@sudo mcopy -i /dev/mapper/loop0p1 $(IMAGE_NAME) ::/fd.img
 	@sudo mkdir -p $(GRUB_MOUNT)
 	@sudo mount /dev/mapper/loop0p1 $(GRUB_MOUNT)
