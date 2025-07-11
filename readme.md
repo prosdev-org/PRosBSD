@@ -32,7 +32,8 @@ by its community.
 Here is Debian's dependencies's packages:
 
 - `build-essential`
-- `mtools dosfstools`
+- `mtools`
+- `dosfstools`
 - `parted`
 - `multipath-tools`
 - `grub2-common`

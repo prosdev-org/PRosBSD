@@ -2,7 +2,8 @@ FROM debian:latest
 
 RUN apt update && apt install -y \
     build-essential \
-    mtools dosfstools \
+    mtools \
+    dosfstools \
     parted \
     multipath-tools \
     grub2-common \
