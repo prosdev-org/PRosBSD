@@ -53,7 +53,7 @@ hdd_image: image
 	@sudo mkdir -p $(GRUB_MOUNT)
 	@sudo mount /dev/mapper/loop0p1 $(GRUB_MOUNT)
 	@sudo mkdir -p $(GRUB_MOUNT)/boot/grub/
-	@sudo cp grub.cfg $(GRUB_MOUNT)/boot/grub/grub.cfg
+	@sudo cp cfg/grub.cfg $(GRUB_MOUNT)/boot/grub/grub.cfg
 	@sudo grub-install \
 		--target=i386-pc \
 		--boot-directory=$(GRUB_MOUNT)/boot \
