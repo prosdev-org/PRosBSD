@@ -1,4 +1,4 @@
-# PRos32 / [<img src="https://img.shields.io/badge/LICENSE-MIT-blue" alt="LICENSE MIT">](https://opensource.org/license/mit)
+# PRos32 / [<img src="https://img.shields.io/badge/LICENSE-MIT-blue" alt="LICENSE MIT">](https://opensource.org/license/mit) / ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pros-dev-fans/PRos32/build.yml)
 
 32-bit operating system written in NASM/C for x86, inspired by [x16-PRos](https://github.com/PRoX2011/x16-PRos) and made
 by its community.
