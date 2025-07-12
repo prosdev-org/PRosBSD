@@ -108,10 +108,20 @@ int strncmp(const char *lhs, const char *rhs, size_t n) {
     return *l - *r;
 }
 
-int strcasecmp(const char *lhs, const char *rhs) {
-    for (; toupper(*lhs) == toupper(*rhs) && *lhs; lhs++, rhs++) {
+int strcasecmp(const char *s1, const char *s2) {
+    while (*s1 && *s2) {
+        char c1 = *s1;
+        char c2 = *s2;
+        if (c1 >= 'a' && c1 <= 'z')
+            c1 -= 32;
+        if (c2 >= 'a' && c2 <= 'z')
+            c2 -= 32;
+        if (c1 != c2)
+            return c1 - c2;
+        s1++;
+        s2++;
     }
-    return *(unsigned char *) lhs - *(unsigned char *) rhs;
+    return *s1 - *s2;
 }
 
 int strcoll(const char *lhs, const char *rhs) {

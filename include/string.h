@@ -19,7 +19,7 @@ char *strncat(char *__restrict, const char *__restrict, size_t);
 
 int strcmp(const char *, const char *);
 int strncmp(const char *, const char *, size_t);
-int strcasecmp(const char *, const char *); // not standart
+int strcasecmp(const char *s1, const char *s2); // not standart
 
 int strcoll(const char *, const char *);
 size_t strxfrm(char *restrict, const char *__restrict, size_t);
