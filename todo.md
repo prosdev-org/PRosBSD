@@ -7,7 +7,7 @@
 - [x] set one code style (.clangformat)
 - [x] pack it to docker
 - [x] hard disk driver
-- [ ] fat32
+- [x] fat32
 - [ ] ext2
 - [ ] syscalls
 - [ ] protection rings
