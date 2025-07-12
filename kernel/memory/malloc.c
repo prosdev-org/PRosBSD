@@ -8,6 +8,8 @@
 #define ALIGNMENT  16
 #define MIN_BLOCK  (sizeof(block_t) * 2)
 
+#define SIZE_MAX ((size_t) -1)
+
 typedef struct block {
     size_t size;
     struct block *next;
@@ -89,6 +91,20 @@ void *malloc(size_t size) {
     best->free = 0;
     *best_prev = best->next;
     return (void *) (best + 1);
+}
+
+void *calloc(size_t nmemb, size_t size) {
+    if (size != 0 && nmemb > SIZE_MAX / size) {
+        panic("calloc: size overflow");
+        return NULL;
+    }
+    size_t total = nmemb * size;
+    void *ptr = malloc(total);
+    if (!ptr)
+        return NULL;
+
+    memset(ptr, 0, total);
+    return ptr;
 }
 
 void free(void *ptr) {

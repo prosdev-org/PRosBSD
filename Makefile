@@ -3,7 +3,7 @@ include cfg/Makefile.header
 CFLAGS += -I./include 
 LDFLAGS += -Ttext 0
 
-.PHONY: all clean boot init drivers kernel_ kernel image hdd_image
+.PHONY: all clean boot init drivers fs kernel_ kernel image hdd_image
 
 all: hdd_image
 
@@ -21,11 +21,15 @@ drivers:
 	@for f in $(wildcard drivers/mouse/*.c); do echo "\033[0;32mCompiling mouse driver..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
 	@for f in $(wildcard drivers/pata_pio/*.c); do echo "\033[0;32mCompiling PATA PIO driver..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
 
+fs:
+	@for f in $(wildcard fs/FATs/FAT32/*.c); do echo "\033[0;32mCompiling FAT32 FS..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
+
 kernel_:
 	@for f in $(wildcard kernel/*.c); do echo "\033[0;32mCompiling kernel piece..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
 	@for f in $(wildcard kernel/memory/*.c); do echo "\033[0;32mCompiling memory operations..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
 
-kernel: boot init drivers kernel_
+
+kernel: boot init drivers fs kernel_
 	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o boot/KERNEL_.BIN boot/KERNEL_ENTRY.o init/*.o *.o
 	@cp boot/KERNEL_.BIN boot/KERNEL.BIN
 	@$(STRIP) boot/KERNEL.BIN

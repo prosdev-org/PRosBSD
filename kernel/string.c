@@ -1,5 +1,6 @@
 // part of x16-pros-libc
 
+#include <ctype.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -105,6 +106,12 @@ int strncmp(const char *lhs, const char *rhs, size_t n) {
     for (; *l && *r && n && *l == *r; l++, r++, n--) {
     }
     return *l - *r;
+}
+
+int strcasecmp(const char *lhs, const char *rhs) {
+    for (; toupper(*lhs) == toupper(*rhs) && *lhs; lhs++, rhs++) {
+    }
+    return *(unsigned char *) lhs - *(unsigned char *) rhs;
 }
 
 int strcoll(const char *lhs, const char *rhs) {

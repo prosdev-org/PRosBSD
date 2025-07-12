@@ -14,6 +14,7 @@ int vsnprintf(char *restrict str, const size_t size, const char *restrict format
 volatile void panic(const char *s);
 void *mallocl(size_t size);
 void *malloc(size_t size);
+void *calloc(size_t nmemb, size_t size);
 void free(void *ptr);
 
 #endif // EXTRNS_H

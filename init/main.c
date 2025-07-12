@@ -1,21 +1,28 @@
+#include <cmos.h>
 #include <extrns.h>
+#include <fs/fat32.h>
+#include <fs/mbr.h>
 #include <keyboard.h>
 #include <pata_pio.h>
 #include <string.h>
 #include <tty.h>
 
-#pragma pack(push, 1)
-typedef struct {
-    uint8_t boot_flag;
-    uint8_t chs_start[3];
-    uint8_t part_type;
-    uint8_t chs_end[3];
-    uint32_t lba_start;
-    uint32_t num_sectors;
-} mbr_part_t;
-#pragma pack(pop)
-
 #define SECTOR_SIZE 512
+
+void fat32_format_name(const fat32_dir_entry_t *entry, char *buffer) {
+    int i = 0;
+    for (; i < 8 && entry->name[i] != ' '; i++) {
+        buffer[i] = entry->name[i];
+    }
+
+    if (entry->name[8] != ' ') {
+        buffer[i++] = '.';
+        for (int j = 8; j < 11 && entry->name[j] != ' '; j++) {
+            buffer[i++] = entry->name[j];
+        }
+    }
+    buffer[i] = '\0';
+}
 
 static const char *mbr_type_name(uint8_t id) {
     switch (id) {
@@ -78,27 +85,33 @@ int main(void) {
     keyboard_init();
     cleark();
 
-    uint8_t mbr[SECTOR_SIZE];
-    read_sector(0, mbr);
+    fat32_ctx_t ctx;
+    uint32_t lba_start = 2048;
 
-    mbr_part_t *parts = (mbr_part_t *) (mbr + 0x1BE);
-
-    for (int i = 0; i < 4; i++) {
-        uint32_t sec = parts[i].num_sectors;
-        if (sec == 0) {
-            continue;
-        }
-
-        uint64_t bytes = (uint64_t) sec * SECTOR_SIZE;
-        printf("Partition %d:\n", i + 1);
-        printf("  Type ID   = 0x%d (%s)\n", parts[i].part_type, mbr_type_name(parts[i].part_type));
-        printf("  Start LBA = %d\n", parts[i].lba_start);
-        printf("  Sectors   = %d\n", sec);
-        printf("  Size      = %d bytes\n", bytes);
-
-        printf("  FS probe  = %s\n\n", probe_fs(parts[i].lba_start));
+    if (!fat32_init(&ctx, lba_start)) {
+        return -1;
     }
 
-    pata_pio_standby();
+    fat32_file_t file;
+    if (!fat32_open_file(&ctx, &file, "/boot/grub/grub.cfg")) {
+        return -1;
+    }
+
+    const char *data = "GJKHLKJHLKJHLJKHLJKHLJKHLKJHLKJHLKJHLKJHLKJHLKJHLKJHLKJHLKJHLKJHJKHHJJHKJHHLKJHLKKHJHHLJJHLJHLK"
+                       "JLHKJHLKJHLJHKLJKHLJKHJHJHLKJHKJHLJKLJKHLJKHLJKJKLJKHJKHJKHJKHKJKJHJKHJKHJLKHLJKHJHKJLHKJLHKLJK"
+                       "HJLHKJHKJHKJLKHJHJHKJK";
+    size_t len = strlen(data);
+    if (!fat32_rewrite(&file, data, len)) {
+        fat32_close(&file);
+        return -1;
+    }
+
+    if (!fat32_update_file_entry(&ctx, "/boot/grub/grub.cfg", file.start_cluster, file.size)) {
+        fat32_close(&file);
+        return -1;
+    }
+
+    fat32_close(&file);
+    printf("Writed!");
     return 0;
 }
