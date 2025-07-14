@@ -19,4 +19,4 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
           name: PRos32
-          path: "pros32.img"
+          path: "*.img"
