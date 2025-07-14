@@ -20,6 +20,9 @@ by its community.
 > This method involves docker to deliver you all the dependencies.
 > You have to [install it](https://docs.docker.com/engine/install/) before using this method.
 
+> [!WARNING]
+> Do not run this script as root, it does not support it.
+
 ```bash
 ./build.sh
 ```
