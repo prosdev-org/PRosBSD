@@ -1,7 +1,7 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 1
 VERSION_PATCH = 0
-VERSION_SUFFIX = -dev
+VERSION_SUFFIX = "-dev"
 
 ASM := nasm
 CC := gcc
@@ -16,5 +16,5 @@ CFLAGS  = -g -m32 -fno-builtin -fno-stack-protector -fomit-frame-pointer -fstren
 OBJCOPYFLAGS := -R .pdr -R .comment -R.note -S -O binary
 
 IMAGE_NAME := fd.img
-HDD_IMAGE ?= pros32.img
+HDD_IMAGE ?= pros32-v.$(VERSION_STRING).img
 GRUB_MOUNT ?= /mnt/disk

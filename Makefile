@@ -103,5 +103,5 @@ format:
 	@find . -name '*.h' -o -name '*.c' | xargs clang-format -i
 
 clean:
-	@$(RM) $(IMAGE_NAME) $(HDD_IMAGE) include/generated/
+	@$(RM) *.img include/generated/
 	@find . -type f \( -name "*.o" -o -name "*.BIN" \) -exec rm -f {} +
