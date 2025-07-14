@@ -5,6 +5,7 @@ LDFLAGS += -Ttext 0
 
 VERSION_H := include/generated/version.h
 VERSION_STRING := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)$(VERSION_SUFFIX)
+BADGE_VERSION := $(shell echo $(VERSION_STRING) | sed 's/-/--/g')
 
 .PHONY: all clean boot version.h init drivers fs kernel_ kernel image hdd_image
 
@@ -98,6 +99,9 @@ version.h:
 	@echo "#define VERSION_STRING \"$(VERSION_STRING)\"" >> $(VERSION_H)
 	@echo "" >> $(VERSION_H)
 	@echo "#endif" >> $(VERSION_H)
+
+update_badge:
+	@sed -i "s|https://img.shields.io/badge/version-[^?)]*|https://img.shields.io/badge/version-$(BADGE_VERSION)-orange|" readme.md
 
 format:
 	@find . -name '*.h' -o -name '*.c' | xargs clang-format -i
