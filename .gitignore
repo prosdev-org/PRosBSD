@@ -15,3 +15,5 @@ memdisk
 *.swo
 .*.swp
 .*.swo
+
+/include/generated/

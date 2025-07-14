@@ -1,3 +1,8 @@
+VERSION_MAJOR = 0
+VERSION_MINOR = 1
+VERSION_PATCH = 0
+VERSION_SUFFIX = -dev
+
 ASM := nasm
 CC := gcc
 LD := ld
