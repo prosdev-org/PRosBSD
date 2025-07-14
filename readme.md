@@ -49,7 +49,7 @@ make
 In both methods, you will get two images:
 
 - one of them `fd.img` _kernel floppy disk image_
-- second is `pros32.img` _hard disk multiboot image_
+- second is `pros32-v.{PROS32-VERSION}.img` _hard disk multiboot image_
 
 ## Running
 
@@ -58,7 +58,7 @@ To run PRos32, use x86 hypervisors/emulators such as **QEMU/VMware/Virtualbox**.
 Here is an example command for running in QEMU
 
 ```bash
-qemu-system-i386 -drive file=pros32.img,format=raw,if=ide,index=0
+qemu-system-i386 -drive file=pros32-v.{PROS32-VERSION}.img,format=raw,if=ide,index=0
 ```
 
 ## Contributing
