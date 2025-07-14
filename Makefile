@@ -43,36 +43,44 @@ image: kernel
 	@mcopy -i $(IMAGE_NAME) boot/KERNEL.BIN ::/
 
 hdd_image: image
+	@echo "\033[0;35mUnmounting the image before continuing, you can safely ignore those errors."
+	@echo "\033[0;33m"
 	@make unmount_image
+	@echo "\033[0m"
 	@dd if=/dev/zero of=$(HDD_IMAGE) bs=1M count=70
 	@parted -s $(HDD_IMAGE) mklabel msdos
 	@parted -s $(HDD_IMAGE) mkpart primary 1MiB 34MiB
 	@parted -s $(HDD_IMAGE) mkpart primary 35MiB 69MiB
-	@sudo kpartx -av $(HDD_IMAGE)
-	@sleep 2
-	@sudo mkfs.fat -F 32 /dev/mapper/loop0p1
-	@sudo mkfs.ext2 /dev/mapper/loop0p2
-	@sudo mcopy -i /dev/mapper/loop0p1 $(MEMDISK) ::/
-	@sudo mcopy -i /dev/mapper/loop0p1 $(IMAGE_NAME) ::/fd.img
-	@sudo mkdir -p $(GRUB_MOUNT)
-	@sudo mount /dev/mapper/loop0p1 $(GRUB_MOUNT)
-	@sudo mkdir -p $(GRUB_MOUNT)/boot/grub/
-	@sudo cp cfg/grub.cfg $(GRUB_MOUNT)/boot/grub/grub.cfg
-	@sudo grub-install \
+	@LOOP_DEVICE=$$(sudo losetup --find --show $(HDD_IMAGE)); \
+	LOOP_NUMBER=$$(basename $$LOOP_DEVICE | sed 's/[^0-9]//g'); \
+	MAPPER=/dev/mapper/loop$$LOOP_NUMBER; \
+	sudo kpartx -av $$LOOP_DEVICE; \
+	while [ ! -e $${MAPPER}p1 ]; do sleep 0.1; done; \
+	while [ ! -e $${MAPPER}p2 ]; do sleep 0.1; done; \
+	sudo mkfs.fat -F 32 $${MAPPER}p1; \
+	sudo mkfs.ext2 $${MAPPER}p2; \
+	sudo mcopy -i $${MAPPER}p1 $(MEMDISK) ::/; \
+	sudo mcopy -i $${MAPPER}p1 $(IMAGE_NAME) ::/fd.img; \
+	sudo mkdir -p $(GRUB_MOUNT); \
+	sudo mount $${MAPPER}p1 $(GRUB_MOUNT); \
+	sudo mkdir -p $(GRUB_MOUNT)/boot/grub/; \
+	sudo cp cfg/grub.cfg $(GRUB_MOUNT)/boot/grub/grub.cfg; \
+	sudo grub-install \
 		--target=i386-pc \
 		--boot-directory=$(GRUB_MOUNT)/boot \
 		--modules="part_msdos fat" \
 		--recheck \
 		--force \
-		/dev/loop0
+		$$LOOP_DEVICE;
 	@make unmount_image
 	@parted -s $(HDD_IMAGE) unit B print
 
 unmount_image:
-	-@sudo umount $(GRUB_MOUNT)
-	-@sudo $(RM) $(GRUB_MOUNT)
-	-@sudo kpartx -d /dev/loop0
-	-@sudo losetup -d /dev/loop0
+	-@LOOP_DEVICE=$$(sudo losetup -j $(HDD_IMAGE) | cut -d: -f1); \
+	sudo umount $(GRUB_MOUNT); \
+	sudo $(RM) $(GRUB_MOUNT); \
+	sudo kpartx -d $$LOOP_DEVICE; \
+	sudo losetup -d $$LOOP_DEVICE
 
 format:
 	@find . -name '*.h' -o -name '*.c' | xargs clang-format -i
