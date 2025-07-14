@@ -49,7 +49,7 @@ make
 In both methods, you will get two images:
 
 - one of them `fd.img` _kernel floppy disk image_
-- second is `pros32-v.{PROS32-VERSION}.img` _hard disk multiboot image_
+- second is `pros32-v.{PROS32-VERSION}.img` _hard disk bootable image_
 
 ## Running
 
