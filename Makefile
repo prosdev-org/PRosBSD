@@ -59,8 +59,17 @@ hdd_image: image
 	LOOP_NUMBER=$$(basename $$LOOP_DEVICE | sed 's/[^0-9]//g'); \
 	MAPPER=/dev/mapper/loop$$LOOP_NUMBER; \
 	sudo kpartx -av $$LOOP_DEVICE; \
-	while [ ! -e $${MAPPER}p1 ]; do sleep 0.1; done; \
-	while [ ! -e $${MAPPER}p2 ]; do sleep 0.1; done; \
+	max=20; \
+	for i in `seq 2 $$max`; \
+		do \
+		if [ -e $${MAPPER}p1 ] && [ -e $${MAPPER}p2 ]; \
+			then break; \
+		fi; \
+		if [ $$i -eq $$max ]; \
+			then exit 1; \
+		fi; \
+		sleep 0.1; \
+	done; \
 	sudo mkfs.fat -F 32 $${MAPPER}p1; \
 	sudo mkfs.ext2 $${MAPPER}p2; \
 	sudo mcopy -i $${MAPPER}p1 $(MEMDISK) ::/; \
