@@ -10,7 +10,6 @@ RUN apt update && apt install -y \
     grub-pc-bin \
     wget \
     e2fsprogs \
-    nasm \
     syslinux \
     sudo \
     && rm -rf /var/lib/apt/lists/*

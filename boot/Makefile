@@ -5,13 +5,17 @@ include ../cfg/Makefile.header
 all: MBR SETUP KERNEL_ENTRY
 
 MBR:
-	@echo "\033[0;32mCompiling MBR (stage 1) of fd.img..\033[0m"
-	@$(ASM) -fbin MBR.asm -o MBR.BIN
+	@echo "$(ESC_GREEN)Compiling MBR (stage 1) of fd.img..$(ESC_END)"
+	@$(AS) $(ASFLAGS) MBR.asm -o MBR.o $(NULL)
+	@$(LD) $(LDFLAGS) -Ttext 0x7C00 -o MBR.BIN MBR.o
+	@$(OBJCOPY) $(OBJCOPYFLAGS) MBR.BIN
 
 SETUP:
-	@echo "\033[0;32mCompiling setup (stage 2) of fd.img..\033[0m"
-	@$(ASM) -fbin setup.asm -o SETUP.BIN
+	@echo "$(ESC_GREEN)Compiling setup (stage 2) of fd.img..$(ESC_END)"
+	@$(AS) $(ASFLAGS) setup.asm -o SETUP.o $(NULL)
+	@$(LD) $(LDFLAGS) -Ttext 0x0600 -o SETUP.BIN SETUP.o
+	@$(OBJCOPY) $(OBJCOPYFLAGS) SETUP.BIN
 
 KERNEL_ENTRY:
-	@echo "\033[0;32mCompiling 32-bit kernel entry..\033[0m"
-	@$(ASM) -felf32 kernel.asm -o KERNEL_ENTRY.o
+	@echo "$(ESC_GREEN)Compiling 32-bit kernel entry..$(ESC_END)"
+	@$(AS) $(ASFLAGS) kernel.asm -o KERNEL_ENTRY.o $(NULL)

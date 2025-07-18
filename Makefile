@@ -15,23 +15,23 @@ boot:
 	@make -C boot/
 
 init: version.h
-	@echo "\033[0;32mCompiling init..\033[0m"
+	@echo "$(ESC_GREEN)Compiling init..$(ESC_END)"
 	@$(CC) $(CFLAGS) -c init/main.c -o init/init.o
 
 drivers:
-	@for f in $(wildcard drivers/cmos/*.c); do echo "\033[0;32mCompiling CMOS driver..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
-	@for f in $(wildcard drivers/keyboard/*.c); do echo "\033[0;32mCompiling keyboard driver..\033[ \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
-	@for f in $(wildcard drivers/vga_tty/*.c); do echo "\033[0;32mCompiling VGA TTY driver..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
-	@for f in $(wildcard drivers/mouse/*.c); do echo "\033[0;32mCompiling mouse driver..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
-	@for f in $(wildcard drivers/pata_pio/*.c); do echo "\033[0;32mCompiling PATA PIO driver..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard drivers/cmos/*.c); do echo "$(ESC_GREEN)Compiling CMOS driver..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard drivers/keyboard/*.c); do echo "$(ESC_GREEN)Compiling keyboard driver..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard drivers/vga_tty/*.c); do echo "$(ESC_GREEN)Compiling VGA TTY driver..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard drivers/mouse/*.c); do echo "$(ESC_GREEN)Compiling mouse driver..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard drivers/pata_pio/*.c); do echo "$(ESC_GREEN)Compiling PATA PIO driver..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; $(CC) -c $(CFLAGS) $$f; done
 
 fs:
-	@for f in $(wildcard fs/FATs/FAT32/*.c); do echo "\033[0;32mCompiling FAT32 FS..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard fs/FATs/FAT32/*.c); do echo "$(ESC_GREEN)Compiling FAT32 FS..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; $(CC) -c $(CFLAGS) $$f; done
 
 kernel_:
-	@for f in $(wildcard kernel/*.c); do echo "\033[0;32mCompiling kernel piece..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
-	@for f in $(wildcard kernel/*.asm); do echo "\033[0;32mAssembling kernel piece..\033[0m \033[34m$$f\033[0m"; $(ASM) -f elf32 $$f; done
-	@for f in $(wildcard kernel/memory/*.c); do echo "\033[0;32mCompiling memory operations..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard kernel/*.c); do echo "$(ESC_GREEN)Compiling kernel piece..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard kernel/*.asm); do echo "$(ESC_GREEN)Assembling kernel piece..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; $(AS) $(ASFLAGS) $$f -o $$f.o $(NULL); done
+	@for f in $(wildcard kernel/memory/*.c); do echo "$(ESC_GREEN)Compiling memory operations..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; $(CC) -c $(CFLAGS) $$f; done
 
 kernel: boot init drivers fs kernel_
 	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o boot/KERNEL_.BIN boot/KERNEL_ENTRY.o init/*.o kernel/*.o *.o
@@ -47,10 +47,10 @@ image: kernel
 	@mcopy -i $(IMAGE_NAME) boot/KERNEL.BIN ::/
 
 hdd_image: image
-	@echo "\033[0;35mUnmounting the image before continuing, you can safely ignore those errors."
-	@echo "\033[0;33m"
+	@echo "$(ESC_PURPLE)Unmounting the image before continuing, you can safely ignore those errors."
+	@echo "$(ESC_YELLOW)"
 	@make unmount_image
-	@echo "\033[0m"
+	@echo "$(ESC_END)"
 	@dd if=/dev/zero of=$(HDD_IMAGE) bs=1M count=70
 	@parted -s $(HDD_IMAGE) mklabel msdos
 	@parted -s $(HDD_IMAGE) mkpart primary 1MiB 34MiB

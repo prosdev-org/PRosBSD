@@ -1,199 +1,204 @@
-[BITS 16]
-[ORG 0x7C00]
+.code16
+.globl _start
 
-FAT12_BYTES_PER_SECTOR equ 512
-FAT12_NUMBER_OF_FATS equ 2
-FAT12_SECTORS_PER_FAT equ 9
-FAT12_FAT_TABLE_SIZE equ FAT12_SECTORS_PER_FAT * FAT12_BYTES_PER_SECTOR
-FAT12_FAT_TABLE_SECTOR equ 1
-FAT12_DIRECTORY_TABLE_SIZE equ 7168
-FAT12_DIRECTORY_TABLE_SECTOR equ FAT12_FAT_TABLE_SECTOR + FAT12_NUMBER_OF_FATS*FAT12_SECTORS_PER_FAT
-FAT12_DIRECTORY_TABLE_SECTOR_COUNT equ FAT12_DIRECTORY_TABLE_SIZE / FAT12_BYTES_PER_SECTOR
-FAT12_DATA_SECTOR equ FAT12_DIRECTORY_TABLE_SECTOR + FAT12_DIRECTORY_TABLE_SECTOR_COUNT
+.set FAT12_BYTES_PER_SECTOR, 512
+.set FAT12_NUMBER_OF_FATS, 2
+.set FAT12_SECTORS_PER_FAT, 9
+.set FAT12_FAT_TABLE_SIZE, FAT12_SECTORS_PER_FAT * FAT12_BYTES_PER_SECTOR
+.set FAT12_FAT_TABLE_SECTOR, 1
+.set FAT12_DIRECTORY_TABLE_SIZE, 7168
+.set FAT12_DIRECTORY_TABLE_SECTOR, FAT12_FAT_TABLE_SECTOR + FAT12_NUMBER_OF_FATS * FAT12_SECTORS_PER_FAT
+.set FAT12_DIRECTORY_TABLE_SECTOR_COUNT, FAT12_DIRECTORY_TABLE_SIZE / FAT12_BYTES_PER_SECTOR
+.set FAT12_DATA_SECTOR, FAT12_DIRECTORY_TABLE_SECTOR + FAT12_DIRECTORY_TABLE_SECTOR_COUNT
 
-; 0600-0E00 SETUP.BIN
-; 7E00-???? KERNEL.BIN
+// 0600-0E00 SETUP.BIN
+// 7E00-???? KERNEL.BIN
 
-SETUPSEG           equ 0x0060
-SETUPMAX        equ 2048/16
-KERNSEG          equ 0x07E0
-KERNEL_SEGMENT_DIFF equ 0x0200
-FAT_TABLE_OFFSET equ (KERNSEG + KERNEL_SEGMENT_DIFF)*16
-FAT_DIRECTORY_TABLE_OFFSET equ FAT_TABLE_OFFSET + FAT12_FAT_TABLE_SIZE
+.set SETUPSEG, 0x0060
+.set KERNSEG, 0x07E0
+.set KERNEL_SEGMENT_DIFF, 0x0200
+.set FAT_TABLE_OFFSET, (KERNSEG + KERNEL_SEGMENT_DIFF)*16
+.set FAT_DIRECTORY_TABLE_OFFSET, FAT_TABLE_OFFSET + FAT12_FAT_TABLE_SIZE
 
-jmp boot
+_start:
+    jmp boot
 
-times 3-($-$$) db 0
-bpbOEM db "  PRos32"
-bpbBytesPerSector DW 512
-bpbSectorsPerCluster DB 1
-bpbReservedSectors DW 1
-bpbNumberOfFATs DB 2
-bpbRootEntries DW 224
-bpbTotalSectors DW 2880
-bpbMedia DB 0xf0
-bpbSectorsPerFAT DW 9
-bpbSectorsPerTrack DW 18
-bpbHeadsPerCylinder DW 2
-bpbHiddenSectors DD 0
-bpbTotalSectorsBig DD 0
-bsDriveNumber DB 0
-bsUnused DB 0
-bsExtBootSignature DB 0x29
-bsSerialNumber DD 0xa0a1a2a3
-bsVolumeLabel DB "FLOPPY "
-bsFileSystem DB "FAT12   "
+.fill 3 - (. - _start), 1, 0
+
+bpbOEM: .ascii "  PRos32"
+bpbBytesPerSector: .word 512
+bpbSectorsPerCluster: .byte 1
+bpbReservedSectors: .word 1
+bpbNumberOfFATs: .byte 2
+bpbRootEntries: .word 224
+bpbTotalSectors: .word 2880
+bpbMedia: .byte 0xf0
+bpbSectorsPerFAT: .word 9
+bpbSectorsPerTrack: .word 18
+bpbHeadsPerCylinder: .word 2
+bpbHiddenSectors: .long 0
+bpbTotalSectorsBig: .long 0
+bsDriveNumber: .byte 0
+bsUnused: .byte 0
+bsExtBootSignature: .byte 0x29
+bsSerialNumber: .long 0xa0a1a2a3
+bsVolumeLabel: .ascii "FLOPPY     "
+bsFileSystem: .ascii "FAT12   "
 
 boot:
-        cld
-        cli
-        xor bp, bp
-        mov ss, bp
-        mov sp, SETUPSEG*16
-        sti
-        mov [drive], dl
+    cld
+    cli
+    xorw %bp, %bp
+    movw %bp, %ss
+    movw $(SETUPSEG*16), %sp
+    sti
+    movb %dl, drive
 
 read_fat_table:
-        xor ax, ax
-        mov es, ax
-        mov bx, FAT_TABLE_OFFSET
-        mov al, FAT12_SECTORS_PER_FAT
-        mov dx, FAT12_FAT_TABLE_SECTOR
-        call read_sector
+    xorw %ax, %ax
+    movw %ax, %es
+    movw $FAT_TABLE_OFFSET, %bx
+    movb $FAT12_SECTORS_PER_FAT, %al
+    movw $FAT12_FAT_TABLE_SECTOR, %dx
+    call read_sector
+
 read_directory_table:
-        xor ax, ax
-        mov es, ax
-        mov bx, FAT_DIRECTORY_TABLE_OFFSET
-        mov al, FAT12_DIRECTORY_TABLE_SECTOR_COUNT
-        mov dx, FAT12_DIRECTORY_TABLE_SECTOR
-        call read_sector
+    xorw %ax, %ax
+    movw %ax, %es
+    movw $FAT_DIRECTORY_TABLE_OFFSET, %bx
+    movb $FAT12_DIRECTORY_TABLE_SECTOR_COUNT, %al
+    movw $FAT12_DIRECTORY_TABLE_SECTOR, %dx
+    call read_sector
 
 find_setup_bin:
-        xor ax, ax
-        mov es, ax
-        mov di, setup_bin_filename
-        call find_file_entry
+    xorw %ax, %ax
+    movw %ax, %es
+    movw $setup_bin_filename, %di
+    call find_file_entry
+
 read_setup_bin:
-        mov dx, FAT12_DATA_SECTOR-2
-        add dx, [bx+26]
-        mov ax, SETUPSEG
-        mov es, ax
-        mov ax, [bx+28]
-        mov cl, 9
-        shr ax, cl
-        inc ax
-        xor bx, bx
-        call read_sector
+    movw $FAT12_DATA_SECTOR-2, %dx
+    addw 26(%bx), %dx
+    movw $SETUPSEG, %ax
+    movw %ax, %es
+    movw 28(%bx), %ax
+    movb $9, %cl
+    shrw %cl, %ax
+    incw %ax
+    xorw %bx, %bx
+    call read_sector
 
 find_kernel_bin:
-        xor ax, ax
-        mov es, ax
-        mov di, kernel_bin_filename
-        call find_file_entry
-read_kernel_bin:
-        mov dx, FAT12_DATA_SECTOR-2
-        add dx, [bx+26]
-        mov ax, KERNSEG
-        mov es, ax
-        mov ax, [bx+28]
-        mov cl, 9
-        shr ax, cl
-        inc ax
-        xor bx, bx
-        call read_sector
+    xorw %ax, %ax
+    movw %ax, %es
+    movw $kernel_bin_filename, %di
+    call find_file_entry
 
-        jmp SETUPSEG:0
+read_kernel_bin:
+    movw $FAT12_DATA_SECTOR-2, %dx
+    addw 26(%bx), %dx
+    movw $KERNSEG, %ax
+    movw %ax, %es
+    movw 28(%bx), %ax
+    movb $9, %cl
+    shrw %cl, %ax
+    incw %ax
+    xorw %bx, %bx
+    call read_sector
+    ljmp $SETUPSEG, $0
 
 halt:
-        cli
-        hlt
+    cli
+    hlt
 
 read_sector:
-        push ax
-        mov ax, dx
-        mov ch, 18
-        div ch
-        mov cl, ah
-        inc cl ; sector
-        xor ah, ah
-        mov ch, 2
-        div ch
-        mov ch, al ; cylinder
-        mov dh, ah ; head
-        pop ax
-        mov dl, [drive]
-        mov ah, 2 ; read sectors from drive
-        int 13h
-        jc read_error
-        ret
+    pushw %ax
+    movw %dx, %ax
+    movb $18, %ch
+    divb %ch
+    movb %ah, %cl
+    incb %cl # sector
+    xorb %ah, %ah
+    movb $2, %ch
+    divb %ch
+    movb %al, %ch # cylinder
+    movb %ah, %dh # head
+    popw %ax
+    movb drive, %dl
+    movb $2, %ah # read sectors from drive
+    int $0x13
+    jc read_error
+    ret
 
 find_file_entry:
-        xor ax, ax
-        mov ds, ax
-        mov dx, di
-        mov es, ax
-        mov bx, FAT_DIRECTORY_TABLE_OFFSET
-        mov si, bx
+    xorw %ax, %ax
+    movw %ax, %ds
+    movw %di, %dx
+    movw %ax, %es
+    movw $FAT_DIRECTORY_TABLE_OFFSET, %bx
+    movw %bx, %si
+
 find_next_file_entry:
-        cmp byte [si], 0
-        jz file_entry_not_found
-        mov di, dx
-        mov cx, 8+3
-        rep cmpsb
-        je file_entry_found
-        add bx, 32
-        mov si, bx
-        jmp find_next_file_entry
+    cmpb $0, (%si)
+    jz file_entry_not_found
+    movw %dx, %di
+    movw $11, %cx
+    rep cmpsb
+    je file_entry_found
+    addw $32, %bx
+    movw %bx, %si
+    jmp find_next_file_entry
+
 file_entry_not_found:
-        mov si, not_found
-        jmp print_error_message
+    movw $not_found, %si
+    jmp print_error_message
+
 file_entry_found:
-        ret
+    ret
 
 read_error:
-        mov al, ah
-        call print_number
-        xor ax, ax
-        mov ds, ax
-        mov si, read_error_message
+    movb %ah, %al
+    call print_number
+    xorw %ax, %ax
+    movw %ax, %ds
+    movw $read_error_message, %si
 
 print_error_message:
-        lodsb
-        cmp al,0
-        je halt
-        mov ah, 0x0E
-        mov bh, 0x00
-        int 10h
-        jmp print_error_message
+    lodsb
+    cmpb $0, %al
+    je halt
+    movb $0x0E, %ah
+    movb $0x00, %bh
+    int $0x10
+    jmp print_error_message
 
 print_number:
-        push ax
-        shr al, 4
-        call print_digit
-        pop ax
-        and al, 15
-        call print_digit
-        ret
+    pushw %ax
+    shrb $4, %al
+    call print_digit
+    popw %ax
+    andb $15, %al
+    call print_digit
+    ret
 
 print_digit:
-        cmp al, 9
-        ja tens
-        add al, '0'
-        jmp ones
-        tens:
-        add al, 'A'-10
-        ones:
-        mov ah, 0x0E
-        mov bh, 0x00
-        int 10h
-        ret
+    cmpb $9, %al
+    ja 1f
+    addb $'0', %al
+    jmp 2f
+1:
+    addb $'A'-10, %al
+2:
+    movb $0x0E, %ah
+    movb $0x00, %bh
+    int $0x10
+    ret
 
-not_found           db "Entry not found!", 0
-read_error_message  db "Read error!", 0
-setup_bin_filename     db "SETUP   BIN"
-kernel_bin_filename  db "KERNEL  BIN"
+not_found: .asciz "Entry not found!"
+read_error_message: .asciz "Read error!"
+setup_bin_filename: .ascii "SETUP   BIN"
+kernel_bin_filename: .ascii "KERNEL  BIN"
+drive: .byte 0
 
-drive db 0
-
-times 510-($-$$) db 0
-dw 0xAA55
+.fill 510 - (. - _start), 1, 0
+.word 0xAA55

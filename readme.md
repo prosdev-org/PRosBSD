@@ -1,6 +1,6 @@
 # PRos32 / [![LICENSE MIT](https://img.shields.io/badge/LICENSE-MIT-blue)](https://opensource.org/license/mit) / ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pros-dev-fans/PRos32/build.yml) / ![Version](https://img.shields.io/badge/version-0.1.0--dev-orange?logo=git)
 
-32-bit operating system written in NASM/C for x86, inspired by [x16-PRos](https://github.com/PRoX2011/x16-PRos) and made
+32-bit operating system written in GAS/C for x86, inspired by [x16-PRos](https://github.com/PRoX2011/x16-PRos) and made
 by its community.
 
 > [!IMPORTANT]
@@ -42,7 +42,6 @@ Here is Debian's dependencies's packages:
 - `grub2-common`
 - `grub-pc-bin`
 - `e2fsprogs`
-- `nasm`
 - `syslinux`
 
 ```bash
