@@ -49,7 +49,7 @@ void pic_remap(uint8_t offset1, uint8_t offset2) {
 
     outb(ICW4_8086, PIC1_DATA);
     io_delay();
-    outb(ICW4_8086, PIC1_DATA);
+    outb(ICW4_8086, PIC2_DATA);
     io_delay();
 
     outb(0, PIC1_DATA);
