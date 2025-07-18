@@ -5,7 +5,7 @@ jmp start
 
 GDT:
     dq 0
-    
+
     ; ring 0, code (base=0, limit=0xFFFFF)
     dw 0xFFFF       ; limit (0-15)
     dw 0x0000       ; base (0-15)
@@ -13,7 +13,7 @@ GDT:
     db 0x9A         ; P=1, DPL=00, S=1, Type=1010 (Exec/Read)
     db 0xCF         ; G=1, D/B=1, AVL=0, limit (16-19)=1111
     db 0x00         ; base (24-31)
-    
+
     ; ring 0, data (base=0, limit=0xFFFFF)
     dw 0xFFFF
     dw 0x0000
@@ -21,7 +21,7 @@ GDT:
     db 0x92         ; P=1, DPL=00, S=1, Type=0010 (Read/Write)
     db 0xCF
     db 0x00
-    
+
     ; ring 3, code
     dw 0xFFFF
     dw 0x0000
@@ -29,7 +29,7 @@ GDT:
     db 0xFA         ; P=1, DPL=11, S=1, Type=1010
     db 0xCF
     db 0x00
-    
+
     ; ring 3, data
     dw 0xFFFF
     dw 0x0000
@@ -37,7 +37,7 @@ GDT:
     db 0xF2         ; P=1, DPL=11, S=1, Type=0010
     db 0xCF
     db 0x00
-    
+
 tss_entry:
     dw 0x0068 ; limit (104)
     dw tss_base ; base (0-15)
@@ -51,14 +51,6 @@ END_GDT:
 GDT_PTR: 
     dw END_GDT - GDT - 1
     dd GDT
-
-IDT_START:
-    times 256 dq 0      ; full blank IDT
-IDT_END:
-
-IDT_PTR:
-    dw IDT_END - IDT_START - 1
-    dd IDT_START
 
 tss_base:
     dd 0x00000000 ; last TSS
@@ -116,30 +108,29 @@ EnableA20:
     ret
 
 EnablePM: ; Set PE=1
-	mov	eax, cr0
-	or	eax, 1
-	mov	cr0, eax
-	ret
+    mov eax, cr0
+    or eax, 1
+    mov cr0, eax
+    ret
 
 start:
-	xor	ax, ax
-	mov	ds, ax
-	mov	es, ax
-	mov	ax, 0x9000
-	mov	ss, ax
-	mov	sp, 0xFFFF
-	
-	call DisableMotor
+    xor ax, ax
+    mov ds, ax
+    mov es, ax
+    mov ax, 0x9000
+    mov ss, ax
+    mov sp, 0xFFFF
+
+    call DisableMotor
     call DisableCursor
 
-	lgdt [GDT_PTR]
-    lidt [IDT_PTR]
+    lgdt [GDT_PTR]
     call EnableA20
-	call EnablePM
-	cli
+    call EnablePM
+    cli
 
-	jmp CODE_SEG:PmodeEntry
-	jmp $
+    jmp CODE_SEG:PmodeEntry
+    jmp $
 
 [BITS 32]
 
@@ -153,9 +144,9 @@ init_tss:
     ret
 
 PmodeEntry:
-	mov ax, DATA_SEG
-	mov ds, ax
-	mov es, ax
+    mov ax, DATA_SEG
+    mov ds, ax
+    mov es, ax
     mov fs, ax
     mov gs, ax
     mov esp, 0x9F000
@@ -167,9 +158,9 @@ PmodeEntry:
 
     call setup_paging
     call EnableKRNL
-	
-	cli
-	hlt
+
+    cli
+    hlt
 
 setup_paging:
     mov edi, 0x20000

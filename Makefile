@@ -30,11 +30,11 @@ fs:
 
 kernel_:
 	@for f in $(wildcard kernel/*.c); do echo "\033[0;32mCompiling kernel piece..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
+	@for f in $(wildcard kernel/*.asm); do echo "\033[0;32mAssembling kernel piece..\033[0m \033[34m$$f\033[0m"; $(ASM) -f elf32 $$f; done
 	@for f in $(wildcard kernel/memory/*.c); do echo "\033[0;32mCompiling memory operations..\033[0m \033[34m$$f\033[0m"; $(CC) -c $(CFLAGS) $$f; done
 
-
 kernel: boot init drivers fs kernel_
-	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o boot/KERNEL_.BIN boot/KERNEL_ENTRY.o init/*.o *.o
+	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o boot/KERNEL_.BIN boot/KERNEL_ENTRY.o init/*.o kernel/*.o *.o
 	@cp boot/KERNEL_.BIN boot/KERNEL.BIN
 	@$(STRIP) boot/KERNEL.BIN
 	@$(OBJCOPY) $(OBJCOPYFLAGS) boot/KERNEL.BIN

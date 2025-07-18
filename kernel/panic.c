@@ -2,6 +2,8 @@
 
 volatile void panic(const char *s) {
     printf("Kernel panic: %s\n\r", s);
-    for (;;)
-        ;
+    __asm__ volatile("cli\n"
+                     "hlt\n"
+                     :
+                     :);
 }
