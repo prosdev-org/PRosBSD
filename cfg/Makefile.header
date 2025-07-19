@@ -2,27 +2,23 @@ VERSION_MAJOR = 0
 VERSION_MINOR = 1
 VERSION_PATCH = 0
 VERSION_SUFFIX = "-dev"
-
 AS := as
 CC := gcc
 LD := ld
 OBJCOPY := objcopy
 STRIP = strip
 RM := rm -rf
-MEMDISK := /usr/lib/syslinux/memdisk
-
 ESC_PURPLE = \033[0;35m
 ESC_YELLOW = \033[0;33m
 ESC_GREEN = \033[0;32m
 ESC_BLUE = \033[34m
 ESC_END = \033[0m
 NULL =  > /dev/null 2>&1
-
 ASFLAGS = --32
 LDFLAGS = -m elf_i386
 CFLAGS  = -g -m32 -fno-builtin -fno-stack-protector -fomit-frame-pointer -fstrength-reduce -fno-pic -nostdinc
 OBJCOPYFLAGS := -R .pdr -R .comment -R.note -S -O binary
-
 IMAGE_NAME := fd.img
 HDD_IMAGE ?= pros32-v.$(VERSION_STRING).img
 GRUB_MOUNT ?= /mnt/disk
+MEMDISK := /usr/lib/syslinux/memdisk
