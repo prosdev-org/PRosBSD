@@ -10,29 +10,29 @@ by its community.
 ## Features
 
 > [!WARNING]
-> This section is not completed yet.
+> This section is not complete yet.
 
 ## Building
 
-### Method #1 _recommended_
+### Method 1 _recommended_
 
 > [!IMPORTANT]
-> This method involves docker to deliver you all the dependencies.
-> You have to [install it](https://docs.docker.com/engine/install/) before using this method.
+> This method uses docker to provide you all the dependencies.
+> You need to [install it](https://docs.docker.com/engine/install/) before using this method.
 
 > [!WARNING]
-> Do not run this script as root, it does not support it.
+> Do not run this script as root. It is not supported.
 
 ```bash
 ./build.sh
 ```
 
-### Method #2
+### Method 2
 
 > [!IMPORTANT]
-> This method assumes that you have all the dependencies installed.
+> This method assumes that you have already installed all the dependencies.
 
-Here is Debian's dependencies's packages:
+Here are the dependencies for Debian:
 
 - `build-essential`
 - `mtools`
@@ -48,16 +48,16 @@ Here is Debian's dependencies's packages:
 make
 ```
 
-In both methods, you will get two images:
+With both methods, you will get two images:
 
-- one of them `fd.img` _kernel floppy disk image_
-- second is `pros32-v.{PROS32-VERSION}.img` _hard disk bootable image_
+- one of them `fd.img`, which is _a kernel floppy disk image_
+- second is `pros32-v.{PROS32-VERSION}.img`,  _a hard disk bootable image_
 
 ## Running
 
-To run PRos32, use x86 hypervisors/emulators such as **QEMU/VMware/Virtualbox**.
+To run PRos32, use an x86 hypervisors/emulators such as **QEMU/VMware/Virtualbox**.
 
-Here is an example command for running in QEMU
+Here is an example of a command to run in QEMU
 
 ```bash
 qemu-system-i386 -drive file=pros32-v.{PROS32-VERSION}.img,format=raw,if=ide,index=0
@@ -66,7 +66,7 @@ qemu-system-i386 -drive file=pros32-v.{PROS32-VERSION}.img,format=raw,if=ide,ind
 ## Contributing
 
 > [!WARNING]
-> This section is not completed yet.
+> This section is not complete yet.
 
 > [!IMPORTANT]
 > TODO:
