@@ -1,10 +1,9 @@
 #include "tty.h"
-#include <extrns.h>
 #include <stdint.h>
-#include <tty.h>
 
 uint32_t cursor_row = 0;
 uint32_t cursor_col = 0;
+uint8_t current_color = ATTRIBUTE;
 
 void cleark() {
     volatile uint16_t *vga = (volatile uint16_t *) VGA_BUFFER;
@@ -102,4 +101,61 @@ void putsk(const char *str) {
         putck(*str++);
     }
     putck('\n');
+}
+
+// Color functions
+void putck_colored(char c, uint8_t color) {
+    volatile uint16_t *vga = (volatile uint16_t *) VGA_BUFFER;
+
+    switch (c) {
+        case '\n': // newline: move to next line
+            cursor_col = 0;
+            cursor_row++;
+            break;
+        case '\r': // carriage return: return to start of line
+            cursor_col = 0;
+            break;
+        case '\t': // tab: advance to next tab stop (every 4 spaces)
+            cursor_col = (cursor_col + 4) & ~3;
+            break;
+        case '\b': // backspace
+            handle_backspace();
+            break;
+        default: // printable character
+            if (c >= ' ') {
+                uint32_t idx = cursor_row * COLS + cursor_col;
+                if (idx >= COLS * ROWS) {
+                    panic("tty: buffer overflow");
+                }
+                vga[idx] = (color << 8) | c;
+                cursor_col++;
+            }
+            break;
+    }
+
+    // handle line wrap
+    if (cursor_col >= COLS) {
+        cursor_col = 0;
+        cursor_row++;
+    }
+
+    // scroll if at the bottom
+    if (cursor_row >= ROWS) {
+        scroll();
+    }
+}
+
+void putsk_colored(const char *str, uint8_t color) {
+    while (*str) {
+        putck_colored(*str++, color);
+    }
+    putck_colored('\n', color);
+}
+
+void set_current_color(uint8_t color) {
+    current_color = color;
+}
+
+uint8_t get_current_color(void) {
+    return current_color;
 }
