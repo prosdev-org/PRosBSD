@@ -33,7 +33,7 @@ kernel_:
 	@for f in $(wildcard kernel/*.asm); do echo "$(ESC_GREEN)Assembling kernel piece..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; $(AS) $(ASFLAGS) $$f -o $$f.o $(NULL); done
 	@for f in $(wildcard kernel/memory/*.c); do echo "$(ESC_GREEN)Compiling memory operations..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; $(CC) -c $(CFLAGS) $$f; done
 
-kernel: boot init drivers fs kernel_
+kernel: clean boot init drivers fs kernel_
 	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o boot/KERNEL_.BIN boot/KERNEL_ENTRY.o init/*.o kernel/*.o *.o
 	@cp boot/KERNEL_.BIN boot/KERNEL.BIN
 	@$(STRIP) boot/KERNEL.BIN
