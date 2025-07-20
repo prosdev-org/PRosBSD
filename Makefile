@@ -55,6 +55,17 @@ hdd_image: image
 	@parted -s $(HDD_IMAGE) mklabel msdos
 	@parted -s $(HDD_IMAGE) mkpart primary 1MiB 34MiB
 	@parted -s $(HDD_IMAGE) mkpart primary 35MiB 69MiB
+	@max=10; \
+	for i in `seq 2 $$max`; \
+		do \
+		if [ -e $(HDD_IMAGE) ]; \
+			then break; \
+		fi; \
+		if [ $$i -eq $$max ]; \
+			then exit 1; \
+		fi; \
+		sleep 0.1; \
+	done;
 	@LOOP_DEVICE=$$(sudo losetup --find --show $(HDD_IMAGE)); \
 	LOOP_NUMBER=$$(basename $$LOOP_DEVICE | sed 's/[^0-9]//g'); \
 	MAPPER=/dev/mapper/loop$$LOOP_NUMBER; \
