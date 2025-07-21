@@ -88,12 +88,26 @@ tss_base:
 .set USER_DATA_SEG, 0x20 | 3 # Ring 3
 .set TSS_SEG, 0x28
 
+font_data:
+    .incbin "../cfg/FONT.FNT"
+
 DisableMotor: # FLoppy motor killer
     push %dx
     mov $0x3F2, %dx
     mov $0, %al
     out %al, %dx
     pop %dx
+    ret
+
+LoadFont:
+    movb $0x11, %ah      # AH = 11h (video function)
+    movb $0x00, %al      # AL = 00h (load user font)
+    movw $font_data, %bp      # BP = offset of Font
+    movb $16, %bh        # BH = bytes per character
+    movw $224, %cx       # CX = character count
+    movw $32, %dx        # DX = starting character
+    movb $0, %bl
+    int $0x10
     ret
 
 DisableCursor:
@@ -123,6 +137,7 @@ start:
     mov $0xFFFF, %sp
 
     call DisableMotor
+    call LoadFont
     call DisableCursor
 
     lgdt GDT_PTR
@@ -157,54 +172,10 @@ PmodeEntry:
     mov $TSS_SEG, %ax
     ltr %ax
 
-    call setup_paging
     call EnableKRNL
 
     cli
     hlt
-
-setup_paging:
-    mov $0x20000, %edi
-    mov $4096, %ecx        # 4KB (1 page) - Page Directory
-    xor %eax, %eax
-    cld
-    rep stosl
-
-    mov $0x21000, %edi
-    mov $4096, %ecx        # 4KB (1 page) - Page Table 1
-    rep stosl
-
-    mov $0x22000, %edi
-    mov $4096, %ecx        # 4KB (1 page) - Page Table 2
-    rep stosl
-
-    mov $0x23000, %edi
-    mov $4096, %ecx        # 4KB (1 page) - Page Table 3
-    rep stosl
-
-    mov $0x24000, %edi
-    mov $4096, %ecx        # 4KB (1 page) - Page Table 4
-    rep stosl
-
-    movl $0x21007, 0x20000
-
-    mov $0x21000, %edi
-    mov $0x00000007, %eax
-.pte_loop:
-    stosl
-    add $0x1000, %eax # increment physical address by 4KB
-    cmp $0x400000, %eax
-    jl .pte_loop
-
-    mov $0x20000, %eax
-    mov %eax, %cr3
-
-    mov %cr0, %eax
-    or $0x80000000, %eax # set the PG bit
-    mov %eax, %cr0
-
-    ret
-
 
 EnableKRNL:
     ljmp $CODE_SEG, $0x7E00
