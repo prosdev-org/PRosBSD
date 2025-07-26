@@ -168,6 +168,7 @@ int write_config(ConfigVar *vars, int count) {
 
 int main() {
     ConfigVar vars[] = {
+        {"ISGRUBQ", "Default bootloader ('Y' for grub, 'N' for syslinux)", "", "", "", 0},
         {"MEMDISK", "Memdisk", "", "", "", 0},
         {"GRUB_MOUNT", "GRUB mount point", "", "", "", 0},
     

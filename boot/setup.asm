@@ -100,12 +100,12 @@ DisableMotor: # FLoppy motor killer
     ret
 
 LoadFont:
-    movb $0x11, %ah      # AH = 11h (video function)
-    movb $0x00, %al      # AL = 00h (load user font)
-    movw $font_data, %bp      # BP = offset of Font
-    movb $16, %bh        # BH = bytes per character
-    movw $224, %cx       # CX = character count
-    movw $32, %dx        # DX = starting character
+    movb $0x11, %ah
+    movb $0x00, %al
+    movw $font_data, %bp
+    movb $16, %bh
+    movw $224, %cx
+    movw $32, %dx
     movb $0, %bl
     int $0x10
     ret

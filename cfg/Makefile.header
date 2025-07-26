@@ -19,6 +19,7 @@ LDFLAGS = -m elf_i386
 CFLAGS  = -g -m32 -fno-builtin -fno-stack-protector -fomit-frame-pointer -fstrength-reduce -fno-pic -nostdinc
 OBJCOPYFLAGS := -R .pdr -R .comment -R.note -S -O binary
 IMAGE_NAME := fd.img
+ISGRUBQ = N
 HDD_IMAGE ?= pros32-v.$(VERSION_STRING).img
 GRUB_MOUNT ?= /mnt/disk
 MEMDISK := /usr/lib/syslinux/memdisk
