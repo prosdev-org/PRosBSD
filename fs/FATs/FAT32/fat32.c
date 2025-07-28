@@ -69,7 +69,7 @@ bool fat32_init(fat32_ctx_t *ctx, uint32_t lba_start) {
             (bs.total_sectors_32 - reserved_sectors - (ctx->fat_count * fat_size)) / bs.sectors_per_cluster;
 
     if (bs.fs_info_sector != 0) {
-        pata_pio_read_sector(lba_start + bs.fs_info_sector, &ctx->fsinfo);
+        pata_pio_read_sector(lba_start + bs.fs_info_sector, (uint8_t *) &ctx->fsinfo);
     }
 
     return true;
