@@ -1,5 +1,3 @@
-memdisk
-
 *.o
 
 *.BIN
@@ -16,5 +14,6 @@ memdisk
 .*.swp
 .*.swo
 
+build/
 /include/generated/
 configurator

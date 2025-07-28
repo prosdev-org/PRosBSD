@@ -7,81 +7,41 @@ VERSION_H := include/generated/version.h
 VERSION_STRING := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)$(VERSION_SUFFIX)
 BADGE_VERSION := $(shell echo $(VERSION_STRING) | sed 's/-/--/g')
 
-.PHONY: all clean boot version.h init drivers fs kernel_ kernel image hdd_image
+.PHONY: all clean boot version.h objs kernel image hdd_image
 
-all: hdd_image
+all: clean hdd_image
 
 boot:
+	@mkdir -p $(BUILD_DIRECTORY)/boot/
 	@make -C boot/
 
-init: version.h
-	@echo "$(ESC_GREEN)Compiling init..$(ESC_END)"
-	@mkdir -p build/
-	@$(CC) $(CFLAGS) -c init/main.c -o build/init.o
+objs: version.h
+	@for f in $$(find $(SOURCES) -name "*.c"); \
+		do \
+		echo "$(ESC_GREEN)Compiling$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
+		mkdir -p $(BUILD_DIRECTORY)/$$(dirname $$f); \
+		$(CC) -c $(CFLAGS) $$f -o $(BUILD_DIRECTORY)/$$(dirname $$f)/$$(basename $$f .c).o; \
+	done;
 
-drivers:
-	@for f in $(wildcard drivers/cmos/*.c); do \
-		obj=$$(echo "$$f" | tr '/' '_' | sed 's/\.c$$/.o/'); \
-		echo "$(ESC_GREEN)Compiling CMOS driver..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
-		$(CC) -c $(CFLAGS) $$f -o build/$$obj; \
-	done
-	@for f in $(wildcard drivers/keyboard/*.c); do \
-		obj=$$(echo "$$f" | tr '/' '_' | sed 's/\.c$$/.o/'); \
-		echo "$(ESC_GREEN)Compiling keyboard driver..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
-		$(CC) -c $(CFLAGS) $$f -o build/$$obj; \
-	done
-	@for f in $(wildcard drivers/vga_tty/*.c); do \
-		obj=$$(echo "$$f" | tr '/' '_' | sed 's/\.c$$/.o/'); \
-		echo "$(ESC_GREEN)Compiling VGA TTY driver..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
-		$(CC) -c $(CFLAGS) $$f -o build/$$obj; \
-	done
-	@for f in $(wildcard drivers/mouse/*.c); do \
-		obj=$$(echo "$$f" | tr '/' '_' | sed 's/\.c$$/.o/'); \
-		echo "$(ESC_GREEN)Compiling mouse driver..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
-		$(CC) -c $(CFLAGS) $$f -o build/$$obj; \
-	done
-	@for f in $(wildcard drivers/pata_pio/*.c); do \
-		obj=$$(echo "$$f" | tr '/' '_' | sed 's/\.c$$/.o/'); \
-		echo "$(ESC_GREEN)Compiling PATA PIO driver..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
-		$(CC) -c $(CFLAGS) $$f -o build/$$obj; \
-	done
+	@for f in $$(find $(SOURCES) -name "*.asm"); \
+		do \
+		echo "$(ESC_GREEN)Assembling$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
+		mkdir -p $(BUILD_DIRECTORY)/$$(dirname $$f); \
+		$(AS) $(ASFLAGS) $$f -o $(BUILD_DIRECTORY)/$$(dirname $$f)/$$(basename $$f .asm).o; \
+	done;
 
-fs:
-	@for f in $(wildcard fs/FATs/FAT32/*.c); do \
-		obj=$$(echo "$$f" | tr '/' '_' | sed 's/\.c$$/.o/'); \
-		echo "$(ESC_GREEN)Compiling FAT32 FS..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
-		$(CC) -c $(CFLAGS) $$f -o build/$$obj; \
-	done
-
-kernel_:
-	@for f in $(wildcard kernel/*.c); do \
-		obj=$$(echo "$$f" | tr '/' '_' | sed 's/\.c$$/.o/'); \
-		echo "$(ESC_GREEN)Compiling kernel piece..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
-		$(CC) -c $(CFLAGS) $$f -o build/$$obj; \
-	done
-	@for f in $(wildcard kernel/*.asm); do \
-		obj=$$(echo "$$f" | tr '/' '_' | sed 's/\.asm$$/.o/'); \
-		echo "$(ESC_GREEN)Assembling kernel piece..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
-		$(AS) $(ASFLAGS) $$f -o build/$$obj $(NULL); \
-	done
-	@for f in $(wildcard kernel/memory/*.c); do \
-		obj=$$(echo "$$f" | tr '/' '_' | sed 's/\.c$$/.o/'); \
-		echo "$(ESC_GREEN)Compiling memory operations..$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
-		$(CC) -c $(CFLAGS) $$f -o build/$$obj; \
-	done
-
-kernel: clean boot init drivers fs kernel_
-	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o boot/KERNEL_.BIN boot/KERNEL_ENTRY.o build/*.o
-	@cp boot/KERNEL_.BIN boot/KERNEL.BIN
-	@$(STRIP) boot/KERNEL.BIN
-	@$(OBJCOPY) $(OBJCOPYFLAGS) boot/KERNEL.BIN
+kernel: boot objs
+	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o $(BUILD_DIRECTORY)/boot/KERNEL_.BIN $(BUILD_DIRECTORY)/boot/KERNEL_ENTRY.o $$(find $(BUILD_DIRECTORY) -name "*.o" -not -path "$(BUILD_DIRECTORY)/boot/*")
+	@cp $(BUILD_DIRECTORY)/boot/KERNEL_.BIN $(BUILD_DIRECTORY)/boot/KERNEL.BIN
+	@$(STRIP) $(BUILD_DIRECTORY)/boot/KERNEL.BIN
+	@$(OBJCOPY) $(OBJCOPYFLAGS) $(BUILD_DIRECTORY)/boot/KERNEL.BIN
 
 image: kernel
 	@dd if=/dev/zero of=$(IMAGE_NAME) count=2880 bs=512 $(NULL)
 	@mkfs.fat -F 12 $(IMAGE_NAME)
-	@dd if=boot/MBR.BIN of=$(IMAGE_NAME) conv=notrunc
-	@mcopy -i $(IMAGE_NAME) boot/SETUP.BIN ::/
-	@mcopy -i $(IMAGE_NAME) boot/KERNEL.BIN ::/
+	@dd if=$(BUILD_DIRECTORY)/boot/MBR.BIN of=$(IMAGE_NAME) conv=notrunc
+	@mcopy -i $(IMAGE_NAME) $(BUILD_DIRECTORY)/boot/SETUP.BIN ::/
+	@mcopy -i $(IMAGE_NAME) $(BUILD_DIRECTORY)/boot/KERNEL.BIN ::/
 
 hdd_image:
 	@if [ "$(ISGRUBQ)" = "Y" ]; then \
@@ -198,4 +158,5 @@ format:
 
 clean:
 	@$(RM) *.img include/generated/ configurator
+	@$(RM) $(BUILD_DIRECTORY)
 	@find . -type f \( -name "*.o" -o -name "*.BIN" \) -exec rm -f {} +
