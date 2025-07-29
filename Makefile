@@ -1,47 +1,25 @@
 include cfg/Makefile.header
 
-CFLAGS += -I./include 
+CFLAGS += -I./include
 LDFLAGS += -Ttext 0
 
 VERSION_H := include/generated/version.h
 VERSION_STRING := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)$(VERSION_SUFFIX)
 BADGE_VERSION := $(shell echo $(VERSION_STRING) | sed 's/-/--/g')
 
-.PHONY: all clean boot version.h objs kernel image hdd_image
+.PHONY: all clean boot version.h kernel image hdd_image
 
 all: clean hdd_image
 
-boot:
-	@mkdir -p $(BUILD_DIRECTORY)/boot/
-	@make -C boot/
-
-objs: version.h
-	@for f in $$(find $(SOURCES) -name "*.c"); \
-		do \
-		echo "$(ESC_GREEN)Compiling$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
-		mkdir -p $(BUILD_DIRECTORY)/$$(dirname $$f); \
-		$(CC) -c $(CFLAGS) $$f -o $(BUILD_DIRECTORY)/$$(dirname $$f)/$$(basename $$f .c).o; \
-	done;
-
-	@for f in $$(find $(SOURCES) -name "*.asm"); \
-		do \
-		echo "$(ESC_GREEN)Assembling$(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
-		mkdir -p $(BUILD_DIRECTORY)/$$(dirname $$f); \
-		$(AS) $(ASFLAGS) $$f -o $(BUILD_DIRECTORY)/$$(dirname $$f)/$$(basename $$f .asm).o; \
-	done;
-
-kernel: boot objs
-	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o $(BUILD_DIRECTORY)/boot/KERNEL_.BIN $(BUILD_DIRECTORY)/boot/KERNEL_ENTRY.o $$(find $(BUILD_DIRECTORY) -name "*.o" -not -path "$(BUILD_DIRECTORY)/boot/*")
-	@cp $(BUILD_DIRECTORY)/boot/KERNEL_.BIN $(BUILD_DIRECTORY)/boot/KERNEL.BIN
-	@$(STRIP) $(BUILD_DIRECTORY)/boot/KERNEL.BIN
-	@$(OBJCOPY) $(OBJCOPYFLAGS) $(BUILD_DIRECTORY)/boot/KERNEL.BIN
+kernel: version.h
+	$(MAKE) -C kernel/
 
 image: kernel
 	@dd if=/dev/zero of=$(IMAGE_NAME) count=2880 bs=512 $(NULL)
 	@mkfs.fat -F 12 $(IMAGE_NAME)
 	@dd if=$(BUILD_DIRECTORY)/boot/MBR.BIN of=$(IMAGE_NAME) conv=notrunc
 	@mcopy -i $(IMAGE_NAME) $(BUILD_DIRECTORY)/boot/SETUP.BIN ::/
-	@mcopy -i $(IMAGE_NAME) $(BUILD_DIRECTORY)/boot/KERNEL.BIN ::/
+	@mcopy -i $(IMAGE_NAME) $(BUILD_DIRECTORY)/kernel/KERNEL.BIN ::/
 
 hdd_image:
 	@if [ "$(ISGRUBQ)" = "Y" ]; then \
