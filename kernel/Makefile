@@ -1,6 +1,7 @@
 include ../cfg/Makefile.header
 
-CFLAGS_KERNEL = $(CFLAGS) -I../include/ -I./include/ -I./libk/include/
+CFLAGS += -I../include/ -I./include/ -I./libk/include/
+LDFLAGS += -T ../cfg/linker.ld
 
 .PHONY: all boot objs kernel
 
@@ -15,7 +16,7 @@ objs:
 		do \
 		echo "$(ESC_GREEN)Compiling kernel.. $(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
 		mkdir -p ../$(BUILD_DIRECTORY)/kernel/$$(dirname $$f); \
-		$(CC) -c $(CFLAGS_KERNEL) $$f -o ../$(BUILD_DIRECTORY)/kernel/$$(dirname $$f)/$$(basename $$f .c).o; \
+		$(CC) $(CFLAGS) $$f -o ../$(BUILD_DIRECTORY)/kernel/$$(dirname $$f)/$$(basename $$f .c).o; \
 	done;
 
 	@for f in $$(find . -name "*.asm" -not -path "./boot/*"); \
@@ -26,7 +27,7 @@ objs:
 	done;
 
 kernel: boot objs
-	@$(LD) $(LDFLAGS) --section-start=.text=0x7E00 -o ../$(BUILD_DIRECTORY)/boot/KERNEL_.BIN ../$(BUILD_DIRECTORY)/boot/KERNEL_ENTRY.o $$(find ../$(BUILD_DIRECTORY)/kernel/ -name "*.o")
+	@$(LD) $(LDFLAGS) -o ../$(BUILD_DIRECTORY)/boot/KERNEL_.BIN ../$(BUILD_DIRECTORY)/boot/KERNEL_ENTRY.o $$(find ../$(BUILD_DIRECTORY)/kernel/ -name "*.o")
 	@cp ../$(BUILD_DIRECTORY)/boot/KERNEL_.BIN ../$(BUILD_DIRECTORY)/kernel/KERNEL.BIN
 	@$(STRIP) ../$(BUILD_DIRECTORY)/kernel/KERNEL.BIN
 	@$(OBJCOPY) $(OBJCOPYFLAGS) ../$(BUILD_DIRECTORY)/kernel/KERNEL.BIN

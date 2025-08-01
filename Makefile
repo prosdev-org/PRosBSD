@@ -1,8 +1,5 @@
 include cfg/Makefile.header
 
-CFLAGS += -I./include
-LDFLAGS += -Ttext 0
-
 VERSION_H := include/generated/version.h
 VERSION_STRING := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)$(VERSION_SUFFIX)
 BADGE_VERSION := $(shell echo $(VERSION_STRING) | sed 's/-/--/g')
