@@ -116,6 +116,53 @@ DisableCursor:
     int $0x10
     ret
 
+.equ nmap_ent, 0x5000
+DoE820:
+    mov $nmap_ent + 0x0004, %di # otherwise we will stuck in int 0x15 after some entries are fetched
+    xor %ebx, %ebx # %ebx must be 0
+    xor %bp, %bp # entry count
+    mov $0x534D4150, %edx # Place "SMAP" into edx
+    mov $0xE820, %eax
+    movl $1, %es:20(%di) # force a valid ACPI 3.x entry
+    mov $24, %ecx # ask for 24 bytes
+    int $0x15
+    jc E820_failed # carry set means "Unsupported function"
+    mov $0x534D4150, %eax # some BIOSes trash this register
+    cmp %eax, %edx # on success, %eax must be set to "SMAP"
+    jne E820_failed
+    test %ebx, %ebx # if ebx = 0 it is worthless
+    je E820_failed
+    jmp E820_jmpin
+E820_lp:
+    mov $0xE820, %eax
+    movl $1, %es:20(%di) # force a valid ACPI 3.x entry
+    mov $24, %ecx # ask for 24 bytes
+    int $0x15
+    jc E820_f # carry set means "End of list already reached"
+    mov $0x534D4150, %eax # some BIOSes trash this register
+E820_jmpin:
+    jcxz E820_skipent
+    cmp $20, %cl
+    jbe E820_notext
+    testb $1, %es:20(%di) # is the "ignore this data" bit clear?
+    je E820_skipent
+E820_notext:
+    mov %es:8(%di), %ecx # get lower uint32_t of memory region length
+    or %es:12(%di), %ecx # or it with upper uint32_t to test for zero
+    jz E820_skipent # if length uint64_t is 0, skip
+    inc %bp
+    add $24, %di
+E820_skipent:
+    test %ebx, %ebx # if ebx = 0, list is complete
+    jne E820_lp
+E820_f:
+    mov %bp, %es:nmap_ent
+    clc
+    ret
+E820_failed:
+    stc
+    ret
+
 EnableA20:
     in $0x92, %al
     or $2, %al
@@ -139,6 +186,7 @@ start:
     call DisableMotor
     call LoadFont
     call DisableCursor
+    call DoE820
 
     lgdt GDT_PTR
     call EnableA20
