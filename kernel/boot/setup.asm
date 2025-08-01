@@ -179,9 +179,9 @@ start:
     xor %ax, %ax
     mov %ax, %ds
     mov %ax, %es
-    mov $0x9000, %ax
+    mov $0x0500, %ax
     mov %ax, %ss
-    mov $0xFFFF, %sp
+    mov $0x4FFF, %sp
 
     call DisableMotor
     call LoadFont

@@ -21,7 +21,6 @@ long long atoll(const char *);
 // void srand(unsigned);
 
 void *malloc(size_t);
-void *mallocl(size_t); // not standard
 void *calloc(size_t, size_t);
 // void *realloc(void *, size_t);
 void free(void *);

@@ -2,9 +2,10 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include <memory/map.h>
 
-#define HEAP_START 0x200000
-#define HEAP_END   0x600000
+#define HEAP_START (int) get_kernel_end()
+#define HEAP_END   0x80000
 #define ALIGNMENT  16
 #define MIN_BLOCK  (sizeof(block_t) * 2)
 
