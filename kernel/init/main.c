@@ -66,11 +66,11 @@ int main(void) {
     keyboard_init();
 
     // Welcome message and system information
-    printf("\nWelcome to PRos32 v.%s!\n\n", VERSION_STRING);
+    printf("\nWelcome to PRosBSD v.%s!\n\n", VERSION_STRING);
 
-    printf("\033[34m * Documentation: \033[0mhttps://github.com/pros-dev-fans/PRos32\n");
-    printf("\033[34m * Support:       \033[0mhttps://github.com/pros-dev-fans/PRos32\n");
-    printf("\033[34m * Source Code:   \033[0mhttps://github.com/pros-dev-fans/PRos32\n\n");
+    printf("\033[34m * Documentation: \033[0mhttps://github.com/pros-dev-fans/PRosBSD\n");
+    printf("\033[34m * Support:       \033[0mhttps://github.com/pros-dev-fans/PRosBSD\n");
+    printf("\033[34m * Source Code:   \033[0mhttps://github.com/pros-dev-fans/PRosBSD\n\n");
 
     printf("\033[1;32m System information\033[0m\n\n");
 

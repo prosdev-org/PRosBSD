@@ -22,6 +22,6 @@ SOURCES = drivers/ fs/ init/ kernel/
 BUILD_DIRECTORY ?= build
 IMAGE_NAME := fd.img
 ISGRUBQ = N
-HDD_IMAGE ?= pros32-v.$(VERSION_STRING).img
+HDD_IMAGE ?= prosbsd-v.$(VERSION_STRING).img
 GRUB_MOUNT ?= /mnt/disk
 MEMDISK := /usr/lib/syslinux/memdisk

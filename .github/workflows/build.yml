@@ -1,4 +1,4 @@
-name: Build PRos32
+name: Build PRosBSD
 
 on:
   push:
@@ -18,5 +18,5 @@ jobs:
         ./build.sh
     - uses: actions/upload-artifact@v4
       with:
-          name: PRos32
+          name: PRosBSD
           path: "*.img"

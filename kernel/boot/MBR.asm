@@ -25,7 +25,7 @@ _start:
 
 .fill 3 - (. - _start), 1, 0
 
-bpbOEM: .ascii "  PRos32"
+bpbOEM: .ascii " PRosBSD"
 bpbBytesPerSector: .word 512
 bpbSectorsPerCluster: .byte 1
 bpbReservedSectors: .word 1
