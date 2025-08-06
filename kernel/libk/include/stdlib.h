@@ -25,6 +25,10 @@ void *calloc(size_t, size_t);
 // void *realloc(void *, size_t);
 void free(void *);
 
+void *mallocl(size_t);
+void *callocl(size_t, size_t);
+void freel(void *);
+
 // void abort(void);
 // int atexit(void (*)(void));
 // void exit(int);

@@ -7,7 +7,7 @@ e820_entry_t *e820_get_map(size_t *size) {
     volatile uint32_t *e820 = (volatile uint32_t *) E820_BUFFER;
 
     *size = e820[0];
-    e820_entry_t *map = malloc(*size * sizeof(e820_entry_t));
+    e820_entry_t *map = mallocl(*size * sizeof(e820_entry_t));
     for (size_t i = 0; i < *size; i++) {
         map[i].address = e820[6 * i + 1] + ((uint64_t) e820[6 * i + 2] << 0x20);
         map[i].length = e820[6 * i + 3] + ((uint64_t) e820[6 * i + 4] << 0x20);

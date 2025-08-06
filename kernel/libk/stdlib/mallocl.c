@@ -4,10 +4,10 @@
 #include <stdint.h>
 #include <string.h>
 
-#define HEAP_START (int) get_kernel_end()
-#define HEAP_END   0x80000
-#define ALIGNMENT  16
-#define MIN_BLOCK  (sizeof(block_t) * 2)
+#define LOW_HEAP_START (int) get_kernel_end()
+#define LOW_HEAP_END   0x80000
+#define ALIGNMENT      16
+#define MIN_BLOCK      (sizeof(block_t) * 2)
 
 #define SIZE_MAX ((size_t) -1)
 
@@ -23,8 +23,8 @@ static void heap_init() {
     if (free_list)
         return;
 
-    free_list = (block_t *) HEAP_START;
-    free_list->size = HEAP_END - HEAP_START - sizeof(block_t);
+    free_list = (block_t *) LOW_HEAP_START;
+    free_list->size = LOW_HEAP_END - LOW_HEAP_START - sizeof(block_t);
     free_list->next = NULL;
     free_list->free = 1;
 }
@@ -55,7 +55,7 @@ static void coalesce_blocks() {
     }
 }
 
-void *malloc(size_t size) {
+void *mallocl(size_t size) {
     if (size == 0)
         return NULL;
     size = (size + ALIGNMENT - 1) & ~(ALIGNMENT - 1);
@@ -80,7 +80,7 @@ void *malloc(size_t size) {
     }
 
     if (!best) {
-        panic("malloc: out of high memory");
+        panic("mallocl: out of low memory");
         return NULL;
     }
 
@@ -94,13 +94,13 @@ void *malloc(size_t size) {
     return (void *) (best + 1);
 }
 
-void *calloc(size_t nmemb, size_t size) {
+void *callocl(size_t nmemb, size_t size) {
     if (size != 0 && nmemb > SIZE_MAX / size) {
-        panic("calloc: size overflow");
+        panic("callocl: size overflow");
         return NULL;
     }
     size_t total = nmemb * size;
-    void *ptr = malloc(total);
+    void *ptr = mallocl(total);
     if (!ptr)
         return NULL;
 
@@ -108,13 +108,13 @@ void *calloc(size_t nmemb, size_t size) {
     return ptr;
 }
 
-void free(void *ptr) {
+void freel(void *ptr) {
     if (!ptr)
         return;
 
     block_t *block = ((block_t *) ptr) - 1;
-    if (block < (block_t *) HEAP_START || block >= (block_t *) HEAP_END) {
-        panic("free: invalid pointer");
+    if (block < (block_t *) LOW_HEAP_START || block >= (block_t *) LOW_HEAP_END) {
+        panic("freel: invalid pointer");
         return;
     }
 
