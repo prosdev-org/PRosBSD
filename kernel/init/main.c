@@ -27,7 +27,7 @@ int main(void) {
             printf("%d) ", i);
             printf("%p-", e820_map[i].address);
             printf("%p ", e820_map[i].address + e820_map[i].length - 1);
-            printf("Type: %p", e820_map[i].type);
+            printf("Type: %p, ", e820_map[i].type);
             printf("ACPI3 attr: %p", e820_map[i].acpi3_attributes);
             printf("\n");
         }
