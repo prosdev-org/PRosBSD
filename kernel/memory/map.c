@@ -68,10 +68,10 @@ void mem_map_init() {
     freel(e820_map);
 
     // Remove everything lower than kernel end
-    for (size_t i = 0; i < find_first(__kernel_end); i++)
+    for (size_t i = 0; i < find_first(&__kernel_end); i++)
         delete (0);
 
-    if (split(__kernel_end, 0))
+    if (split(&__kernel_end, 0))
         delete (0);
 }
 
