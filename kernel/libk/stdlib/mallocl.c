@@ -4,12 +4,12 @@
 #include <stdint.h>
 #include <string.h>
 
-#define LOW_HEAP_START (int) get_kernel_end()
+#define LOW_HEAP_START 0x7E00
 #define LOW_HEAP_END   0x80000
 #define ALIGNMENT      16
 #define MIN_BLOCK      (sizeof(block_t) * 2)
 
-#define SIZE_MAX ((size_t) -1)
+#define SIZE_MAX ((size_t) - 1)
 
 typedef struct block {
     size_t size;

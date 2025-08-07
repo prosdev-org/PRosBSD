@@ -1,6 +1,8 @@
 .code16
 .globl _start
 
+.set KERNEL_SIZE, 65536 / 4
+
 _start:
     jmp start
 
@@ -220,11 +222,16 @@ PmodeEntry:
     mov $TSS_SEG, %ax
     ltr %ax
 
+    mov $0x07E00, %esi
+    mov $0x100000, %edi
+    mov $KERNEL_SIZE, %ecx
+    rep movsl
+
     call EnableKRNL
 
     cli
     hlt
 
 EnableKRNL:
-    ljmp $CODE_SEG, $0x7E00
+    ljmp $CODE_SEG, $0x100000
     ret
