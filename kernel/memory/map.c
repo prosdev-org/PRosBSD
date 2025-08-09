@@ -11,8 +11,8 @@ void *get_kernel_end() {
     return (void *) &__kernel_end;
 }
 
-memory_block_t map[MEMORY_MAP_MAX_SIZE];
-size_t map_size = 0;
+static memory_block_t map[MEMORY_MAP_MAX_SIZE];
+static size_t map_size = 0;
 
 static void insert(memory_block_t *memory_block, size_t idx) {
     if (map_size == MEMORY_MAP_MAX_SIZE)
@@ -42,7 +42,7 @@ static bool split(uint64_t address, size_t idx) {
     if (address <= map[idx].base || address >= map[idx].base + map[idx].length)
         return false;
 
-    memory_block_t new = {.base = address, .length = map[idx].length - address, .type = map[idx].type};
+    memory_block_t new = {.base = address, .length = map[idx].base + map[idx].length - address, .type = map[idx].type};
 
     map[idx].length = address - map[idx].base;
 
@@ -68,10 +68,10 @@ void mem_map_init() {
     freel(e820_map);
 
     // Remove everything lower than kernel end
-    for (size_t i = 0; i < find_first(&__kernel_end); i++)
+    for (size_t i = 0; i < find_first((size_t) &__kernel_end); i++)
         delete (0);
 
-    if (split(&__kernel_end, 0))
+    if (split((size_t) &__kernel_end, 0))
         delete (0);
 }
 

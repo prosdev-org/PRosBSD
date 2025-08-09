@@ -4,6 +4,7 @@
 #include <generated/version.h>
 #include <memory/map.h>
 #include <memory/map/e820.h>
+#include <memory/pfa.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -35,16 +36,13 @@ int main(void) {
         freel(e820_map);
     }
 
+    printf("Initializing Memory map...\n");
+    mem_map_init();
+
+    printf("Initializing PFA...\n");
+    pfa_init();
+
     {
-        printf("Initializing Memory map...\n");
-        mem_map_init();
-
-        while (mem_has_free()) {
-            size_t size;
-            printf("ptr = %p, ", mem_alloc(&size));
-            printf("Allocated %d MiB of High Memory\n", size / (0x100000));
-        }
-
         size_t size;
         memory_block_t *memory_map;
         memory_map = get_memory_map(&size);
@@ -64,6 +62,24 @@ int main(void) {
             }
             printf("\n");
         }
+    }
+
+    {
+        printf("\x1b[33m");
+        printf("PFA test:\n");
+        uint32_t ptrs[100];
+
+        printf("Allocating...\n");
+        for (size_t i = 0; i < 100; i++) {
+            ptrs[i] = pf_alloc();
+        }
+
+        printf("Freeing...\n");
+        for (size_t i = 0; i < 100; i++) {
+            pf_free(ptrs[i]);
+        }
+
+        printf("\x1b[0m");
     }
 
     printf("Initializing keyboard...\n");
