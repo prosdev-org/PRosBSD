@@ -1,7 +1,6 @@
 #include <core/panic.h>
 #include <memory/map.h>
 #include <stdbool.h>
-#include <stdint.h>
 
 #define PFA_MEMORY_MAP_MAX_SIZE MEMORY_MAP_MAX_SIZE
 #define BITMAP_SIZE             0x100000 / 32
@@ -62,9 +61,9 @@ static bool is_usable(uint32_t address) {
     return false;
 }
 
-static bool is_free_and_calc_idxs(uint32_t address, size_t *sup_idx, size_t *sub_idx) {
-    *sup_idx = address >> 5;
-    *sub_idx = address & 0x1F;
+static bool is_free_and_calc_idxs(uint32_t idx, size_t *sup_idx, size_t *sub_idx) {
+    *sup_idx = idx >> 5;
+    *sub_idx = idx & 0x1F;
 
     return !((bitmap[*sup_idx] & (1u << *sub_idx)) >> *sub_idx);
 }
@@ -91,26 +90,26 @@ static uint32_t pf_alloc_general(uint32_t start, uint32_t end, bool *found) {
 
 uint32_t pf_alloc() {
     bool found;
-    uint32_t address = pf_alloc_general(last_alloc, BITMAP_SIZE * sizeof(uint32_t), &found);
+    uint32_t idx = pf_alloc_general(last_alloc, BITMAP_SIZE * sizeof(uint32_t), &found);
     if (found)
-        return address;
+        return idx;
     else {
-        address = pf_alloc_general(0, last_alloc, &found);
+        idx = pf_alloc_general(0, last_alloc, &found);
         if (found)
-            return address;
+            return idx;
     }
 
     panic("PFA: Ran out of page frames");
 }
 
-void pf_free(uint32_t address) {
-    if (!is_usable(address << 12))
+void pf_free(uint32_t idx) {
+    if (!is_usable(idx << 12))
         panic("PFA: Attempt to free reserved memory");
 
     size_t sup_idx;
     size_t sub_idx;
 
-    if (!is_free_and_calc_idxs(address, &sup_idx, &sub_idx))
+    if (!is_free_and_calc_idxs(idx, &sup_idx, &sub_idx))
         bitmap[sup_idx] &= ~(1u << sub_idx);
     else
         panic("PFA: Double freeing");
