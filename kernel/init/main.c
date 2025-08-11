@@ -5,6 +5,7 @@
 #include <memory/map.h>
 #include <memory/map/e820.h>
 #include <memory/pfa.h>
+#include <drivers/gpu/clgd64xx.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -89,6 +90,9 @@ int main(void) {
     printf("\033[34m * Source Code:   \033[0mhttps://github.com/pros-dev-fans/PRosBSD\n\n");
 
     printf("\033[1;32m~$\033[0m ");
+
+    vga_init(CIRRUS_320x200x8);
+    vga_clear(0x1F);
 
     for (;;) {
         putck(getchark());
