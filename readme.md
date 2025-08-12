@@ -33,7 +33,6 @@ by its community.
 
 Here are the dependencies for Debian:
 
-- `build-essential`
 - `mtools`
 - `dosfstools`
 - `parted`
@@ -42,6 +41,8 @@ Here are the dependencies for Debian:
 - `grub-pc-bin`
 - `e2fsprogs`
 - `syslinux`
+
+> Also, you need to install `i686-elf-gcc` [homebrew link](https://formulae.brew.sh/formula/i686-elf-gcc)
 
 ```bash
 make

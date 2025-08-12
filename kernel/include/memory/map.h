@@ -27,6 +27,6 @@ void *mem_alloc_largest(uint64_t *size);
 
 bool mem_has_free();
 
-memory_block_t *get_memory_map();
+memory_block_t *get_memory_map(size_t *size);
 
 #endif
