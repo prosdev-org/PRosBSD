@@ -107,7 +107,7 @@ unmount_image:
 	sudo losetup -d $$LOOP_DEVICE
 
 config:
-	@$(CC) cfg/configurator.c -o configurator $(NULL)
+	@gcc cfg/configurator.c -o configurator $(NULL)
 	@chmod +X configurator
 	@./configurator
 
