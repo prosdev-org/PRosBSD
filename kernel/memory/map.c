@@ -2,7 +2,6 @@
 #include <memory/map.h>
 #include <memory/map/e820.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
 
 extern uint32_t __kernel_end;
@@ -64,8 +63,6 @@ void mem_map_init() {
 
         append(&memory_block);
     }
-
-    freel(e820_map);
 
     // Remove everything lower than kernel end
     for (size_t i = 0; i < find_first((size_t) &__kernel_end); i++)

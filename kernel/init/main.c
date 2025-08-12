@@ -8,7 +8,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 int main(void) {
@@ -32,8 +31,6 @@ int main(void) {
             printf("ACPI3 attr: %p", e820_map[i].acpi3_attributes);
             printf("\n");
         }
-
-        freel(e820_map);
     }
 
     printf("Initializing Memory map...\n");
