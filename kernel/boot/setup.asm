@@ -1,7 +1,7 @@
 .code16
 .globl _start
 
-.set KERNEL_SIZE, 65536 / 4
+.set KERNEL_SIZE, 131072 / 4
 
 _start:
     jmp start
