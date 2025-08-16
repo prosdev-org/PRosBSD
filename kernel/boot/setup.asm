@@ -209,6 +209,55 @@ init_tss:
     movl $0x9F000, tss_base+4
     ret
 
+Paging_setup:
+    # Page directory
+    mov $0x8000, %edi
+    mov $4096, %ecx
+    xor %eax, %eax
+    cld
+    rep stosl
+
+    # ID mapping Page Entry
+    mov $0x9000, %edi
+    mov $4096, %ecx
+    rep stosl
+
+    # High addr (0xC000_0000) mapping Page Entry
+    mov $0xA000, %edi
+    mov $4096, %ecx
+    rep stosl
+
+    # flags: 3 - present, read/write
+    movl $0x9003, 0x8000
+
+    # flags, as shown above
+    movl $0xA003, 0x8C00
+
+    mov $0x9000, %edi
+    mov $0x00000003, %eax # flags, as shown above
+Page_ID_mapping_loop:
+    stosl
+    add $0x1000, %eax
+    cmp $0xA000, %edi
+    jne Page_ID_mapping_loop
+
+    mov $0xA000, %edi
+    mov $0x00000003, %eax # flags, as shown above
+Page_High_mapping_loop:
+    stosl
+    add $0x1000, %eax
+    cmp $0xB000, %edi
+    jne Page_High_mapping_loop
+
+    mov $0x8000, %eax
+    mov %eax, %cr3
+
+    mov %cr0, %eax
+    or $0x80000000, %eax # set the PG bit
+    mov %eax, %cr0
+
+    ret
+
 PmodeEntry:
     mov $DATA_SEG, %ax
     mov %ax, %ds
@@ -227,11 +276,13 @@ PmodeEntry:
     mov $KERNEL_SIZE, %ecx
     rep movsl
 
+    call Paging_setup
+    mov $0xC009F000, %esp
     call EnableKRNL
 
     cli
     hlt
 
 EnableKRNL:
-    ljmp $CODE_SEG, $0x100000
+    ljmp $CODE_SEG, $0xC0100000
     ret

@@ -1,10 +1,15 @@
 #include <core/panic.h>
 #include <memory/map.h>
 #include <memory/map/e820.h>
+#include <memory/virtual/paging.h>
 #include <stdint.h>
 #include <string.h>
 
 extern uint32_t __kernel_end;
+
+static void *get_kernel_physical_end() {
+    return (void *) ((size_t) &__kernel_end - PAGING_FIRST_4MIB_MAPPING_ADDR);
+}
 
 void *get_kernel_end() {
     return (void *) &__kernel_end;
@@ -65,10 +70,10 @@ void mem_map_init() {
     }
 
     // Remove everything lower than kernel end
-    for (size_t i = 0; i < find_first((size_t) &__kernel_end); i++)
+    for (size_t i = 0; i < find_first((size_t) get_kernel_physical_end()); i++)
         delete (0);
 
-    if (split((size_t) &__kernel_end, 0))
+    if (split((size_t) get_kernel_physical_end(), 0))
         delete (0);
 }
 

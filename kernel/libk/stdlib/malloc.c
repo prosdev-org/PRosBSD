@@ -5,11 +5,11 @@
 #include <string.h>
 
 #define HEAP_START (int) get_kernel_end()
-#define HEAP_END   0x178200
+#define HEAP_END   0xC0178200
 #define ALIGNMENT  16
 #define MIN_BLOCK  (sizeof(block_t) * 2)
 
-#define SIZE_MAX ((size_t) - 1)
+#define SIZE_MAX ((size_t) -1)
 
 typedef struct block {
     size_t size;

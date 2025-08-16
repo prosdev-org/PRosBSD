@@ -1,10 +1,11 @@
-#include <drivers/idt.h>
 #include <drivers/keyboard.h>
 #include <drivers/tty.h>
 #include <generated/version.h>
+#include <interrupts/idt.h>
 #include <memory/map.h>
 #include <memory/map/e820.h>
 #include <memory/pfa.h>
+#include <memory/virtual/paging.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -13,8 +14,8 @@
 int main(void) {
     cleark();
 
-    printf("Initializing IDT...\n");
-    idt_init();
+    // printf("Initializing IDT...\n");
+    // idt_init();
 
     printf("Detecting memory...\n");
     {
@@ -60,6 +61,9 @@ int main(void) {
             printf("\n");
         }
     }
+
+    printf("Initializing Paging...\n");
+    paging_init();
 
     {
         printf("\x1b[33m");

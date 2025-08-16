@@ -1,5 +1,5 @@
-#include <drivers/idt.h>
-#include <drivers/pic.h>
+#include <interrupts/idt.h>
+#include <interrupts/pic.h>
 #include <stdint.h>
 
 typedef struct {

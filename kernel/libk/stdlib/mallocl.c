@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define LOW_HEAP_START 0x7E00
-#define LOW_HEAP_END   0x80000
+#define LOW_HEAP_START 0xC000B000
+#define LOW_HEAP_END   0xC0080000
 
 static uint32_t low_mem_ptr = LOW_HEAP_START;
 

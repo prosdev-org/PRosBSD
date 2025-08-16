@@ -1,5 +1,6 @@
 #include <core/panic.h>
 #include <memory/map.h>
+#include <memory/virtual/paging.h>
 #include <stdbool.h>
 
 #define PFA_MEMORY_MAP_MAX_SIZE MEMORY_MAP_MAX_SIZE
@@ -17,7 +18,7 @@ static uint32_t *bitmap; // 0 - free, 1 - busy
 static uint32_t last_alloc = 0;
 
 void pfa_init() {
-    bitmap = mem_alloc_size(BITMAP_SIZE * sizeof(uint32_t));
+    bitmap = mem_alloc_size(BITMAP_SIZE * sizeof(uint32_t)) + PAGING_FIRST_4MIB_MAPPING_ADDR;
     for (size_t i = 0; i < BITMAP_SIZE; i++)
         bitmap[i] = 0;
 
@@ -93,11 +94,10 @@ uint32_t pf_alloc() {
     uint32_t idx = pf_alloc_general(last_alloc, BITMAP_SIZE * sizeof(uint32_t), &found);
     if (found)
         return idx;
-    else {
-        idx = pf_alloc_general(0, last_alloc, &found);
-        if (found)
-            return idx;
-    }
+
+    idx = pf_alloc_general(0, last_alloc, &found);
+    if (found)
+        return idx;
 
     panic("PFA: Ran out of page frames");
 }
