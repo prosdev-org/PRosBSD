@@ -1,4 +1,4 @@
-#include <drivers/pic.h>
+#include <interrupts/pic.h>
 #include <util/io.h>
 
 #define PIC1         0x20

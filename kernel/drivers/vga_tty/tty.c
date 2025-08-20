@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define VGA_BUFFER        0xB8000
+#define VGA_BUFFER        0xC00B8000
 #define COLS              80
 #define ROWS              25
 #define DEFAULT_ATTRIBUTE 0x07

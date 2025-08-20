@@ -1,4 +1,4 @@
-#include <drivers/pic.h>
+#include <interrupts/pic.h>
 
 void irq_0_handler() {
     pic_send_eoi(0);

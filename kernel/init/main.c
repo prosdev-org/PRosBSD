@@ -1,10 +1,12 @@
-#include <drivers/idt.h>
+#include <cpu/gdt.h>
 #include <drivers/keyboard.h>
 #include <drivers/tty.h>
 #include <generated/version.h>
+#include <interrupts/idt.h>
 #include <memory/map.h>
 #include <memory/map/e820.h>
 #include <memory/pfa.h>
+#include <memory/virtual/paging.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -13,6 +15,9 @@
 int main(void) {
     cleark();
 
+    printf("Initializing GDT...\n");
+    gdt_init();
+
     printf("Initializing IDT...\n");
     idt_init();
 
@@ -20,7 +25,6 @@ int main(void) {
     {
         size_t size;
         e820_entry_t *e820_map = e820_get_map(&size);
-        uint64_t available_mem = 0;
 
         printf("Memory map provided by BIOS:\n");
         for (size_t i = 0; i < size; i++) {
@@ -60,6 +64,9 @@ int main(void) {
             printf("\n");
         }
     }
+
+    printf("Initializing Paging...\n");
+    paging_init();
 
     {
         printf("\x1b[33m");

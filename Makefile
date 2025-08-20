@@ -14,8 +14,8 @@ kernel: version.h
 image: kernel
 	@dd if=/dev/zero of=$(IMAGE_NAME) count=2880 bs=512 $(NULL)
 	@mkfs.fat -F 12 $(IMAGE_NAME)
-	@dd if=$(BUILD_DIRECTORY)/boot/MBR.BIN of=$(IMAGE_NAME) conv=notrunc
-	@mcopy -i $(IMAGE_NAME) $(BUILD_DIRECTORY)/boot/SETUP.BIN ::/
+	@dd if=$(BUILD_DIRECTORY)/kernel/boot/MBR.BIN of=$(IMAGE_NAME) conv=notrunc
+	@mcopy -i $(IMAGE_NAME) $(BUILD_DIRECTORY)/kernel/boot/SETUP.BIN ::/
 	@mcopy -i $(IMAGE_NAME) $(BUILD_DIRECTORY)/kernel/KERNEL.BIN ::/
 
 hdd_image:

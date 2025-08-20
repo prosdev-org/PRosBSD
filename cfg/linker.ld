@@ -10,7 +10,7 @@ PHDRS
 
 SECTIONS
 {
-  . = 0x100000;
+  . = 0xC0100000;
 
   .text : AT(ADDR(.text)) {
     *(.text*)

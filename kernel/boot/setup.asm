@@ -6,6 +6,7 @@
 _start:
     jmp start
 
+# Temporarily, it will be reset in the kernel
 GDT:
     .quad 0
 
@@ -25,70 +26,14 @@ GDT:
     .byte 0xCF
     .byte 0x00
 
-    # ring 3, code
-    .word 0xFFFF
-    .word 0x0000
-    .byte 0x00
-    .byte 0xFA         # P=1, DPL=11, S=1, Type=1010
-    .byte 0xCF
-    .byte 0x00
-
-    # ring 3, data
-    .word 0xFFFF
-    .word 0x0000
-    .byte 0x00
-    .byte 0xF2         # P=1, DPL=11, S=1, Type=0010
-    .byte 0xCF
-    .byte 0x00
-
-tss_entry:
-    .word 0x0068 # limit (104)
-    .word tss_base # base (0-15)
-    .byte 0x00 # base (16-23)
-    .byte 0x89 # P=1, DPL=00, Type=1001 (32-bit TSS available)
-    .byte 0x00 # G=0, AVL=0, limit (16-19)=0000
-    .byte 0x00 # base (24-31)
-
 END_GDT:
 
 GDT_PTR: 
     .word END_GDT - GDT - 1
     .long GDT
 
-tss_base:
-    .long 0x00000000 # last TSS
-    .long 0x001FFFF0 # ESP0
-    .long DATA_SEG   # SS0
-    .long 0x00000000 # ESP1
-    .long 0x00000000 # SS1
-    .long 0x00000000 # ESP2
-    .long 0x00000000 # SS2
-    .long 0x00000000 # CR3
-    .long 0x00000000 # EIP
-    .long 0x00000000 # EFLAGS
-    .long 0x00000000 # EAX
-    .long 0x00000000 # ECX
-    .long 0x00000000 # EDX
-    .long 0x00000000 # EBX
-    .long 0x00000000 # ESP
-    .long 0x00000000 # EBP
-    .long 0x00000000 # ESI
-    .long 0x00000000 # EDI
-    .long 0x00000000 # ES
-    .long 0x00000000 # CS
-    .long 0x00000000 # SS
-    .long 0x00000000 # DS
-    .long 0x00000000 # FS
-    .long 0x00000000 # GS
-    .long 0x00000000 # LDTR
-    .word 0x0000 # debug flag
-    .word 0x0000 # I/O Permission Bitmap offset
-
 .set CODE_SEG, 0x08 # Ring 0
 .set DATA_SEG, 0x10 # Ring 0
-.set USER_CODE_SEG, 0x18 | 3 # Ring 3
-.set USER_DATA_SEG, 0x20 | 3 # Ring 3
-.set TSS_SEG, 0x28
 
 font_data:
     .incbin "../../cfg/FONT.FNT"
@@ -200,13 +145,53 @@ start:
 
 .code32
 
-init_tss:
-    # mov eax, tss_base
-    # mov word [tss_entry + 2], ax # base (0-15)
-    # shr eax, 16
-    # mov byte [tss_entry + 4], al # base (16-23)
-    # mov byte [tss_entry + 7], ah # base (24-31)
-    movl $0x9F000, tss_base+4
+Paging_setup:
+    # Page directory
+    mov $0x8000, %edi
+    mov $4096, %ecx
+    xor %eax, %eax
+    cld
+    rep stosl
+
+    # ID mapping Page Entry
+    mov $0x9000, %edi
+    mov $4096, %ecx
+    rep stosl
+
+    # High addr (0xC000_0000) mapping Page Entry
+    mov $0xA000, %edi
+    mov $4096, %ecx
+    rep stosl
+
+    # flags: 3 - present, read/write
+    movl $0x9003, 0x8000
+
+    # flags, as shown above
+    movl $0xA003, 0x8C00
+
+    mov $0x9000, %edi
+    mov $0x00000003, %eax # flags, as shown above
+Page_ID_mapping_loop:
+    stosl
+    add $0x1000, %eax
+    cmp $0xA000, %edi
+    jne Page_ID_mapping_loop
+
+    mov $0xA000, %edi
+    mov $0x00000003, %eax # flags, as shown above
+Page_High_mapping_loop:
+    stosl
+    add $0x1000, %eax
+    cmp $0xB000, %edi
+    jne Page_High_mapping_loop
+
+    mov $0x8000, %eax
+    mov %eax, %cr3
+
+    mov %cr0, %eax
+    or $0x80000000, %eax # set the PG bit
+    mov %eax, %cr0
+
     ret
 
 PmodeEntry:
@@ -218,20 +203,18 @@ PmodeEntry:
     mov $0x9F000, %esp
     mov %ax, %ss
 
-    call init_tss
-    mov $TSS_SEG, %ax
-    ltr %ax
-
     mov $0x07E00, %esi
     mov $0x100000, %edi
     mov $KERNEL_SIZE, %ecx
     rep movsl
 
+    call Paging_setup
+    mov $0xC009F000, %esp
     call EnableKRNL
 
     cli
     hlt
 
 EnableKRNL:
-    ljmp $CODE_SEG, $0x100000
+    ljmp $CODE_SEG, $0xC0100000
     ret
