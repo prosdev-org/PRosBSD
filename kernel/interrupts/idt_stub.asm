@@ -2,7 +2,9 @@
     .extern isr_\num\()_handler
     .global isr_\num
     isr_\num:
+        pusha
         call isr_\num\()_handler
+        popa
         iret
 .endm
 
@@ -10,8 +12,10 @@
     .extern isr_\num\()_handler
     .global isr_\num
     isr_\num:
-        call isr_\num\()_handler
         add $4, %esp
+        pusha
+        call isr_\num\()_handler
+        popa
         iret
 .endm
 
@@ -19,7 +23,9 @@
     .extern irq_\num\()_handler
     .global irq_\num
     irq_\num:
+        pusha
         call irq_\num\()_handler
+        popa
         iret
 .endm
 
