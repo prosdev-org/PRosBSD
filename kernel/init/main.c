@@ -1,6 +1,7 @@
 #include <cpu/gdt.h>
 #include <drivers/keyboard.h>
 #include <drivers/tty.h>
+#include <drivers/pci.h>
 #include <generated/version.h>
 #include <interrupts/idt.h>
 #include <memory/map.h>
@@ -40,6 +41,7 @@ int main(void) {
     printf("Initializing Memory map...\n");
     mem_map_init();
 
+    __asm__ ("cli");
     printf("Initializing PFA...\n");
     pfa_init();
 
@@ -93,6 +95,9 @@ int main(void) {
     printf("\033[34m * Source Code:   \033[0mhttps://github.com/pros-dev-fans/PRosBSD\n\n");
 
     printf("\033[1;32m~$\033[0m ");
+
+    pci_init();
+    pci_print_info();
 
     for (;;) {
         putck(getchark());
