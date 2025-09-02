@@ -16,7 +16,7 @@ ESC_END = \033[0m
 NULL =  > /dev/null 2>&1
 ASFLAGS = --32
 LDFLAGS = -m elf_i386
-CFLAGS  = -std=c99 -O2 -c -g -m32 -fno-builtin -fno-stack-protector -fomit-frame-pointer -fno-inline -fstrength-reduce -fno-pic -nostdinc -Wall -Wextra -Wshadow -Wstrict-aliasing
+CFLAGS  = -std=c99 -O2 -c -g -m32 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer -fno-inline -fstrength-reduce -fno-pic -nostdinc -Wall -Wextra -Wshadow -Wstrict-aliasing -w
 OBJCOPYFLAGS := -R .pdr -R .comment -R.note -S -O binary
 BUILD_DIRECTORY ?= build
 IMAGE_NAME := fd.img
