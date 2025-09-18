@@ -1,5 +1,8 @@
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+
+static bool panicked = false;
 
 struct stackframe {
     struct stackframe *ebp;
@@ -28,19 +31,30 @@ void panic(const char *s) {
                      "mov %%cr4, %3\n"
                      : "=r"(cr0), "=r"(cr2), "=r"(cr3), "=r"(cr4));
 
-    printf("\n\rKernel panic: %s\n\r"
-           "EBP: 0x%x, ESP: 0x%x\n\r"
-           "Registers: EAX: 0x%x, EBX: 0x%x, ECX: 0x%x,\n\rEDX: 0x%x ESI: 0x%x, EDI: 0x%x\n\r"
-           "Control Registers: CR0: 0x%x, CR2: 0x%x, CR3: 0x%x, CR4: 0x%x\n\r",
+    if (panicked)
+        printf("\n\033[37m\033[41mNested panic: ");
+    else
+        printf("\n\033[37m\033[44mKernel panic: ");
+    printf("%s\n"
+           "EBP: 0x%x, ESP: 0x%x\n"
+           "Registers: EAX: 0x%x, EBX: 0x%x, ECX: 0x%x,\nEDX: 0x%x ESI: 0x%x, EDI: 0x%x\n"
+           "Control Registers: CR0: 0x%x, CR2: 0x%x, CR3: 0x%x, CR4: 0x%x\n",
            s, ebp, esp, eax, ebx, ecx, edx, esi, edi, cr0, cr2, cr3, cr4);
+
+    if (panicked)
+        goto halt;
+    panicked = true;
+
     struct stackframe *stk;
     __asm__ volatile("movl %%ebp, %0" : "=r"(stk)::);
-    printf("Stack trace:\n\r");
+
+    printf("Stack trace:\n");
     for (uint32_t frame = 0; stk && frame < 10; ++frame) {
-        printf("  0x%x\n\r", stk->eip);
+        printf("  0x%x\n", stk->eip);
         stk = stk->ebp;
     }
 
+halt:
     __asm__ volatile("cli\n"
                      "hlt\n"
                      :
