@@ -17,14 +17,18 @@ objs:
 		do \
 		echo "$(ESC_GREEN)Compiling kernel.. $(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
 		mkdir -p $(BUILD_DIRECTORY)/$$(dirname $$f); \
-		$(CC) $(CFLAGS) $$f -o $(BUILD_DIRECTORY)/$$(dirname $$f)/$$(basename $$f .c).o; \
+		if ! $(CC) $(CFLAGS) $$f -o $(BUILD_DIRECTORY)/$$f.o; then \
+			exit 1; \
+		fi; \
 	done;
 
 	@for f in $$(find . -name "*.asm" -not -path "./boot/*"); \
 		do \
 		echo "$(ESC_GREEN)Assembling kernel.. $(ESC_END) $(ESC_BLUE)$$f$(ESC_END)"; \
 		mkdir -p $(BUILD_DIRECTORY)/$$(dirname $$f); \
-		$(AS) $(ASFLAGS) $$f -o $(BUILD_DIRECTORY)/$$(dirname $$f)/$$(basename $$f .asm).o; \
+		if ! $(AS) $(ASFLAGS) $$f -o $(BUILD_DIRECTORY)/$$f.o; then \
+			exit 1; \
+		fi; \
 	done;
 
 kernel: boot objs
