@@ -27,6 +27,7 @@ hdd_image:
 		echo "$(ESC_BLUE)ERROR: ISGRUBQ must be only Y or N!$(ESC_END)"; \
 		exit 1; \
 	fi
+	@ln -s $(HDD_IMAGE) prosbsd.img
 
 hdd_image_syslinux: image
 	@dd if=/dev/zero of=$(HDD_IMAGE) bs=1M count=70 $(NULL)
