@@ -23,7 +23,7 @@ by its community.
 > Do not run this script as root. It is not supported.
 
 ```bash
-./build.sh
+./build.sh -R
 ```
 
 ### Method 2
@@ -59,7 +59,7 @@ To run PRosBSD, use an x86 hypervisors/emulators such as **QEMU/VMware/Virtualbo
 Here is an example of a command to run in QEMU
 
 ```bash
-qemu-system-i386 -drive file=prosbsd-v.{PROSBSD-VERSION}.img,format=raw,if=ide,index=0
+./build.sh -B
 ```
 
 ## Contributing
