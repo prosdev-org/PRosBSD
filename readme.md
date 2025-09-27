@@ -13,8 +13,6 @@ by its community.
 
 ## Building
 
-### Method 1 _recommended_
-
 > [!IMPORTANT]
 > This method uses docker to provide you all the dependencies.
 > You need to [install it](https://docs.docker.com/engine/install/) before using this method.
@@ -26,28 +24,7 @@ by its community.
 ./build.sh -R
 ```
 
-### Method 2
-
-> [!IMPORTANT]
-> This method assumes that you have already installed all the dependencies.
-
-Here are the dependencies for Debian:
-
-- `build-essential`
-- `mtools`
-- `dosfstools`
-- `parted`
-- `multipath-tools`
-- `grub2-common`
-- `grub-pc-bin`
-- `e2fsprogs`
-- `syslinux`
-
-```bash
-make
-```
-
-With both methods, you will get two images:
+You will get two images:
 
 - one of them `fd.img`, which is _a kernel floppy disk image_
 - second is `prosbsd-v.{PROSBSD-VERSION}.img`,  _a hard disk bootable image_

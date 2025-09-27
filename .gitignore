@@ -2,6 +2,7 @@
 
 *.BIN
 *.bin
+*.a
 
 *.img
 
@@ -16,4 +17,3 @@
 
 build/
 /include/generated/
-configurator

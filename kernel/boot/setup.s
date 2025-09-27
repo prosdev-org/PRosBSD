@@ -36,7 +36,7 @@ GDT_PTR:
 .set DATA_SEG, 0x10 # Ring 0
 
 font_data:
-    .incbin "../../cfg/FONT.FNT"
+    .incbin "FONT.FNT"
 
 DisableMotor: # FLoppy motor killer
     push %dx
