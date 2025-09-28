@@ -8,6 +8,7 @@
 
 .vscode/
 .idea/
+cmake-*/
 
 *~
 *.swp

@@ -31,5 +31,6 @@ set(ISGRUBQ FALSE)
 
 set(IMAGE_NAME "fd.img")
 set(HARD_IMAGE_NAME "prosbsd-v.${PROJECT_VERSION_FULL}.img")
+set(HARD_IMAGE_LINK_NAME "prosbsd.img")
 
 set(MEMDISK_PATH "/usr/lib/syslinux/memdisk")

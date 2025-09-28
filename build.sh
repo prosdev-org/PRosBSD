@@ -75,5 +75,5 @@ fi
 
 if [[ $run ]]; then
     echo "[BUILD SCRIPT] Running PRosBSD"
-    qemu-system-i386 -drive file=prosbsd.img,format=raw,if=ide,index=0
+    qemu-system-i386 -drive file=build/prosbsd.img,format=raw,if=ide,index=0
 fi
