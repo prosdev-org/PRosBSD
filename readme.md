@@ -24,11 +24,6 @@ by its community.
 ./build.sh -R
 ```
 
-You will get two images:
-
-- one of them `fd.img`, which is _a kernel floppy disk image_
-- second is `prosbsd-v.{PROSBSD-VERSION}.img`,  _a hard disk bootable image_
-
 ## Running
 
 To run PRosBSD, use an x86 hypervisors/emulators such as **QEMU/VMware/Virtualbox**.
