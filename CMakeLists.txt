@@ -20,6 +20,8 @@ file(WRITE "${CMAKE_BINARY_DIR}/include/generated/version.h" "// This file is au
 #endif
 ")
 
+file(WRITE "${CMAKE_BINARY_DIR}/version" "${PROJECT_VERSION_FULL}")
+
 add_subdirectory(kernel)
 
 add_custom_target(image
