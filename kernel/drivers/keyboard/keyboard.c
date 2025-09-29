@@ -26,7 +26,7 @@ uint8_t num_lock_active = 0;
 uint8_t scroll_lock_active = 0;
 
 // US QWERTY scancode maps
-const char scancode_map_normal[] = {0,    0,   '1', '2',  '3',  '4', '5',  '6', // 00-07
+const char scancode_map_normal[255] = {0,    0,   '1', '2',  '3',  '4', '5',  '6', // 00-07
                                     '7',  '8', '9', '0',  '-',  '=', '\b', '\t', // 08-0F
                                     'q',  'w', 'e', 'r',  't',  'y', 'u',  'i', // 10-17
                                     'o',  'p', '[', ']',  '\n', 0,   'a',  's', // 18-1F
@@ -39,7 +39,7 @@ const char scancode_map_normal[] = {0,    0,   '1', '2',  '3',  '4', '5',  '6', 
                                     '2',  '3', '0', '.',  0,    0,   0,    0, // 50-57
                                     0};
 
-const char scancode_map_shifted[] = {0,   0,   '!', '@', '#',  '$', '%',  '^', // 00-07
+const char scancode_map_shifted[255] = {0,   0,   '!', '@', '#',  '$', '%',  '^', // 00-07
                                      '&', '*', '(', ')', '_',  '+', '\b', '\t', // 08-0F
                                      'Q', 'W', 'E', 'R', 'T',  'Y', 'U',  'I', // 10-17
                                      'O', 'P', '{', '}', '\n', 0,   'A',  'S', // 18-1F
