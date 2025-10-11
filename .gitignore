@@ -2,11 +2,13 @@
 
 *.BIN
 *.bin
+*.a
 
 *.img
 
 .vscode/
 .idea/
+cmake-*/
 
 *~
 *.swp
@@ -16,4 +18,3 @@
 
 build/
 /include/generated/
-configurator

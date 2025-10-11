@@ -2,6 +2,7 @@ FROM debian:latest
 
 RUN apt-get update && apt-get install -y \
     build-essential \
+    cmake \
     mtools \
     dosfstools \
     parted \
@@ -22,4 +23,4 @@ RUN groupadd -g $HOST_GID builder \
 
 USER builder
 
-CMD ["make"]
+CMD ["sh", "-c", "cmake -S . -B build; cmake --build build"]

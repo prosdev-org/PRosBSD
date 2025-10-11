@@ -19,4 +19,4 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
           name: PRosBSD
-          path: "*.img"
+          path: "build/prosbsd.img"

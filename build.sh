@@ -70,10 +70,13 @@ done
 if [[ $build ]]; then
     echo "[BUILD SCRIPT] Building PRosBSD"
     docker build --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) -t prosbsd-builder .
-    $sudo docker run --privileged --rm -v "$(pwd):/prosbsd" -w /prosbsd prosbsd-builder
+    $sudo docker run --privileged --rm -v "$(pwd):/prosbsd" --mount type=tmpfs,destination=/tmp/image/ -w /prosbsd prosbsd-builder
+    if [ "$?" -ne 0 ]; then
+        exit 1
+    fi
 fi
 
 if [[ $run ]]; then
     echo "[BUILD SCRIPT] Running PRosBSD"
-    qemu-system-i386 -drive file=prosbsd.img,format=raw,if=ide,index=0
+    qemu-system-i386 -drive file=build/prosbsd.img,format=raw,if=ide,index=0
 fi
