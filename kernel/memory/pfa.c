@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define PFA_MEMORY_MAP_MAX_SIZE MEMORY_MAP_MAX_SIZE
-#define BITMAP_SIZE             0x100000 / 32
+#define BITMAP_SIZE             (0x100000 / 32)
 
 typedef struct {
     uint32_t base;
@@ -54,7 +54,7 @@ void pfa_init() {
     }
 }
 
-static bool is_usable(uint32_t address) {
+static bool is_usable(const uint32_t address) {
     for (size_t i = 0; i < map_size; i++)
         if (address >= map[i].base && address < map[i].base + map[i].length)
             return true;
@@ -62,14 +62,14 @@ static bool is_usable(uint32_t address) {
     return false;
 }
 
-static bool is_free_and_calc_idxs(uint32_t idx, size_t *sup_idx, size_t *sub_idx) {
+static bool is_free_and_calc_idxs(const uint32_t idx, size_t *sup_idx, size_t *sub_idx) {
     *sup_idx = idx >> 5;
     *sub_idx = idx & 0x1F;
 
     return !((bitmap[*sup_idx] & (1u << *sub_idx)) >> *sub_idx);
 }
 
-static uint32_t pf_alloc_general(uint32_t start, uint32_t end, bool *found) {
+static uint32_t pf_alloc_general(const uint32_t start, const uint32_t end, bool *found) {
     for (size_t i = start; i < end; i++) {
         if (!is_usable(i << 12))
             continue;
@@ -102,7 +102,7 @@ uint32_t pf_alloc() {
     panic("PFA: Ran out of page frames");
 }
 
-void pf_free(uint32_t idx) {
+void pf_free(const uint32_t idx) {
     if (!is_usable(idx << 12))
         panic("PFA: Attempt to free reserved memory");
 

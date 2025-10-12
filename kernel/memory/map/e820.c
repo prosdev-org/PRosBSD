@@ -4,7 +4,7 @@
 #define E820_BUFFER 0xC0005000
 
 e820_entry_t *e820_get_map(size_t *size) {
-    volatile uint32_t *e820 = (volatile uint32_t *) E820_BUFFER;
+    const volatile uint32_t *e820 = (volatile uint32_t *) E820_BUFFER;
 
     *size = e820[0];
     e820_entry_t *map = mallocl(*size * sizeof(e820_entry_t));

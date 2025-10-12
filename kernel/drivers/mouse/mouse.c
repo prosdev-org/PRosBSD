@@ -50,7 +50,7 @@ void mouse_init() {
     mouse_set_sample_rate(MOUSE_SAMPLE_RATE_200);
     mouse_set_sample_rate(MOUSE_SAMPLE_RATE_100);
     mouse_set_sample_rate(MOUSE_SAMPLE_RATE_80);
-    uint8_t id = mouse_get_id();
+    const uint8_t id = mouse_get_id();
 
     // set packet size based on mouse ID
     if (id == MOUSE_ID_SCROLL) {
@@ -77,10 +77,10 @@ void mouse_init() {
     mouse.id = id;
 }
 
-void mouse_wait(uint8_t type) {
+void mouse_wait(const uint8_t type) {
     uint32_t timeout = 100000;
     while (timeout--) {
-        uint8_t status = inb(PS2_STATUS_PORT);
+        const uint8_t status = inb(PS2_STATUS_PORT);
 
         if (type == 0 && !(status & STATUS_INPUT_FULL))
             return;
@@ -89,7 +89,7 @@ void mouse_wait(uint8_t type) {
     }
 }
 
-void mouse_write(uint8_t command) {
+void mouse_write(const uint8_t command) {
     outb(PS2_CMD_WRITE_PORT2, PS2_CTRL_PORT);
     mouse_wait(1);
 
@@ -103,14 +103,14 @@ uint8_t mouse_read() {
 }
 
 void mouse_handler() {
-    uint8_t status = inb(PS2_STATUS_PORT);
+    const uint8_t status = inb(PS2_STATUS_PORT);
 
     if (!(status & STATUS_OUTPUT_FULL))
         return;
     if (!(status & 0x20))
         return; // not from mouse
 
-    uint8_t data = inb(PS2_DATA_PORT);
+    const uint8_t data = inb(PS2_DATA_PORT);
 
     if (mouse.packet_index == 0 && (data & MOUSE_ALWAYS_1)) {
         mouse.packet[0] = data;
@@ -128,7 +128,7 @@ void mouse_handler() {
 }
 
 void mouse_parse_packet() {
-    uint8_t flags = mouse.packet[0];
+    const uint8_t flags = mouse.packet[0];
 
     mouse.buttons = flags & 0x07;
 
@@ -138,9 +138,9 @@ void mouse_parse_packet() {
 
     // apply sign bits
     if (flags & MOUSE_X_SIGN)
-        x |= 0xFF00;
+        x |= (int16_t) 0xFF00;
     if (flags & MOUSE_Y_SIGN)
-        y |= 0xFF00;
+        y |= (int16_t) 0xFF00;
 
     if (!(flags & (MOUSE_X_OVERFLOW | MOUSE_Y_OVERFLOW))) {
         mouse.x += x;
@@ -151,19 +151,19 @@ void mouse_parse_packet() {
     if (mouse.packet_size == 4) {
         int8_t z = mouse.packet[3] & 0x0F;
         if (z & 0x08)
-            z |= 0xF0;
+            z |= (int8_t) 0xF0;
         mouse.z += z;
     }
 }
 
-void mouse_set_sample_rate(uint8_t rate) {
+void mouse_set_sample_rate(const uint8_t rate) {
     mouse_write(MOUSE_CMD_SET_SAMPLE);
     mouse_read();
     mouse_write(rate);
     mouse_read();
 }
 
-void mouse_set_resolution(uint8_t res) {
+void mouse_set_resolution(const uint8_t res) {
     mouse_write(MOUSE_CMD_SET_RES);
     mouse_read();
     mouse_write(res);
@@ -177,10 +177,10 @@ uint8_t mouse_get_id() {
 }
 
 void mouse_poll() {
-    uint8_t status = inb(PS2_STATUS_PORT);
+    const uint8_t status = inb(PS2_STATUS_PORT);
 
     if ((status & STATUS_OUTPUT_FULL) && (status & 0x20)) {
-        uint8_t data = inb(PS2_DATA_PORT);
+        const uint8_t data = inb(PS2_DATA_PORT);
 
         if (mouse.packet_index == 0 && (data & MOUSE_ALWAYS_1)) {
             mouse.packet[0] = data;

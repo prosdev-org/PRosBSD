@@ -19,7 +19,7 @@ __attribute((aligned(0x10))) static idt_entry_t idt[256];
 
 static idtr_t idtr;
 
-void idt_set_descriptor(uint8_t vector, void *isr, uint8_t flags) {
+void idt_set_descriptor(const uint8_t vector, void *isr, const uint8_t flags) {
     idt_entry_t *descriptor = &idt[vector];
 
     descriptor->isr_low = (uint32_t) isr & 0xFFFF;

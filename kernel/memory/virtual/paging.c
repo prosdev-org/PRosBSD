@@ -3,20 +3,20 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define PAGE_DIRECTORY_SIZE 0x1000 / sizeof(uint32_t)
-#define PAGE_TABLE_SIZE     0x1000 / sizeof(uint32_t)
+#define PAGE_DIRECTORY_SIZE (0x1000 / sizeof(uint32_t))
+#define PAGE_TABLE_SIZE     (0x1000 / sizeof(uint32_t))
 #define PAGE_SIZE           0x1000
 
 #define PAGING_ATTR_PRESENT    0x00000001
 #define PAGING_ATTR_READ_WRITE 0x00000002
 
-#define PAGING_ATTR_DEFAULT PAGING_ATTR_PRESENT | PAGING_ATTR_READ_WRITE
+#define PAGING_ATTR_DEFAULT (PAGING_ATTR_PRESENT | PAGING_ATTR_READ_WRITE)
 #define PAGING_ATTR_EMPTY   0x00000000
 
 static uint32_t *page_directory;
 static uint32_t *first_4mib_table;
 
-static void *idx_to_ptr(uint32_t idx) {
+static void *idx_to_ptr(const uint32_t idx) {
     return (void *) (idx << 12);
 }
 

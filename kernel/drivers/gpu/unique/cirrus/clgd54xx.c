@@ -8,9 +8,9 @@ uint16_t vga_height = 200;
 uint8_t vga_bpp = 8;
 uint32_t vga_stride = 320;
 
-static void write_reg_sequence(const uint16_t *data, uint16_t port) {
+static void write_reg_sequence(const uint16_t *data, const uint16_t port) {
     while (1) {
-        uint16_t val = *data++;
+        const uint16_t val = *data++;
         if (val == 0xFFFF)
             break;
         outw(val, port);
@@ -29,16 +29,16 @@ static void cirrus_unlock() {
 }
 
 // set 64KB bank
-static inline void cirrus_set_bank(uint8_t bank) {
+static void cirrus_set_bank(const uint8_t bank) {
     outb(0x09, 0x3CE);
     outb((uint8_t) ((bank & 0x0F) | ((bank & 0x0F) << 4)), 0x3CF);
 }
 
 // write to banked VRAM
-static inline void vram_write(uint32_t offset, const uint8_t *src, uint32_t len) {
+static void vram_write(uint32_t offset, const uint8_t *src, uint32_t len) {
     while (len) {
-        uint32_t bank = offset >> 16;
-        uint16_t off = (uint16_t) (offset & 0xFFFF);
+        const uint32_t bank = offset >> 16;
+        const uint16_t off = (uint16_t) (offset & 0xFFFF);
         uint32_t chunk = 0x10000u - off;
         if (chunk > len)
             chunk = len;
@@ -53,10 +53,10 @@ static inline void vram_write(uint32_t offset, const uint8_t *src, uint32_t len)
 }
 
 // fill range in VRAM, bank-aware
-static inline void vram_fill8(uint32_t offset, uint8_t value, uint32_t len) {
+static void vram_fill8(uint32_t offset, const uint8_t value, uint32_t len) {
     while (len) {
-        uint32_t bank = offset >> 16;
-        uint16_t off = (uint16_t) (offset & 0xFFFF);
+        const uint32_t bank = offset >> 16;
+        const uint16_t off = (uint16_t) (offset & 0xFFFF);
         uint32_t chunk = 0x10000u - off;
         if (chunk > len)
             chunk = len;
@@ -143,11 +143,11 @@ static uint16_t ccrtc_1280x1024x16[] = {0x2911, 0xc300, 0x9f01, 0x9f02, 0x8603, 
                                         0xff15, 0x2416, 0xc317, 0xff18, 0x001a, 0x321b, 0x001d, 0xffff};
 
 // 1600x1200x8 (table only)
-static uint16_t cseq_1600x1200x8[] = {0x0300, 0x2101, 0x0f02, 0x0003, 0x0e04, 0x1107, 0x760b, 0x760c, 0x760d,
-                                      0x760e, 0x0412, 0x0013, 0x2017, 0x341b, 0x341c, 0x341d, 0x341e, 0xffff};
-static uint16_t ccrtc_1600x1200x8[] = {0x2911, 0xc300, 0x9f01, 0x9f02, 0x8603, 0x8304, 0x9405, 0x2406,
-                                       0xf707, 0x6009, 0x000c, 0x000d, 0x0310, 0xff12, 0xc813, 0x4014,
-                                       0xff15, 0x2416, 0xc317, 0xff18, 0x001a, 0x221b, 0x001d, 0xffff};
+// static uint16_t cseq_1600x1200x8[] = {0x0300, 0x2101, 0x0f02, 0x0003, 0x0e04, 0x1107, 0x760b, 0x760c, 0x760d,
+//                                       0x760e, 0x0412, 0x0013, 0x2017, 0x341b, 0x341c, 0x341d, 0x341e, 0xffff};
+// static uint16_t ccrtc_1600x1200x8[] = {0x2911, 0xc300, 0x9f01, 0x9f02, 0x8603, 0x8304, 0x9405, 0x2406,
+//                                        0xf707, 0x6009, 0x000c, 0x000d, 0x0310, 0xff12, 0xc813, 0x4014,
+//                                        0xff15, 0x2416, 0xc317, 0xff18, 0x001a, 0x221b, 0x001d, 0xffff};
 
 typedef struct {
     uint8_t code;
@@ -180,7 +180,7 @@ static const cirrus_mode_t cirrus_modes[] = {
         {0x69, 1280, 1024, 15, 0xF0, cseq_1280x1024x16, cgraph_svgacolor, ccrtc_1280x1024x16},
 };
 
-static const cirrus_mode_t *find_cirrus_mode(uint8_t bios_code) {
+static const cirrus_mode_t *find_cirrus_mode(const uint8_t bios_code) {
     for (size_t i = 0; i < sizeof(cirrus_modes) / sizeof(cirrus_modes[0]); i++) {
         if (cirrus_modes[i].code == bios_code)
             return &cirrus_modes[i];
@@ -209,7 +209,7 @@ static void cirrus_set_mode_raw(const cirrus_mode_t *m) {
     vga_stride = (uint32_t) m->w * (m->bpp == 15 ? 2u : (m->bpp / 8u));
 }
 
-void vga_init(vga_mode_t mode) {
+void vga_init(const vga_mode_t mode) {
     if (mode == CIRRUS_320x200x8) {
         outb(0x63, 0x3C2);
 
@@ -278,7 +278,7 @@ void vga_init(vga_mode_t mode) {
     }
 }
 
-void vga_draw_pixel(uint16_t x, uint16_t y, uint32_t color) {
+void vga_draw_pixel(const uint16_t x, const uint16_t y, const uint32_t color) {
     if (x >= vga_width || y >= vga_height)
         return;
     uint32_t off;
@@ -291,15 +291,15 @@ void vga_draw_pixel(uint16_t x, uint16_t y, uint32_t color) {
         case 15:
         case 16: {
             off = (uint32_t) y * vga_stride + (uint32_t) x * 2u;
-            uint8_t px[2] = {(uint8_t) (color & 0xFF), (uint8_t) ((color >> 8) & 0xFF)};
+            const uint8_t px[2] = {(uint8_t) (color & 0xFF), (uint8_t) ((color >> 8) & 0xFF)};
             vram_write(off, px, 2);
             break;
         }
 
         case 24: {
             off = (uint32_t) y * vga_stride + (uint32_t) x * 3u;
-            uint8_t px[3] = {(uint8_t) (color & 0xFF), (uint8_t) ((color >> 8) & 0xFF),
-                             (uint8_t) ((color >> 16) & 0xFF)};
+            const uint8_t px[3] = {(uint8_t) (color & 0xFF), (uint8_t) ((color >> 8) & 0xFF),
+                                   (uint8_t) ((color >> 16) & 0xFF)};
             vram_write(off, px, 3);
             break;
         }
@@ -309,21 +309,21 @@ void vga_draw_pixel(uint16_t x, uint16_t y, uint32_t color) {
     }
 }
 
-void vga_clear(uint32_t color) {
-    uint32_t fb_size = (uint32_t) vga_stride * vga_height;
+void vga_clear(const uint32_t color) {
+    const uint32_t fb_size = vga_stride * vga_height;
     if (vga_bpp == 8) {
         vram_fill8(0, (uint8_t) color, fb_size);
         return;
     }
 
     for (uint16_t y = 0; y < vga_height; y++) {
-        uint32_t off = (uint32_t) y * vga_stride;
+        const uint32_t off = (uint32_t) y * vga_stride;
         switch (vga_bpp) {
             case 15:
             case 16: {
                 // supports up to 4096 pixels wide
                 static uint8_t line[8192];
-                uint32_t need = (uint32_t) vga_width * 2u;
+                const uint32_t need = (uint32_t) vga_width * 2u;
                 for (uint32_t i = 0; i < need; i += 2) {
                     line[i + 0] = (uint8_t) (color & 0xFF);
                     line[i + 1] = (uint8_t) ((color >> 8) & 0xFF);
@@ -334,7 +334,7 @@ void vga_clear(uint32_t color) {
             case 24: {
                 // supports up to 5461 pixels wide
                 static uint8_t line[16384];
-                uint32_t need = (uint32_t) vga_width * 3u;
+                const uint32_t need = (uint32_t) vga_width * 3u;
                 for (uint32_t i = 0, p = 0; i < vga_width; i++, p += 3) {
                     line[p + 0] = (uint8_t) (color & 0xFF);
                     line[p + 1] = (uint8_t) ((color >> 8) & 0xFF);

@@ -10,7 +10,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 
 int main(void) {
     cleark();
@@ -24,7 +23,7 @@ int main(void) {
     printf("Detecting memory...\n");
     {
         size_t size;
-        e820_entry_t *e820_map = e820_get_map(&size);
+        const e820_entry_t *e820_map = e820_get_map(&size);
 
         printf("Memory map provided by BIOS:\n");
         for (size_t i = 0; i < size; i++) {
@@ -45,8 +44,7 @@ int main(void) {
 
     {
         size_t size;
-        memory_block_t *memory_map;
-        memory_map = get_memory_map(&size);
+        const memory_block_t *memory_map = get_memory_map(&size);
 
         printf("Memory map:\n");
         for (size_t i = 0; i < size; i++) {
@@ -97,6 +95,4 @@ int main(void) {
     for (;;) {
         putck(getchark());
     }
-
-    return 0;
 }

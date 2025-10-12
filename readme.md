@@ -1,4 +1,5 @@
 # PRosBSD / ![3-Clause BSD License](https://img.shields.io/badge/LICENSE-3--Clause_BSD-blue) / ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pros-dev-fans/PRosBSD/build.yml) / ![Version](https://img.shields.io/badge/version-0.1.0--dev-orange?logo=git)
+
 32-bit operating system written in GAS/C for x86, inspired by [x16-PRos](https://github.com/PRoX2011/x16-PRos) and made
 by its community.
 

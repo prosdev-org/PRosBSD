@@ -8,7 +8,7 @@
 
 static uint32_t low_mem_ptr = LOW_HEAP_START;
 
-void *mallocl(size_t size) {
+void *mallocl(const size_t size) {
     low_mem_ptr = (low_mem_ptr + 15) & ~0xF;
 
     if (low_mem_ptr + size > LOW_HEAP_END) {

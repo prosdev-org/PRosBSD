@@ -4,23 +4,23 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 add_compile_options(
-    -O2
-    -c
-    -g
-    -m32
-    -fno-builtin
-    -fno-stack-protector
-    -fno-omit-frame-pointer
-    -fno-inline
-    -fstrength-reduce
-    -fno-pic
-    -nostdinc
-    -nostdlib
-    -Wall
-    -Wextra
-    -Wshadow
-    -Wstrict-aliasing
-    -w
+        -O2
+        -c
+        -g
+        -m32
+        -fno-builtin
+        -fno-stack-protector
+        -fno-omit-frame-pointer
+        -fno-inline
+        -fstrength-reduce
+        -fno-pic
+        -nostdinc
+        -nostdlib
+        -Wall
+        -Wextra
+        -Wshadow
+        -Wstrict-aliasing
+        -w
 )
 
 set(CMAKE_LINKER_FLAGS -melf_i386)

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-bool read_sectors(fat32_ctx_t *ctx, uint32_t lba, uint32_t count, void *buffer) {
+bool read_sectors(const uint32_t lba, const uint32_t count, void *buffer) {
     for (uint32_t i = 0; i < count; i++) {
         if (!pata_pio_read_sector(lba + i, (uint8_t *) buffer + i * 512)) {
             return false;
@@ -14,7 +14,7 @@ bool read_sectors(fat32_ctx_t *ctx, uint32_t lba, uint32_t count, void *buffer) 
     return true;
 }
 
-bool write_sectors(fat32_ctx_t *ctx, uint32_t lba, uint32_t count, void *buffer) {
+bool write_sectors(const uint32_t lba, const uint32_t count, void *buffer) {
     for (uint32_t i = 0; i < count; i++) {
         if (!pata_pio_write_sector(lba + i, (uint8_t *) buffer + i * 512)) {
             return false;
@@ -23,21 +23,21 @@ bool write_sectors(fat32_ctx_t *ctx, uint32_t lba, uint32_t count, void *buffer)
     return true;
 }
 
-uint32_t cluster_to_lba(fat32_ctx_t *ctx, uint32_t cluster) {
+uint32_t cluster_to_lba(const fat32_ctx_t *ctx, const uint32_t cluster) {
     return ctx->data_start + (cluster - 2) * ctx->sectors_per_cluster;
 }
 
-uint16_t time_to_fat(uint8_t hours, uint8_t minutes, uint8_t seconds) {
+uint16_t time_to_fat(const uint8_t hours, const uint8_t minutes, const uint8_t seconds) {
     return ((hours & 0x1F) << 11) | ((minutes & 0x3F) << 5) | ((seconds / 2) & 0x1F);
 }
 
-uint16_t date_to_fat(uint8_t day, uint8_t month, uint8_t year) {
-    uint8_t fat_year = (year >= 80) ? (year - 80) : (year + 20);
+uint16_t date_to_fat(const uint8_t day, const uint8_t month, const uint8_t year) {
+    const uint8_t fat_year = (year >= 80) ? (year - 80) : (year + 20);
     return ((fat_year & 0x7F) << 9) | ((month & 0x0F) << 5) | (day & 0x1F);
 }
 
 
-bool fat32_init(fat32_ctx_t *ctx, uint32_t lba_start) {
+bool fat32_init(fat32_ctx_t *ctx, const uint32_t lba_start) {
     memset(ctx, 0, sizeof(fat32_ctx_t));
     ctx->lba_start = lba_start;
 
@@ -58,8 +58,8 @@ bool fat32_init(fat32_ctx_t *ctx, uint32_t lba_start) {
     ctx->cluster_size = ctx->bytes_per_sector * ctx->sectors_per_cluster;
     ctx->fat_count = bs.fat_count;
 
-    uint32_t reserved_sectors = bs.reserved_sectors;
-    uint32_t fat_size = (bs.fat_size_16 != 0) ? bs.fat_size_16 : bs.fat_size_32;
+    const uint32_t reserved_sectors = bs.reserved_sectors;
+    const uint32_t fat_size = (bs.fat_size_16 != 0) ? bs.fat_size_16 : bs.fat_size_32;
 
     ctx->fat_start = lba_start + reserved_sectors;
     ctx->fat_size = fat_size;
@@ -75,15 +75,14 @@ bool fat32_init(fat32_ctx_t *ctx, uint32_t lba_start) {
     return true;
 }
 
-bool fat32_update_timestamps(fat32_ctx_t *ctx, uint32_t dir_cluster, const char *name, bool update_creation,
-                             bool update_access, bool update_modification) {
+bool fat32_update_timestamps(fat32_ctx_t *ctx, const uint32_t dir_cluster, const char *name, const bool update_creation,
+                             const bool update_access, const bool update_modification) {
     uint8_t seconds, minutes, hours, day, month, year;
     get_rtc_time(&seconds, &minutes, &hours);
     get_rtc_date(&day, &month, &year);
 
-    uint16_t fat_time = time_to_fat(hours, minutes, seconds);
-    uint16_t fat_date = date_to_fat(day, month, year);
-    uint8_t fat_time_tenths = 0;
+    const uint16_t fat_time = time_to_fat(hours, minutes, seconds);
+    const uint16_t fat_date = date_to_fat(day, month, year);
 
     fat32_dir_entry_t entry;
     if (!fat32_find_file(ctx, dir_cluster, name, &entry)) {
@@ -94,8 +93,8 @@ bool fat32_update_timestamps(fat32_ctx_t *ctx, uint32_t dir_cluster, const char 
     if (!cluster_data)
         return false;
 
-    uint32_t lba = cluster_to_lba(ctx, dir_cluster);
-    if (!read_sectors(ctx, lba, ctx->sectors_per_cluster, cluster_data)) {
+    const uint32_t lba = cluster_to_lba(ctx, dir_cluster);
+    if (!read_sectors(lba, ctx->sectors_per_cluster, cluster_data)) {
         free(cluster_data);
         return false;
     }
@@ -104,6 +103,7 @@ bool fat32_update_timestamps(fat32_ctx_t *ctx, uint32_t dir_cluster, const char 
     for (uint32_t i = 0; i < ctx->cluster_size / sizeof(fat32_dir_entry_t); i++) {
         if (memcmp(de[i].name, entry.name, 11) == 0) {
             if (update_creation) {
+                const uint8_t fat_time_tenths = 0;
                 de[i].creation_time_tenths = fat_time_tenths;
                 de[i].creation_time = fat_time;
                 de[i].creation_date = fat_date;
@@ -116,7 +116,7 @@ bool fat32_update_timestamps(fat32_ctx_t *ctx, uint32_t dir_cluster, const char 
                 de[i].last_write_date = fat_date;
             }
 
-            bool success = write_sectors(ctx, lba, ctx->sectors_per_cluster, cluster_data);
+            const bool success = write_sectors(lba, ctx->sectors_per_cluster, cluster_data);
             free(cluster_data);
             return success;
         }
@@ -143,7 +143,7 @@ void split_path(const char *path, char *parent, char *name) {
         return;
     }
 
-    size_t parent_len = last_slash - path;
+    const size_t parent_len = last_slash - path;
     if (parent_len == 0) {
         strcpy(parent, "/");
     } else {
@@ -153,16 +153,16 @@ void split_path(const char *path, char *parent, char *name) {
     strcpy(name, last_slash + 1);
 }
 
-uint32_t find_free_cluster(fat32_ctx_t *ctx) {
+uint32_t find_free_cluster(const fat32_ctx_t *ctx) {
     uint8_t sector[512];
     for (uint32_t sector_num = 0; sector_num < ctx->fat_size; sector_num++) {
-        if (!read_sectors(ctx, ctx->fat_start + sector_num, 1, sector))
+        if (!read_sectors(ctx->fat_start + sector_num, 1, sector))
             return 0;
 
         for (uint32_t i = 0; i < ctx->bytes_per_sector; i += 4) {
-            uint32_t entry = *(uint32_t *) (sector + i) & FAT32_MASK;
+            const uint32_t entry = *(uint32_t *) (sector + i) & FAT32_MASK;
             if (entry == 0) {
-                uint32_t cluster = (sector_num * ctx->bytes_per_sector + i) / 4;
+                const uint32_t cluster = (sector_num * ctx->bytes_per_sector + i) / 4;
                 if (cluster >= 2 && cluster < ctx->total_clusters + 2)
                     return cluster;
             }
@@ -171,38 +171,38 @@ uint32_t find_free_cluster(fat32_ctx_t *ctx) {
     return 0;
 }
 
-bool set_fat_entry(fat32_ctx_t *ctx, uint32_t cluster, uint32_t value) {
+bool set_fat_entry(const fat32_ctx_t *ctx, const uint32_t cluster, uint32_t value) {
     value &= FAT32_MASK;
-    uint32_t fat_offset = cluster * 4;
-    uint32_t fat_sector = ctx->fat_start + (fat_offset / ctx->bytes_per_sector);
-    uint32_t entry_offset = fat_offset % ctx->bytes_per_sector;
+    const uint32_t fat_offset = cluster * 4;
+    const uint32_t fat_sector = ctx->fat_start + (fat_offset / ctx->bytes_per_sector);
+    const uint32_t entry_offset = fat_offset % ctx->bytes_per_sector;
 
     uint8_t sector[512];
-    if (!read_sectors(ctx, fat_sector, 1, sector))
+    if (!read_sectors(fat_sector, 1, sector))
         return false;
 
     *(uint32_t *) (sector + entry_offset) = value;
 
-    if (!write_sectors(ctx, fat_sector, 1, sector))
+    if (!write_sectors(fat_sector, 1, sector))
         return false;
 
     // update all FAT copies
     for (int i = 1; i < ctx->fat_count; i++) {
-        if (!write_sectors(ctx, fat_sector + i * ctx->fat_size, 1, sector))
+        if (!write_sectors(fat_sector + i * ctx->fat_size, 1, sector))
             return false;
     }
 
     return true;
 }
 
-bool create_direntry(fat32_ctx_t *ctx, uint32_t dir_cluster, const char *name, uint8_t attrs, uint32_t first_cluster,
-                     uint32_t size) {
+bool create_direntry(const fat32_ctx_t *ctx, const uint32_t dir_cluster, const char *name, const uint8_t attrs,
+                     const uint32_t first_cluster, const uint32_t size) {
     uint8_t *cluster_data = malloc(ctx->cluster_size);
     if (!cluster_data)
         return false;
 
-    uint32_t lba = cluster_to_lba(ctx, dir_cluster);
-    if (!read_sectors(ctx, lba, ctx->sectors_per_cluster, cluster_data)) {
+    const uint32_t lba = cluster_to_lba(ctx, dir_cluster);
+    if (!read_sectors(lba, ctx->sectors_per_cluster, cluster_data)) {
         free(cluster_data);
         return false;
     }
@@ -218,7 +218,7 @@ bool create_direntry(fat32_ctx_t *ctx, uint32_t dir_cluster, const char *name, u
             size_t name_len = dot ? (dot - name) : strlen(name);
             name_len = (name_len > 8) ? 8 : name_len;
             for (size_t j = 0; j < name_len; j++) {
-                de->name[j] = toupper(name[j]);
+                de->name[j] = (char) toupper(name[j]);
             }
 
             for (size_t j = name_len; j < 8; j++) {
@@ -230,7 +230,7 @@ bool create_direntry(fat32_ctx_t *ctx, uint32_t dir_cluster, const char *name, u
                 size_t ext_len = strlen(ext);
                 ext_len = (ext_len > 3) ? 3 : ext_len;
                 for (size_t j = 0; j < ext_len; j++) {
-                    de->name[8 + j] = toupper(ext[j]);
+                    de->name[8 + j] = (char) toupper(ext[j]);
                 }
                 for (size_t j = ext_len; j < 3; j++) {
                     de->name[8 + j] = ' ';
@@ -250,8 +250,8 @@ bool create_direntry(fat32_ctx_t *ctx, uint32_t dir_cluster, const char *name, u
             get_rtc_time(&seconds, &minutes, &hours);
             get_rtc_date(&day, &month, &year);
 
-            uint16_t fat_time = time_to_fat(hours, minutes, seconds);
-            uint16_t fat_date = date_to_fat(day, month, year);
+            const uint16_t fat_time = time_to_fat(hours, minutes, seconds);
+            const uint16_t fat_date = date_to_fat(day, month, year);
 
             de->creation_time_tenths = 0;
             de->creation_time = fat_time;
@@ -261,7 +261,7 @@ bool create_direntry(fat32_ctx_t *ctx, uint32_t dir_cluster, const char *name, u
             de->last_write_date = fat_date;
 
             // write back
-            bool success = write_sectors(ctx, lba, ctx->sectors_per_cluster, cluster_data);
+            const bool success = write_sectors(lba, ctx->sectors_per_cluster, cluster_data);
             free(cluster_data);
             return success;
         }
@@ -271,9 +271,8 @@ bool create_direntry(fat32_ctx_t *ctx, uint32_t dir_cluster, const char *name, u
     return false;
 }
 
-bool fat32_find_file(fat32_ctx_t *ctx, uint32_t start_cluster, const char *name, fat32_dir_entry_t *entry) {
-    fat32_file_t dir;
-    memset(&dir, 0, sizeof(dir));
+bool fat32_find_file(fat32_ctx_t *ctx, const uint32_t start_cluster, const char *name, fat32_dir_entry_t *entry) {
+    fat32_file_t dir = {0};
     dir.ctx = ctx;
     dir.start_cluster = start_cluster;
     dir.current_cluster = start_cluster;
@@ -362,17 +361,17 @@ bool fat32_open_file(fat32_ctx_t *ctx, fat32_file_t *file, const char *path) {
     return true;
 }
 
-uint32_t fat32_next_cluster(fat32_ctx_t *ctx, uint32_t cluster) {
-    uint32_t fat_offset = cluster * 4;
-    uint32_t fat_sector = ctx->fat_start + (fat_offset / ctx->bytes_per_sector);
-    uint32_t entry_offset = fat_offset % ctx->bytes_per_sector;
+uint32_t fat32_next_cluster(const fat32_ctx_t *ctx, const uint32_t cluster) {
+    const uint32_t fat_offset = cluster * 4;
+    const uint32_t fat_sector = ctx->fat_start + (fat_offset / ctx->bytes_per_sector);
+    const uint32_t entry_offset = fat_offset % ctx->bytes_per_sector;
 
     uint8_t sector[512];
     if (!pata_pio_read_sector(fat_sector, sector)) {
         return 0;
     }
 
-    uint32_t next = *(uint32_t *) (sector + entry_offset) & FAT32_MASK;
+    const uint32_t next = *(uint32_t *) (sector + entry_offset) & FAT32_MASK;
 
     if (next >= FAT32_EOC) {
         return 0;
@@ -381,16 +380,16 @@ uint32_t fat32_next_cluster(fat32_ctx_t *ctx, uint32_t cluster) {
     return next;
 }
 
-bool fat32_read_cluster(fat32_ctx_t *ctx, uint32_t cluster, void *buffer) {
-    return read_sectors(ctx, cluster_to_lba(ctx, cluster), ctx->sectors_per_cluster, buffer);
+bool fat32_read_cluster(const fat32_ctx_t *ctx, const uint32_t cluster, void *buffer) {
+    return read_sectors(cluster_to_lba(ctx, cluster), ctx->sectors_per_cluster, buffer);
 }
 
-bool fat32_read(fat32_file_t *file, void *buffer, size_t size, size_t *bytes_read) {
+bool fat32_read(fat32_file_t *file, void *buffer, const size_t size, size_t *bytes_read) {
     if (!file || !buffer || file->is_dir)
         return false;
 
-    fat32_ctx_t *ctx = file->ctx;
-    uint8_t *buf = (uint8_t *) buffer;
+    const fat32_ctx_t *ctx = file->ctx;
+    uint8_t *buf = buffer;
     size_t remaining = size;
     *bytes_read = 0;
 
@@ -398,8 +397,8 @@ bool fat32_read(fat32_file_t *file, void *buffer, size_t size, size_t *bytes_rea
         if (file->file_offset >= file->size)
             break;
 
-        uint32_t cluster_offset = file->file_offset % ctx->cluster_size;
-        uint32_t bytes_in_cluster = ctx->cluster_size - cluster_offset;
+        const uint32_t cluster_offset = file->file_offset % ctx->cluster_size;
+        const uint32_t bytes_in_cluster = ctx->cluster_size - cluster_offset;
         size_t to_read = (remaining < bytes_in_cluster) ? remaining : bytes_in_cluster;
         if (to_read > file->size - file->file_offset) {
             to_read = file->size - file->file_offset;
@@ -429,15 +428,14 @@ bool fat32_read(fat32_file_t *file, void *buffer, size_t size, size_t *bytes_rea
     return true;
 }
 
-bool fat32_seek(fat32_file_t *file, uint32_t offset) {
+bool fat32_seek(fat32_file_t *file, const uint32_t offset) {
     if (!file || offset > file->size)
         return false;
 
-    fat32_ctx_t *ctx = file->ctx;
+    const fat32_ctx_t *ctx = file->ctx;
     file->file_offset = offset;
 
     uint32_t target_cluster = file->start_cluster;
-    uint32_t cluster_offset = 0;
     uint32_t position = 0;
 
     while (position + ctx->cluster_size <= offset) {
@@ -456,7 +454,7 @@ bool fat32_read_dir(fat32_file_t *dir, fat32_dir_entry_t *entry) {
     if (!dir || !dir->is_dir || !entry)
         return false;
 
-    fat32_ctx_t *ctx = dir->ctx;
+    const fat32_ctx_t *ctx = dir->ctx;
     uint8_t cluster_data[ctx->cluster_size];
 
     while (1) {
@@ -466,7 +464,7 @@ bool fat32_read_dir(fat32_file_t *dir, fat32_dir_entry_t *entry) {
             }
         }
 
-        fat32_dir_entry_t *de = (fat32_dir_entry_t *) (cluster_data + dir->cluster_offset);
+        const fat32_dir_entry_t *de = (fat32_dir_entry_t *) (cluster_data + dir->cluster_offset);
 
         if (de->name[0] == 0) {
             return false;
@@ -506,7 +504,7 @@ bool fat32_mkdir(fat32_ctx_t *ctx, const char *path) {
     if (!fat32_open_file(ctx, &parent_dir, parent) || !parent_dir.is_dir)
         return false;
 
-    uint32_t new_cluster = find_free_cluster(ctx);
+    const uint32_t new_cluster = find_free_cluster(ctx);
     if (!new_cluster || !set_fat_entry(ctx, new_cluster, FAT32_EOC))
         return false;
 
@@ -534,14 +532,14 @@ bool fat32_mkdir(fat32_ctx_t *ctx, const char *path) {
         dotdot->first_cluster_low = parent_dir.start_cluster & 0xFFFF;
     }
 
-    uint32_t lba = cluster_to_lba(ctx, new_cluster);
-    if (!write_sectors(ctx, lba, ctx->sectors_per_cluster, cluster_data)) {
+    const uint32_t lba = cluster_to_lba(ctx, new_cluster);
+    if (!write_sectors(lba, ctx->sectors_per_cluster, cluster_data)) {
         free(cluster_data);
         return false;
     }
     free(cluster_data);
 
-    bool success = create_direntry(ctx, parent_dir.current_cluster, dirname, ATTR_DIRECTORY, new_cluster, 0);
+    const bool success = create_direntry(ctx, parent_dir.current_cluster, dirname, ATTR_DIRECTORY, new_cluster, 0);
 
     fat32_close(&parent_dir);
     return success;
@@ -555,25 +553,25 @@ bool fat32_create(fat32_ctx_t *ctx, const char *path) {
     if (!fat32_open_file(ctx, &parent_dir, parent) || !parent_dir.is_dir)
         return false;
 
-    bool success = create_direntry(ctx, parent_dir.current_cluster, filename, ATTR_ARCHIVE, 0, 0);
+    const bool success = create_direntry(ctx, parent_dir.current_cluster, filename, ATTR_ARCHIVE, 0, 0);
 
     fat32_close(&parent_dir);
     return success;
 }
 
-bool fat32_write(fat32_file_t *file, const void *buffer, size_t size) {
+bool fat32_write(fat32_file_t *file, const void *buffer, const size_t size) {
     if (!file || file->is_dir)
         return false;
 
-    fat32_ctx_t *ctx = file->ctx;
-    const uint8_t *src = (const uint8_t *) buffer;
+    const fat32_ctx_t *ctx = file->ctx;
+    const uint8_t *src = buffer;
     size_t written = 0;
 
     while (written < size) {
-        uint32_t cluster_offset = file->file_offset % ctx->cluster_size;
+        const uint32_t cluster_offset = file->file_offset % ctx->cluster_size;
 
         if (cluster_offset == 0 && file->file_offset >= file->size) {
-            uint32_t new_cluster = find_free_cluster(ctx);
+            const uint32_t new_cluster = find_free_cluster(ctx);
             if (!new_cluster)
                 break;
 
@@ -589,18 +587,19 @@ bool fat32_write(fat32_file_t *file, const void *buffer, size_t size) {
         uint8_t *cluster_data = malloc(ctx->cluster_size);
         if (!cluster_data)
             break;
-        uint32_t lba = cluster_to_lba(ctx, file->current_cluster);
-        if (!read_sectors(ctx, lba, ctx->sectors_per_cluster, cluster_data)) {
+        const uint32_t lba = cluster_to_lba(ctx, file->current_cluster);
+        if (!read_sectors(lba, ctx->sectors_per_cluster, cluster_data)) {
             free(cluster_data);
             break;
         }
 
-        size_t to_write = (size - written < ctx->cluster_size - cluster_offset) ? size - written
-                                                                                : ctx->cluster_size - cluster_offset;
+        const size_t to_write = (size - written < ctx->cluster_size - cluster_offset)
+                                        ? size - written
+                                        : ctx->cluster_size - cluster_offset;
 
         memcpy(cluster_data + cluster_offset, src + written, to_write);
 
-        if (!write_sectors(ctx, lba, ctx->sectors_per_cluster, cluster_data)) {
+        if (!write_sectors(lba, ctx->sectors_per_cluster, cluster_data)) {
             free(cluster_data);
             break;
         }
@@ -616,14 +615,14 @@ bool fat32_write(fat32_file_t *file, const void *buffer, size_t size) {
     return written == size;
 }
 
-bool fat32_rewrite(fat32_file_t *file, const void *buffer, size_t size) {
+bool fat32_rewrite(fat32_file_t *file, const void *buffer, const size_t size) {
     if (!file || file->is_dir)
         return false;
 
-    fat32_ctx_t *ctx = file->ctx;
+    const fat32_ctx_t *ctx = file->ctx;
     uint32_t cluster = file->start_cluster;
     while (cluster && cluster < FAT32_EOC) {
-        uint32_t next = fat32_next_cluster(ctx, cluster);
+        const uint32_t next = fat32_next_cluster(ctx, cluster);
         set_fat_entry(ctx, cluster, 0);
         cluster = next;
     }
@@ -649,8 +648,8 @@ bool fat32_remove(fat32_ctx_t *ctx, const char *path) {
     uint8_t *cluster_data = malloc(ctx->cluster_size);
     if (!cluster_data)
         return false;
-    uint32_t lba = cluster_to_lba(ctx, parent_dir.current_cluster);
-    if (!read_sectors(ctx, lba, ctx->sectors_per_cluster, cluster_data)) {
+    const uint32_t lba = cluster_to_lba(ctx, parent_dir.current_cluster);
+    if (!read_sectors(lba, ctx->sectors_per_cluster, cluster_data)) {
         free(cluster_data);
         return false;
     }
@@ -658,8 +657,8 @@ bool fat32_remove(fat32_ctx_t *ctx, const char *path) {
     fat32_dir_entry_t *de = (fat32_dir_entry_t *) cluster_data;
     for (uint32_t i = 0; i < ctx->cluster_size / sizeof(fat32_dir_entry_t); i++) {
         if (memcmp(de[i].name, entry.name, 11) == 0) {
-            de[i].name[0] = 0xE5;
-            bool success = write_sectors(ctx, lba, ctx->sectors_per_cluster, cluster_data);
+            de[i].name[0] = (char) 0xE5;
+            const bool success = write_sectors(lba, ctx->sectors_per_cluster, cluster_data);
             free(cluster_data);
             if (success) {
                 fat32_update_timestamps(ctx, parent_dir.start_cluster, name, false, false, true);
@@ -686,7 +685,7 @@ bool fat32_rmdir(fat32_ctx_t *ctx, const char *path) {
     return fat32_remove(ctx, path);
 }
 
-bool fat32_update_file_entry(fat32_ctx_t *ctx, const char *path, uint32_t start_cluster, uint32_t size) {
+bool fat32_update_file_entry(fat32_ctx_t *ctx, const char *path, const uint32_t start_cluster, const uint32_t size) {
     char parent[256], name[13];
     split_path(path, parent, name);
 
@@ -700,8 +699,8 @@ bool fat32_update_file_entry(fat32_ctx_t *ctx, const char *path, uint32_t start_
         return false;
     }
 
-    uint32_t lba = cluster_to_lba(ctx, parent_dir.start_cluster);
-    if (!read_sectors(ctx, lba, ctx->sectors_per_cluster, cluster_data)) {
+    const uint32_t lba = cluster_to_lba(ctx, parent_dir.start_cluster);
+    if (!read_sectors(lba, ctx->sectors_per_cluster, cluster_data)) {
         free(cluster_data);
         fat32_close(&parent_dir);
         return false;
@@ -748,7 +747,7 @@ bool fat32_update_file_entry(fat32_ctx_t *ctx, const char *path, uint32_t start_
 
     bool success = false;
     if (found) {
-        success = write_sectors(ctx, lba, ctx->sectors_per_cluster, cluster_data);
+        success = write_sectors(lba, ctx->sectors_per_cluster, cluster_data);
     }
 
     free(cluster_data);

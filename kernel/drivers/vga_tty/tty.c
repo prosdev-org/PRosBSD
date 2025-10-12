@@ -2,19 +2,16 @@
 #include <drivers/tty.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 #define VGA_BUFFER        0xC00B8000
 #define COLS              80
 #define ROWS              25
 #define DEFAULT_ATTRIBUTE 0x07
 
-// VGA attributes (internal use only)
 #define VGA_ATTR_BLINK     0x80
 #define VGA_ATTR_BRIGHT    0x08
 #define VGA_ATTR_UNDERLINE 0x01
 
-// VGA colors (internal use only)
 #define VGA_BLACK         0
 #define VGA_BLUE          1
 #define VGA_GREEN         2
@@ -48,9 +45,9 @@ int escape_pos = 0;
 // Bit 7 is used for blinking text
 // Bit 1 is used for underlining in monochrome mode
 
-void set_color(uint8_t fg, uint8_t bg) {
+void set_color(const uint8_t fg, const uint8_t bg) {
     // Preserve special attributes (blink, etc.)
-    uint8_t special = current_attribute & 0x80; // Keep only the blink bit
+    const uint8_t special = current_attribute & 0x80; // Keep only the blink bit
     current_attribute = special | (bg << 4) | (fg & 0x0F);
 }
 
@@ -73,14 +70,14 @@ void scroll() {
     // shift lines 1-24 up to lines 0-23
     for (uint32_t row = 0; row < ROWS - 1; row++) {
         for (uint32_t col = 0; col < COLS; col++) {
-            uint32_t dst_idx = row * COLS + col;
-            uint32_t src_idx = (row + 1) * COLS + col;
+            const uint32_t dst_idx = row * COLS + col;
+            const uint32_t src_idx = (row + 1) * COLS + col;
             vga[dst_idx] = vga[src_idx];
         }
     }
 
     // clear the last line (row 24)
-    uint32_t last_row = (ROWS - 1) * COLS;
+    const uint32_t last_row = (ROWS - 1) * COLS;
     for (uint32_t col = 0; col < COLS; col++) {
         vga[last_row + col] = (current_attribute << 8) | ' ';
     }
@@ -104,7 +101,7 @@ void handle_backspace() {
     }
 
     // overwrite character with space
-    uint32_t idx = cursor_row * COLS + cursor_col;
+    const uint32_t idx = cursor_row * COLS + cursor_col;
     vga[idx] = (current_attribute << 8) | ' ';
 }
 
@@ -119,15 +116,15 @@ static void clear_screen() {
 
 static void clear_line_from_cursor() {
     volatile uint16_t *vga = (volatile uint16_t *) VGA_BUFFER;
-    uint32_t start = cursor_row * COLS + cursor_col;
-    uint32_t end = (cursor_row + 1) * COLS;
+    const uint32_t start = cursor_row * COLS + cursor_col;
+    const uint32_t end = (cursor_row + 1) * COLS;
 
     for (uint32_t i = start; i < end; i++) {
         vga[i] = (current_attribute << 8) | ' ';
     }
 }
 
-static void move_cursor(int n, char direction) {
+static void move_cursor(const int n, const char direction) {
     switch (direction) {
         case 'A': // Up
             if (cursor_row >= n) {
@@ -155,10 +152,11 @@ static void move_cursor(int n, char direction) {
                 cursor_col = 0;
             }
             break;
+        default:;
     }
 }
 
-static void handle_color_param(int param) {
+static void handle_color_param(const int param) {
     uint8_t fg = current_attribute & 0x0F;
     uint8_t bg = (current_attribute >> 4) & 0x0F;
 
@@ -256,6 +254,7 @@ static void handle_color_param(int param) {
         case 97: // Bright white foreground
             set_color(VGA_WHITE, bg);
             break;
+        default:;
     }
 }
 
@@ -270,7 +269,7 @@ static int parse_decimal(int *pos) {
 
 void handle_csi_sequence() {
     escape_buffer[escape_pos] = '\0';
-    char terminator = escape_buffer[escape_pos - 1];
+    const char terminator = escape_buffer[escape_pos - 1];
     int pos = 0;
 
     switch (terminator) {
@@ -283,7 +282,7 @@ void handle_csi_sequence() {
 
             // Process all parameters separated by semicolons
             while (pos < escape_pos - 1) {
-                int param = parse_decimal(&pos);
+                const int param = parse_decimal(&pos);
                 handle_color_param(param);
 
                 // Skip semicolon
@@ -301,7 +300,7 @@ void handle_csi_sequence() {
 
         case 'J': // Clear Screen
             pos = 0;
-            int mode = (escape_pos > 1) ? parse_decimal(&pos) : 0;
+            const int mode = (escape_pos > 1) ? parse_decimal(&pos) : 0;
             if (mode == 2) {
                 clear_screen();
             }
@@ -316,9 +315,10 @@ void handle_csi_sequence() {
         case 'C': // Cursor Forward
         case 'D': // Cursor Back
             pos = 0;
-            int n = (escape_pos > 1) ? parse_decimal(&pos) : 1;
+            const int n = (escape_pos > 1) ? parse_decimal(&pos) : 1;
             move_cursor(n, terminator);
             break;
+        default:;
     }
 
     // Reset escape sequence state
@@ -327,7 +327,7 @@ void handle_csi_sequence() {
     escape_pos = 0;
 }
 
-void putck(char c) {
+void putck(const char c) {
     volatile uint16_t *vga = (volatile uint16_t *) VGA_BUFFER;
 
     if (in_escape) {
@@ -339,12 +339,12 @@ void putck(char c) {
                 handle_csi_sequence();
             }
             return;
-        } else if (c == '[') {
+        }
+        if (c == '[') {
             in_csi = true;
             return;
-        } else {
-            in_escape = false;
         }
+        in_escape = false;
     } else if (c == '\033') { // ESC
         in_escape = true;
         escape_pos = 0;
@@ -367,7 +367,7 @@ void putck(char c) {
             break;
         default: // printable character
             if (c >= ' ') {
-                uint32_t idx = cursor_row * COLS + cursor_col;
+                const uint32_t idx = cursor_row * COLS + cursor_col;
                 if (idx >= COLS * ROWS) {
                     panic("tty: buffer overflow");
                 }

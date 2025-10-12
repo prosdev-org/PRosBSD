@@ -12,13 +12,13 @@ static void *get_kernel_physical_end() {
 }
 
 void *get_kernel_end() {
-    return (void *) &__kernel_end;
+    return &__kernel_end;
 }
 
 static memory_block_t map[MEMORY_MAP_MAX_SIZE];
 static size_t map_size = 0;
 
-static void insert(memory_block_t *memory_block, size_t idx) {
+static void insert(const memory_block_t *memory_block, const size_t idx) {
     if (map_size == MEMORY_MAP_MAX_SIZE)
         panic("Map: Max size exceeded");
 
@@ -26,7 +26,7 @@ static void insert(memory_block_t *memory_block, size_t idx) {
     map[idx] = *memory_block;
 }
 
-static void append(memory_block_t *memory_block) {
+static void append(const memory_block_t *memory_block) {
     insert(memory_block, map_size);
 }
 
@@ -34,7 +34,7 @@ static void delete(size_t idx) {
     memmove(&map[idx], &map[idx + 1], (--map_size - idx) * sizeof(memory_block_t));
 }
 
-static size_t find_first(uint64_t address) {
+static size_t find_first(const uint64_t address) {
     for (size_t i = 0; i < map_size; i++)
         if ((address >= map[i].base && address <= map[i].base + map[i].length) || address <= map[i].base)
             return i;
@@ -42,11 +42,12 @@ static size_t find_first(uint64_t address) {
     panic("Map: Failed to find memory");
 }
 
-static bool split(uint64_t address, size_t idx) {
+static bool split(const uint64_t address, const size_t idx) {
     if (address <= map[idx].base || address >= map[idx].base + map[idx].length)
         return false;
 
-    memory_block_t new = {.base = address, .length = map[idx].base + map[idx].length - address, .type = map[idx].type};
+    const memory_block_t new = {
+            .base = address, .length = map[idx].base + map[idx].length - address, .type = map[idx].type};
 
     map[idx].length = address - map[idx].base;
 
@@ -56,7 +57,7 @@ static bool split(uint64_t address, size_t idx) {
 
 void mem_map_init() {
     size_t e820_size;
-    e820_entry_t *e820_map = e820_get_map(&e820_size);
+    const e820_entry_t *e820_map = e820_get_map(&e820_size);
     for (size_t i = 0; i < e820_size; i++) {
         if (e820_map[i].length == 0 || e820_map[i].type != 1)
             continue;
@@ -77,12 +78,12 @@ void mem_map_init() {
         delete (0);
 }
 
-static void *mem_alloc_common(size_t *target) {
+static void *mem_alloc_common(const size_t *target) {
     map[*target].type = MEMORY_BUSY;
     return (void *) (size_t) map[*target].base;
 }
 
-void *mem_alloc_size(uint64_t size) {
+void *mem_alloc_size(const uint64_t size) {
     size_t target = 0;
     while (map[target].type != MEMORY_FREE || map[target].length < size) // first fit
         target++;

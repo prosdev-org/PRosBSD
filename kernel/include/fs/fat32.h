@@ -96,10 +96,10 @@ typedef struct {
 #define FAT32_EOC  0x0FFFFFF8
 #define FAT32_MASK 0x0FFFFFFF
 
-bool read_sectors(fat32_ctx_t *ctx, uint32_t lba, uint32_t count, void *buffer);
-bool write_sectors(fat32_ctx_t *ctx, uint32_t lba, uint32_t count, void *buffer);
+bool read_sectors(uint32_t lba, uint32_t count, void *buffer);
+bool write_sectors(uint32_t lba, uint32_t count, void *buffer);
 
-uint32_t cluster_to_lba(fat32_ctx_t *ctx, uint32_t cluster);
+uint32_t cluster_to_lba(const fat32_ctx_t *ctx, uint32_t cluster);
 
 uint16_t time_to_fat(uint8_t hours, uint8_t minutes, uint8_t seconds);
 uint16_t date_to_fat(uint8_t day, uint8_t month, uint8_t year);
@@ -109,14 +109,14 @@ bool fat32_update_timestamps(fat32_ctx_t *ctx, uint32_t dir_cluster, const char 
                              bool update_access, bool update_modification);
 bool fat32_open_root(fat32_ctx_t *ctx, fat32_file_t *file);
 void split_path(const char *path, char *parent, char *name);
-uint32_t find_free_cluster(fat32_ctx_t *ctx);
-bool set_fat_entry(fat32_ctx_t *ctx, uint32_t cluster, uint32_t value);
-bool create_direntry(fat32_ctx_t *ctx, uint32_t dir_cluster, const char *name, uint8_t attrs, uint32_t first_cluster,
-                     uint32_t size);
+uint32_t find_free_cluster(const fat32_ctx_t *ctx);
+bool set_fat_entry(const fat32_ctx_t *ctx, uint32_t cluster, uint32_t value);
+bool create_direntry(const fat32_ctx_t *ctx, uint32_t dir_cluster, const char *name, uint8_t attrs,
+                     uint32_t first_cluster, uint32_t size);
 bool fat32_find_file(fat32_ctx_t *ctx, uint32_t start_cluster, const char *name, fat32_dir_entry_t *entry);
 bool fat32_open_file(fat32_ctx_t *ctx, fat32_file_t *file, const char *path);
-uint32_t fat32_next_cluster(fat32_ctx_t *ctx, uint32_t cluster);
-bool fat32_read_cluster(fat32_ctx_t *ctx, uint32_t cluster, void *buffer);
+uint32_t fat32_next_cluster(const fat32_ctx_t *ctx, uint32_t cluster);
+bool fat32_read_cluster(const fat32_ctx_t *ctx, uint32_t cluster, void *buffer);
 bool fat32_read(fat32_file_t *file, void *buffer, size_t size, size_t *bytes_read);
 bool fat32_seek(fat32_file_t *file, uint32_t offset);
 bool fat32_read_dir(fat32_file_t *dir, fat32_dir_entry_t *entry);

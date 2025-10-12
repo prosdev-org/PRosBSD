@@ -16,23 +16,23 @@
 #define CMOS_STATUS_REGISTER_A 0x0A
 #define CMOS_STATUS_REGISTER_B 0x0B
 
-uint8_t cmos_read(uint8_t reg) {
+uint8_t cmos_read(const uint8_t reg) {
     outb(reg, CMOS_ADDRESS_PORT);
     return inb(CMOS_DATA_PORT);
 }
 
-void cmos_write(uint8_t reg, uint8_t value) {
+void cmos_write(const uint8_t reg, const uint8_t value) {
     outb(reg, CMOS_ADDRESS_PORT);
     outb(value, CMOS_DATA_PORT);
 }
 
-static uint8_t bcd_to_binary(uint8_t bcd) {
+static uint8_t bcd_to_binary(const uint8_t bcd) {
     return (bcd & 0x0F) + ((bcd / 16) * 10);
 }
 
 void get_rtc_time(uint8_t *seconds, uint8_t *minutes, uint8_t *hours) {
-    uint8_t regB = cmos_read(CMOS_STATUS_REGISTER_B);
-    uint8_t bcd_format = !(regB & 0x04);
+    const uint8_t regB = cmos_read(CMOS_STATUS_REGISTER_B);
+    const uint8_t bcd_format = !(regB & 0x04);
 
     *seconds = cmos_read(CMOS_RTC_SECONDS);
     *minutes = cmos_read(CMOS_RTC_MINUTES);
@@ -50,8 +50,8 @@ void get_rtc_time(uint8_t *seconds, uint8_t *minutes, uint8_t *hours) {
 }
 
 void get_rtc_date(uint8_t *day, uint8_t *month, uint8_t *year) {
-    uint8_t regB = cmos_read(CMOS_STATUS_REGISTER_B);
-    uint8_t bcd_format = !(regB & 0x04);
+    const uint8_t regB = cmos_read(CMOS_STATUS_REGISTER_B);
+    const uint8_t bcd_format = !(regB & 0x04);
 
     *day = cmos_read(CMOS_RTC_DAY_OF_MONTH);
     *month = cmos_read(CMOS_RTC_MONTH);

@@ -101,7 +101,7 @@ int sprintf(char *restrict str, const char *restrict format, ...) {
     return ret;
 }
 
-int snprintf(char *restrict str, size_t size, const char *restrict format, ...) {
+int snprintf(char *restrict str, const size_t size, const char *restrict format, ...) {
     va_list args;
     va_start(args, format);
     const int ret = vsnprintf(str, size, format, args);
@@ -291,7 +291,7 @@ int vsprintf(char *restrict buf, const char *restrict format, const va_list args
                         fraction *= 10;
                         const int digit = (int) fraction;
                         *ptr++ = digit + '0';
-                        fraction -= digit;
+                        fraction -= (float) digit;
                     }
                 }
                 *ptr = '\0';

@@ -29,7 +29,7 @@ static void heap_init() {
     free_list->free = 1;
 }
 
-static void split_block(block_t *block, size_t size) {
+static void split_block(block_t *block, const size_t size) {
     if (block->size <= size + sizeof(block_t) + MIN_BLOCK)
         return; // not enough
 
@@ -91,15 +91,15 @@ void *malloc(size_t size) {
 
     best->free = 0;
     *best_prev = best->next;
-    return (void *) (best + 1);
+    return best + 1;
 }
 
-void *calloc(size_t nmemb, size_t size) {
+void *calloc(const size_t nmemb, const size_t size) {
     if (size != 0 && nmemb > SIZE_MAX / size) {
         panic("calloc: size overflow");
         return NULL;
     }
-    size_t total = nmemb * size;
+    const size_t total = nmemb * size;
     void *ptr = malloc(total);
     if (!ptr)
         return NULL;

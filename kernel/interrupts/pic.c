@@ -24,7 +24,7 @@
 
 #define PIC_EOI 0x20
 
-void pic_send_eoi(uint8_t irq) {
+void pic_send_eoi(const uint8_t irq) {
     if (irq >= 8) {
         outb(PIC2_COMMAND, PIC_EOI);
     }
@@ -32,7 +32,7 @@ void pic_send_eoi(uint8_t irq) {
     outb(PIC1_COMMAND, PIC_EOI);
 }
 
-void pic_remap(uint8_t offset1, uint8_t offset2) {
+void pic_remap(const uint8_t offset1, const uint8_t offset2) {
     outb(ICW1_INIT | ICW1_ICW4, PIC1_COMMAND);
     io_delay();
     outb(ICW1_INIT | ICW1_ICW4, PIC2_COMMAND);
