@@ -44,7 +44,7 @@ typedef struct FILE {
 
 // int fgetc(FILE *);
 // int getc(FILE *);
-int getchar(void);
+int getchar();
 // int ungetc(int, FILE *);
 
 // int fputc(int, FILE *);

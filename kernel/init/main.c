@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 int main(void) {
-    cleark();
+    vga_tty_clear();
 
     printf("Initializing GDT...\n");
     gdt_init();
@@ -93,6 +93,6 @@ int main(void) {
     printf("\033[1;32m~$\033[0m ");
 
     for (;;) {
-        putck(getchark());
+        putchar(getchar());
     }
 }

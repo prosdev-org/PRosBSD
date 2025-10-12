@@ -45,17 +45,17 @@ int escape_pos = 0;
 // Bit 7 is used for blinking text
 // Bit 1 is used for underlining in monochrome mode
 
-void set_color(const uint8_t fg, const uint8_t bg) {
+void vga_tty_set_color(const uint8_t fg, const uint8_t bg) {
     // Preserve special attributes (blink, etc.)
     const uint8_t special = current_attribute & 0x80; // Keep only the blink bit
     current_attribute = special | (bg << 4) | (fg & 0x0F);
 }
 
-void reset_color() {
+void vga_tty_reset_color() {
     current_attribute = DEFAULT_ATTRIBUTE;
 }
 
-void cleark() {
+void vga_tty_clear() {
     volatile uint16_t *vga = (volatile uint16_t *) VGA_BUFFER;
     for (uint32_t i = 0; i < COLS * ROWS; i++) {
         vga[i] = (current_attribute << 8) | ' ';
@@ -162,97 +162,97 @@ static void handle_color_param(const int param) {
 
     switch (param) {
         case 0: // Reset
-            reset_color();
+            vga_tty_reset_color();
             break;
         case 1: // Bright/Bold
             // Use high-intensity VGA colors (8-15) for bright colors
             if (fg < 8)
                 fg += 8;
-            set_color(fg, bg);
+            vga_tty_set_color(fg, bg);
             break;
         case 4: // Underline
             // Emulate underlining with blue background in color mode
             bg = VGA_BLUE;
-            set_color(fg, bg);
+            vga_tty_set_color(fg, bg);
             break;
         case 5: // Blink
             current_attribute |= 0x80; // Set blink bit
             break;
         case 7: // Inverse
-            set_color(bg, fg);
+            vga_tty_set_color(bg, fg);
             break;
         case 30: // Black foreground
-            set_color(VGA_BLACK, bg);
+            vga_tty_set_color(VGA_BLACK, bg);
             break;
         case 31: // Red foreground
-            set_color(VGA_RED, bg);
+            vga_tty_set_color(VGA_RED, bg);
             break;
         case 32: // Green foreground
-            set_color(VGA_GREEN, bg);
+            vga_tty_set_color(VGA_GREEN, bg);
             break;
         case 33: // Yellow foreground
-            set_color(VGA_BROWN, bg);
+            vga_tty_set_color(VGA_BROWN, bg);
             break;
         case 34: // Blue foreground
-            set_color(VGA_BLUE, bg);
+            vga_tty_set_color(VGA_BLUE, bg);
             break;
         case 35: // Magenta foreground
-            set_color(VGA_MAGENTA, bg);
+            vga_tty_set_color(VGA_MAGENTA, bg);
             break;
         case 36: // Cyan foreground
-            set_color(VGA_CYAN, bg);
+            vga_tty_set_color(VGA_CYAN, bg);
             break;
         case 37: // White foreground
-            set_color(VGA_LIGHT_GREY, bg);
+            vga_tty_set_color(VGA_LIGHT_GREY, bg);
             break;
         case 40: // Black background
-            set_color(fg, VGA_BLACK);
+            vga_tty_set_color(fg, VGA_BLACK);
             break;
         case 41: // Red background
-            set_color(fg, VGA_RED);
+            vga_tty_set_color(fg, VGA_RED);
             break;
         case 42: // Green background
-            set_color(fg, VGA_GREEN);
+            vga_tty_set_color(fg, VGA_GREEN);
             break;
         case 43: // Yellow background
-            set_color(fg, VGA_BROWN);
+            vga_tty_set_color(fg, VGA_BROWN);
             break;
         case 44: // Blue background
-            set_color(fg, VGA_BLUE);
+            vga_tty_set_color(fg, VGA_BLUE);
             break;
         case 45: // Magenta background
-            set_color(fg, VGA_MAGENTA);
+            vga_tty_set_color(fg, VGA_MAGENTA);
             break;
         case 46: // Cyan background
-            set_color(fg, VGA_CYAN);
+            vga_tty_set_color(fg, VGA_CYAN);
             break;
         case 47: // White background
-            set_color(fg, VGA_LIGHT_GREY);
+            vga_tty_set_color(fg, VGA_LIGHT_GREY);
             break;
         // Bright foreground colors
         case 90: // Bright black (gray) foreground
-            set_color(VGA_DARK_GREY, bg);
+            vga_tty_set_color(VGA_DARK_GREY, bg);
             break;
         case 91: // Bright red foreground
-            set_color(VGA_LIGHT_RED, bg);
+            vga_tty_set_color(VGA_LIGHT_RED, bg);
             break;
         case 92: // Bright green foreground
-            set_color(VGA_LIGHT_GREEN, bg);
+            vga_tty_set_color(VGA_LIGHT_GREEN, bg);
             break;
         case 93: // Bright yellow foreground
-            set_color(VGA_YELLOW, bg);
+            vga_tty_set_color(VGA_YELLOW, bg);
             break;
         case 94: // Bright blue foreground
-            set_color(VGA_LIGHT_BLUE, bg);
+            vga_tty_set_color(VGA_LIGHT_BLUE, bg);
             break;
         case 95: // Bright magenta foreground
-            set_color(VGA_LIGHT_MAGENTA, bg);
+            vga_tty_set_color(VGA_LIGHT_MAGENTA, bg);
             break;
         case 96: // Bright cyan foreground
-            set_color(VGA_LIGHT_CYAN, bg);
+            vga_tty_set_color(VGA_LIGHT_CYAN, bg);
             break;
         case 97: // Bright white foreground
-            set_color(VGA_WHITE, bg);
+            vga_tty_set_color(VGA_WHITE, bg);
             break;
         default:;
     }
@@ -327,7 +327,7 @@ void handle_csi_sequence() {
     escape_pos = 0;
 }
 
-void putck(const char c) {
+void vga_tty_putchar(const char c) {
     volatile uint16_t *vga = (volatile uint16_t *) VGA_BUFFER;
 
     if (in_escape) {
@@ -387,11 +387,4 @@ void putck(const char c) {
     if (cursor_row >= ROWS) {
         scroll();
     }
-}
-
-void putsk(const char *str) {
-    while (*str) {
-        putck(*str++);
-    }
-    putck('\n');
 }

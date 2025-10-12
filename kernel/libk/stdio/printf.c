@@ -1,5 +1,4 @@
 #include <ctype.h>
-#include <drivers/tty.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -87,7 +86,7 @@ int printf(const char *restrict format, ...) {
 
     const char *p = printbuf;
     for (int j = 0; j < i; j++) {
-        putck(*p++);
+        putchar(*p++);
     }
 
     return i;
@@ -113,7 +112,7 @@ int vprintf(const char *restrict format, const va_list ap) {
     const int len = vsprintf(printbuf, format, ap);
     const char *p = printbuf;
     for (int i = 0; i < len; i++) {
-        putck(*p++);
+        putchar(*p++);
     }
     return len;
 }

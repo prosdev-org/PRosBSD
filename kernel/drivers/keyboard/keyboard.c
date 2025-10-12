@@ -154,7 +154,7 @@ char scancode_to_ascii(const uint8_t scancode) {
     return result;
 }
 
-char getchark() {
+char keyboard_getchar() {
     while (1) {
         const uint8_t scancode = read_scancode();
         const char c = scancode_to_ascii(scancode);
