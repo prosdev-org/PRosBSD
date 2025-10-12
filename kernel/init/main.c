@@ -88,7 +88,7 @@ int main(void) {
     keyboard_init();
 
     printf("\nWelcome to PRosBSD v.%s!\n\n", VERSION_STRING);
-    printf("\033[34m * Source Code:   \033[0mhttps://github.com/pros-dev-fans/PRosBSD\n\n");
+    printf("\033[34m * Source Code:   \033[0mhttps://github.com/prosdev-org/PRosBSD\n\n");
 
     printf("\033[1;32m~$\033[0m ");
 
