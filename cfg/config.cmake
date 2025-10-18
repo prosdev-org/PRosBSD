@@ -10,7 +10,6 @@ add_compile_options(
         -g
         -fno-builtin
         -fno-exceptions
-        -fno-rtti
         -fno-stack-protector
         -fno-omit-frame-pointer
         -fno-strict-aliasing
@@ -36,7 +35,6 @@ add_compile_options(
         -Wcast-align
         -Wundef
         -Wwrite-strings
-        -Wmissing-prototypes
 )
 
 set(CMAKE_LINKER_FLAGS -melf_i386)
