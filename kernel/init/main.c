@@ -7,6 +7,7 @@
 #include <memory/map/e820.h>
 #include <memory/pfa.h>
 #include <memory/virtual/paging.h>
+#include <shell/shell.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -90,9 +91,5 @@ int main(void) {
     printf("\nWelcome to PRosBSD v.%s!\n\n", VERSION_STRING);
     printf("\033[34m * Source Code:   \033[0mhttps://github.com/prosdev-org/PRosBSD\n\n");
 
-    printf("\033[1;32m~$\033[0m ");
-
-    for (;;) {
-        putchar(getchar());
-    }
+    shell_loop();
 }
