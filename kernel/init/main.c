@@ -28,10 +28,9 @@ int main(void) {
         printf("Memory map provided by BIOS:\n");
         for (size_t i = 0; i < size; i++) {
             printf("%d) ", i);
-            printf("%p-", e820_map[i].address);
-            printf("%p ", e820_map[i].address + e820_map[i].length - 1);
-            printf("Type: %p, ", e820_map[i].type);
-            printf("ACPI3 attr: %p", e820_map[i].acpi3_attributes);
+            printf("0x%x-0x%x ", (uint32_t) e820_map[i].address, (uint32_t) (e820_map[i].address + e820_map[i].length - 1));
+            printf("Type: 0x%x, ", e820_map[i].type);
+            printf("ACPI3 attr: 0x%x", e820_map[i].acpi3_attributes);
             printf("\n");
         }
     }
@@ -48,9 +47,8 @@ int main(void) {
 
         printf("Memory map:\n");
         for (size_t i = 0; i < size; i++) {
-            printf("[%d] ", i);
-            printf("%p ", memory_map[i].base);
-            printf("- %p", memory_map[i].base + memory_map[i].length - 1);
+            printf("%d) ", i);
+            printf("0x%x-0x%x ", (uint32_t) memory_map[i].base, (uint32_t) (memory_map[i].base + memory_map[i].length - 1));
             switch (memory_map[i].type) {
                 case MEMORY_FREE:
                     printf(" FREE");
