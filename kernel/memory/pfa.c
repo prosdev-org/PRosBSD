@@ -17,14 +17,22 @@ static size_t map_size = 0;
 static uint32_t *bitmap; // 0 - free, 1 - busy
 static uint32_t last_alloc = 0;
 
+static uintptr_t idx_to_addr(const uint32_t idx) {
+    return (uintptr_t) idx << 12;
+}
+
+static uint32_t addr_to_idx(const uintptr_t addr) {
+    return (uint32_t) addr >> 12;
+}
+
 void pfa_init() {
-    bitmap = mem_alloc_size(BITMAP_SIZE * sizeof(uint32_t)) + PAGING_FIRST_4MIB_MAPPING_ADDR;
+    bitmap = paging_addr_phys_to_virt(mem_alloc_size(BITMAP_SIZE * sizeof(uint32_t)));
     for (size_t i = 0; i < BITMAP_SIZE; i++)
         bitmap[i] = 0;
 
     while (mem_has_free()) {
         uint64_t length;
-        uint64_t base = (size_t) mem_alloc(&length);
+        uint64_t base = mem_alloc(&length);
 
         if (base > 0xFFFFFFFF)
             break;
@@ -89,20 +97,21 @@ static uint32_t pf_alloc_general(const uint32_t start, const uint32_t end, bool 
     return 0;
 }
 
-uint32_t pf_alloc() {
+uintptr_t pf_alloc() {
     bool found;
     uint32_t idx = pf_alloc_general(last_alloc, BITMAP_SIZE * sizeof(uint32_t), &found);
     if (found)
-        return idx;
+        return idx_to_addr(idx);
 
     idx = pf_alloc_general(0, last_alloc, &found);
     if (found)
-        return idx;
+        return idx_to_addr(idx);
 
     panic("PFA: Ran out of page frames");
 }
 
-void pf_free(const uint32_t idx) {
+void pf_free(const uintptr_t addr) {
+    const uint32_t idx = addr_to_idx(addr);
     if (!is_usable(idx << 12))
         panic("PFA: Attempt to free reserved memory");
 

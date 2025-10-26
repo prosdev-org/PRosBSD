@@ -9,7 +9,7 @@ struct stackframe {
     uint32_t eip;
 };
 
-void panic(const char *s) {
+_Noreturn void panic(const char *s) {
     uint32_t ebp, esp;
     __asm__ volatile("mov %%ebp, %0\n"
                      "mov %%esp, %1\n"

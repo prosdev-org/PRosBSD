@@ -28,7 +28,8 @@ int main(void) {
         printf("Memory map provided by BIOS:\n");
         for (size_t i = 0; i < size; i++) {
             printf("%d) ", i);
-            printf("0x%x-0x%x ", (uint32_t) e820_map[i].address, (uint32_t) (e820_map[i].address + e820_map[i].length - 1));
+            printf("0x%x-0x%x ", (uint32_t) e820_map[i].address,
+                   (uint32_t) (e820_map[i].address + e820_map[i].length - 1));
             printf("Type: 0x%x, ", e820_map[i].type);
             printf("ACPI3 attr: 0x%x", e820_map[i].acpi3_attributes);
             printf("\n");
@@ -48,7 +49,8 @@ int main(void) {
         printf("Memory map:\n");
         for (size_t i = 0; i < size; i++) {
             printf("%d) ", i);
-            printf("0x%x-0x%x ", (uint32_t) memory_map[i].base, (uint32_t) (memory_map[i].base + memory_map[i].length - 1));
+            printf("0x%x-0x%x ", (uint32_t) memory_map[i].base,
+                   (uint32_t) (memory_map[i].base + memory_map[i].length - 1));
             switch (memory_map[i].type) {
                 case MEMORY_FREE:
                     printf(" FREE");
@@ -67,15 +69,15 @@ int main(void) {
     {
         printf("\x1b[33m");
         printf("PFA test:\n");
-        uint32_t ptrs[100];
+        uintptr_t ptrs[100];
 
         printf("Allocating...\n");
-        for (size_t i = 0; i < 100; i++) {
+        for (size_t i = 0; i < sizeof(ptrs) / sizeof(*ptrs); i++) {
             ptrs[i] = pf_alloc();
         }
 
         printf("Freeing...\n");
-        for (size_t i = 0; i < 100; i++) {
+        for (size_t i = 0; i < sizeof(ptrs) / sizeof(*ptrs); i++) {
             pf_free(ptrs[i]);
         }
 

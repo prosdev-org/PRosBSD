@@ -1,14 +1,14 @@
 #include <core/panic.h>
 #include <memory/map.h>
 #include <memory/map/e820.h>
-#include <memory/virtual/paging.h>
+#include <memory/virtual/layout.h>
 #include <stdint.h>
 #include <string.h>
 
 extern uint32_t __kernel_end;
 
 static void *get_kernel_physical_end() {
-    return (void *) ((size_t) &__kernel_end - PAGING_FIRST_4MIB_MAPPING_ADDR);
+    return (void *) ((uintptr_t) &__kernel_end - MEM_VIRT_LAYOUT_KERNEL_LOW_START);
 }
 
 void *get_kernel_end() {
@@ -30,7 +30,7 @@ static void append(const memory_block_t *memory_block) {
     insert(memory_block, map_size);
 }
 
-static void delete(size_t idx) {
+static void delete(const size_t idx) {
     memmove(&map[idx], &map[idx + 1], (--map_size - idx) * sizeof(memory_block_t));
 }
 
@@ -78,32 +78,32 @@ void mem_map_init() {
         delete (0);
 }
 
-static void *mem_alloc_common(const size_t *target) {
+static uintptr_t mem_alloc_common(const size_t *target) {
     map[*target].type = MEMORY_BUSY;
-    return (void *) (size_t) map[*target].base;
+    return (uintptr_t) map[*target].base;
 }
 
-void *mem_alloc_size(const uint64_t size) {
+uintptr_t mem_alloc_size(const uint64_t size) {
     size_t target = 0;
     while (map[target].type != MEMORY_FREE || map[target].length < size) // first fit
         target++;
 
-    void *ptr = mem_alloc_common(&target);
+    const uintptr_t base = mem_alloc_common(&target);
 
     if (split(map[target].base + size, target))
         map[target + 1].type = MEMORY_FREE;
 
-    return ptr;
+    return base;
 }
 
-void *mem_alloc(uint64_t *size) {
+uintptr_t mem_alloc(uint64_t *size) {
     size_t target = 0;
     while (map[target].type != MEMORY_FREE)
         target++;
 
-    void *ptr = mem_alloc_common(&target);
+    const uintptr_t base = mem_alloc_common(&target);
     *size = map[target].length;
-    return ptr;
+    return base;
 }
 
 bool mem_has_free() {
