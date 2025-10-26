@@ -1,0 +1,12 @@
+#include <stdio.h>
+
+void shell_loop() {
+    for (;;) {
+        printf("\033[1;32m~$\033[0m ");
+        char str[128];
+        gets(str);
+        if (*str) {
+            printf("%s: command not found\n", str);
+        }
+    }
+}
