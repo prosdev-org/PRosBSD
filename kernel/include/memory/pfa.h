@@ -5,8 +5,8 @@
 
 void pfa_init();
 
-uint32_t pf_alloc();
+uintptr_t pf_alloc();
 
-void pf_free(uint32_t idx);
+void pf_free(uintptr_t addr);
 
 #endif

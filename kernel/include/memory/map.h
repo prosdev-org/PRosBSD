@@ -1,11 +1,11 @@
 #ifndef MEMORY_MAP_H
 #define MEMORY_MAP_H
 
-#define MEMORY_MAP_MAX_SIZE 64
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#define MEMORY_MAP_MAX_SIZE 64
 
 typedef enum { MEMORY_FREE, MEMORY_BUSY } memory_t;
 
@@ -19,11 +19,9 @@ void *get_kernel_end();
 
 void mem_map_init();
 
-void *mem_alloc_size(uint64_t size);
+uintptr_t mem_alloc_size(uint64_t size);
 
-void *mem_alloc(uint64_t *size);
-
-void *mem_alloc_largest(uint64_t *size);
+uintptr_t mem_alloc(uint64_t *size);
 
 bool mem_has_free();
 

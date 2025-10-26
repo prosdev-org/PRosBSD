@@ -1,7 +1,7 @@
 #ifndef PAGING_H
 #define PAGING_H
 
-#define PAGING_FIRST_4MIB_MAPPING_ADDR 0xC0000000
+void *paging_addr_phys_to_virt(uintptr_t phys);
 
 void paging_init();
 
