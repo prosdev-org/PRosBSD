@@ -98,4 +98,9 @@ void paging_init() {
     pd[(MEM_VIRT_LAYOUT_KERNEL_LOW_START >> 0x16)] = low_pt_phys | PAGING_ATTR_DEFAULT;
 
     load_cr3(pd_phys);
+
+    // Setting up page frames for stack
+    for (uintptr_t addr = MEM_VIRT_LAYOUT_KERNEL_STACK_START; addr < MEM_VIRT_LAYOUT_KERNEL_STACK_END; addr += 0x1000) {
+        map_page(pf_alloc(), addr);
+    }
 }

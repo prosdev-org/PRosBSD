@@ -6,12 +6,45 @@
 #include <memory/map.h>
 #include <memory/map/e820.h>
 #include <memory/pfa.h>
+#include <memory/virtual/layout.h>
 #include <memory/virtual/paging.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
-int main(void) {
+_Noreturn void _main() {
+    {
+        printf("\x1b[33m");
+        printf("PFA test:\n");
+        uintptr_t ptrs[100];
+
+        printf("Allocating...\n");
+        for (size_t i = 0; i < sizeof(ptrs) / sizeof(*ptrs); i++) {
+            ptrs[i] = pf_alloc();
+        }
+
+        printf("Freeing...\n");
+        for (size_t i = 0; i < sizeof(ptrs) / sizeof(*ptrs); i++) {
+            pf_free(ptrs[i]);
+        }
+
+        printf("\x1b[0m");
+    }
+
+    printf("Initializing keyboard...\n");
+    keyboard_init();
+
+    printf("\nWelcome to PRosBSD v.%s!\n\n", VERSION_STRING);
+    printf("\033[34m * Source Code:   \033[0mhttps://github.com/prosdev-org/PRosBSD\n\n");
+
+    printf("\033[1;32m~$\033[0m ");
+
+    for (;;) {
+        putchar(getchar());
+    }
+}
+
+int main() {
     vga_tty_clear();
 
     printf("Initializing GDT...\n");
@@ -66,33 +99,6 @@ int main(void) {
     printf("Initializing Paging...\n");
     paging_init();
 
-    {
-        printf("\x1b[33m");
-        printf("PFA test:\n");
-        uintptr_t ptrs[100];
-
-        printf("Allocating...\n");
-        for (size_t i = 0; i < sizeof(ptrs) / sizeof(*ptrs); i++) {
-            ptrs[i] = pf_alloc();
-        }
-
-        printf("Freeing...\n");
-        for (size_t i = 0; i < sizeof(ptrs) / sizeof(*ptrs); i++) {
-            pf_free(ptrs[i]);
-        }
-
-        printf("\x1b[0m");
-    }
-
-    printf("Initializing keyboard...\n");
-    keyboard_init();
-
-    printf("\nWelcome to PRosBSD v.%s!\n\n", VERSION_STRING);
-    printf("\033[34m * Source Code:   \033[0mhttps://github.com/prosdev-org/PRosBSD\n\n");
-
-    printf("\033[1;32m~$\033[0m ");
-
-    for (;;) {
-        putchar(getchar());
-    }
+    mem_virt_layout_setup_stack();
+    _main();
 }

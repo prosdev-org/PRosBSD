@@ -25,4 +25,7 @@
 #define MEM_VIRT_LAYOUT_PAGE_MAPPING_START 0xFFC00000
 #define MEM_VIRT_LAYOUT_PAGE_MAPPING_END   0xFFFFFFFF
 
+// It is defined like this to prevent stack corruption
+#define mem_virt_layout_setup_stack() __asm__ volatile("mov %0, %%esp" : : "r"(MEM_VIRT_LAYOUT_KERNEL_STACK_END));
+
 #endif
