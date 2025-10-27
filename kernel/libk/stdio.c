@@ -18,7 +18,9 @@ char *gets(char *str) {
     int c;
     while ((c = getchar()) != '\n') {
         if (c == '\b') {
-            s--;
+            if (s != str) {
+                s--;
+            }
             continue;
         }
         *s++ = (char) c;
@@ -32,5 +34,5 @@ int puts(const char *str) {
         putchar(*str++);
     }
     putchar('\n');
-    return (char) str;
+    return (int) str;
 }
