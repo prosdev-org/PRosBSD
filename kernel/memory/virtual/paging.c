@@ -2,12 +2,12 @@
 #include <memory/pfa.h>
 #include <memory/virtual/layout.h>
 #include <memory/virtual/paging.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 
 #define PAGE_DIRECTORY_SIZE 0x1000
 #define PAGE_TABLE_SIZE     0x1000
+#define PAGE_SIZE           0x1000
 
 #define PAGING_ATTR_PRESENT    0x00000001
 #define PAGING_ATTR_READ_WRITE 0x00000002
@@ -19,6 +19,20 @@
 #define PAGE_TABLES_BASE    MEM_VIRT_LAYOUT_PAGE_MAPPING_START
 #define PAGE_DIRECTORY_IDX  0x3FF
 #define PAGE_DIRECTORY_BASE (PAGE_TABLES_BASE + PAGE_DIRECTORY_IDX * PAGE_TABLE_SIZE)
+
+static bool is_initialized = false;
+
+void *paging_addr_phys_to_virt(const uintptr_t phys) {
+    if (is_initialized) {
+        panic("Paging: tried to convert the physical address to virtual, but paging is already initialized");
+    }
+
+    if (phys > MEM_VIRT_LAYOUT_KERNEL_LOW_END - MEM_VIRT_LAYOUT_KERNEL_LOW_START) {
+        panic("Paging: tried to convert the physical address to virtual, which is out of the low 4 MiB range");
+    }
+
+    return (void *) (phys + MEM_VIRT_LAYOUT_KERNEL_LOW_START);
+}
 
 static void load_cr3(const uint32_t page_directory_addr) {
     __asm__ volatile("mov %0, %%cr3" : : "r"(page_directory_addr));
@@ -59,7 +73,11 @@ static void ensure_pt(const size_t pd_idx) {
     memset(pt, PAGING_ATTR_EMPTY, PAGE_TABLE_SIZE);
 }
 
-static void map_page(uintptr_t phys, uintptr_t virt) {
+void paging_map(uintptr_t phys, uintptr_t virt) {
+    if (!is_initialized) {
+        panic("Paging: tried to map a page, but paging is not initialized");
+    }
+
     phys &= 0xFFFFF000;
     virt &= 0xFFFFF000;
 
@@ -74,12 +92,12 @@ static void map_page(uintptr_t phys, uintptr_t virt) {
     invlpg(virt);
 }
 
-void *paging_addr_phys_to_virt(const uintptr_t phys) {
-    if (phys > MEM_VIRT_LAYOUT_KERNEL_LOW_END - MEM_VIRT_LAYOUT_KERNEL_LOW_START) {
-        panic("Paging: tried to convert the physical address to virtual, which is out of the low 4 MiB range");
+void paging_alloc_and_map(uintptr_t base, const size_t size) {
+    base &= 0xFFFFF000;
+    const size_t n = size / PAGE_SIZE + (size % PAGE_SIZE != 0);
+    for (size_t i = 0; i < n; i++) {
+        paging_map(pf_alloc(), base + i * PAGE_SIZE);
     }
-
-    return (void *) (phys + MEM_VIRT_LAYOUT_KERNEL_LOW_START);
 }
 
 void paging_init() {
@@ -92,15 +110,12 @@ void paging_init() {
     const uintptr_t low_pt_phys = pf_alloc();
     uint32_t *low_pt = paging_addr_phys_to_virt(low_pt_phys);
 
-    for (unsigned i = 0; i < PAGE_TABLE_SIZE / sizeof(uint32_t); i++) {
+    for (size_t i = 0; i < PAGE_TABLE_SIZE / sizeof(uint32_t); i++) {
         low_pt[i] = (i << 0xC) | PAGING_ATTR_DEFAULT;
     }
     pd[(MEM_VIRT_LAYOUT_KERNEL_LOW_START >> 0x16)] = low_pt_phys | PAGING_ATTR_DEFAULT;
 
     load_cr3(pd_phys);
 
-    // Setting up page frames for stack
-    for (uintptr_t addr = MEM_VIRT_LAYOUT_KERNEL_STACK_START; addr < MEM_VIRT_LAYOUT_KERNEL_STACK_END; addr += 0x1000) {
-        map_page(pf_alloc(), addr);
-    }
+    is_initialized = true;
 }

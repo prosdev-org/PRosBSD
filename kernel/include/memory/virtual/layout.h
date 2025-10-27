@@ -1,6 +1,8 @@
 #ifndef MEMORY_VIRTUAL_LAYOUT_H
 #define MEMORY_VIRTUAL_LAYOUT_H
 
+#include <memory/virtual/paging.h>
+
 #define MEM_VIRT_LAYOUT_NULL_PAGE_START 0x00000000
 #define MEM_VIRT_LAYOUT_NULL_PAGE_END   0x00000FFF
 
@@ -26,6 +28,11 @@
 #define MEM_VIRT_LAYOUT_PAGE_MAPPING_END   0xFFFFFFFF
 
 // It is defined like this to prevent stack corruption
-#define mem_virt_layout_setup_stack() __asm__ volatile("mov %0, %%esp" : : "r"(MEM_VIRT_LAYOUT_KERNEL_STACK_END));
+#define mem_virt_layout_setup_stack()                                                                \
+    {                                                                                                \
+        paging_alloc_and_map(MEM_VIRT_LAYOUT_KERNEL_STACK_START,                                     \
+                             MEM_VIRT_LAYOUT_KERNEL_STACK_END - MEM_VIRT_LAYOUT_KERNEL_STACK_START); \
+        __asm__ volatile("mov %0, %%esp" : : "r"(MEM_VIRT_LAYOUT_KERNEL_STACK_END));                 \
+    }
 
 #endif

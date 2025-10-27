@@ -1,11 +1,12 @@
 #include <core/panic.h>
-#include <memory/map.h>
+#include <memory/virtual/layout.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
-#define HEAP_START (int) get_kernel_end()
-#define HEAP_END   0xC0178200
+#define HEAP_START MEM_VIRT_LAYOUT_KERNEL_HEAP_START
+#define HEAP_END   MEM_VIRT_LAYOUT_KERNEL_HEAP_END
 #define ALIGNMENT  16
 #define MIN_BLOCK  (sizeof(block_t) * 2)
 
@@ -22,6 +23,8 @@ static block_t *free_list = NULL;
 static void heap_init() {
     if (free_list)
         return;
+
+    paging_alloc_and_map(HEAP_START, HEAP_END - HEAP_START);
 
     free_list = (block_t *) HEAP_START;
     free_list->size = HEAP_END - HEAP_START - sizeof(block_t);
