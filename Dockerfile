@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y \
     e2fsprogs \
     syslinux \
     sudo \
+    curl \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 ARG HOST_UID=0
@@ -23,4 +25,10 @@ RUN groupadd -g $HOST_GID builder \
 
 USER builder
 
-CMD ["sh", "-c", "cmake -S . -B build; cmake --build build"]
+RUN NONINTERACTIVE=1 \
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${PATH}"
+
+RUN brew install i686-elf-gcc
+
+CMD ["sh", "-c", "cmake -DCMAKE_TOOLCHAIN_FILE=cfg/toolchain-i686-elf.cmake -S . -B build; cmake --build build"]

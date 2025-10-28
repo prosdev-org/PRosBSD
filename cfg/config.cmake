@@ -4,8 +4,6 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 add_compile_options(
-        -m32
-        -march=i586
         -O2
         -g
         -fno-builtin
@@ -38,7 +36,6 @@ add_compile_options(
 )
 
 set(CMAKE_LINKER_FLAGS -melf_i386)
-set(CMAKE_ASM_FLAGS -m32)
 set(CMAKE_OBJCOPY_FLAGS -R .pdr -R .comment -R.note -S -O binary)
 
 set(ISGRUBQ FALSE)
