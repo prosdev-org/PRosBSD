@@ -1,5 +1,6 @@
 #include <cpu/gdt.h>
 #include <drivers/keyboard.h>
+#include <drivers/pit.h>
 #include <drivers/tty.h>
 #include <generated/version.h>
 #include <interrupts/idt.h>
@@ -12,88 +13,95 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <timer/timer.h>
+
+static void log(const char *format, ...) {
+    va_list args;
+
+    va_start(args, format);
+    va_end(args);
+
+    printf("[%f] ", (double) timer_seconds_since_boot());
+    vprintf(format, args);
+    putchar('\n');
+}
 
 _Noreturn void _main() {
     {
-        printf("\x1b[33m");
-        printf("PFA test:\n");
+        log("\x1b[33mPFA test:\x1b[0m");
         uintptr_t ptrs[100];
 
-        printf("Allocating...\n");
+        log("\x1b[33mAllocating...\x1b[0m");
         for (size_t i = 0; i < sizeof(ptrs) / sizeof(*ptrs); i++) {
             ptrs[i] = pf_alloc();
         }
 
-        printf("Freeing...\n");
+        log("\x1b[33mFreeing...\x1b[0m");
         for (size_t i = 0; i < sizeof(ptrs) / sizeof(*ptrs); i++) {
             pf_free(ptrs[i]);
         }
-
-        printf("\x1b[0m");
     }
 
-    printf("Initializing keyboard...\n");
+    log("Initializing keyboard...");
     keyboard_init();
 
     printf("\nWelcome to PRosBSD v.%s!\n\n", VERSION_STRING);
     printf("\033[34m * Source Code:   \033[0mhttps://github.com/prosdev-org/PRosBSD\n\n");
-
     shell_loop();
 }
 
 int main() {
     vga_tty_clear();
 
-    printf("Initializing GDT...\n");
+    log("Initializing GDT...");
     gdt_init();
 
-    printf("Initializing IDT...\n");
+    log("Initializing IDT...");
     idt_init();
 
-    printf("Detecting memory...\n");
+    log("Initializing PIT...");
+    pit_init();
+
+    log("Detecting memory...");
     {
         size_t size;
         const e820_entry_t *e820_map = e820_get_map(&size);
 
-        printf("Memory map provided by BIOS:\n");
+        log("Memory map provided by BIOS:");
         for (size_t i = 0; i < size; i++) {
-            printf("%d) ", i);
-            printf("0x%x-0x%x ", (uint32_t) e820_map[i].address,
-                   (uint32_t) (e820_map[i].address + e820_map[i].length - 1));
-            printf("Type: 0x%x, ", e820_map[i].type);
-            printf("ACPI3 attr: 0x%x", e820_map[i].acpi3_attributes);
-            printf("\n");
+            log("%d) 0x%x-0x%x Type: 0x%x, ACPI3 attr: 0x%x", i, (uint32_t) e820_map[i].address,
+                (uint32_t) (e820_map[i].address + e820_map[i].length - 1), e820_map[i].type,
+                e820_map[i].acpi3_attributes);
         }
     }
 
-    printf("Initializing Memory map...\n");
+    log("Initializing Memory map...");
     mem_map_init();
 
-    printf("Initializing PFA...\n");
+    log("Initializing PFA...");
     pfa_init();
 
     {
         size_t size;
         const memory_block_t *memory_map = get_memory_map(&size);
 
-        printf("Memory map:\n");
+        log("Memory map:");
         for (size_t i = 0; i < size; i++) {
-            printf("%d) ", i);
-            printf("0x%x-0x%x ", (uint32_t) memory_map[i].base,
-                   (uint32_t) (memory_map[i].base + memory_map[i].length - 1));
+            const char *type;
             switch (memory_map[i].type) {
                 case MEMORY_FREE:
-                    printf(" FREE");
+                    type = "FREE";
                     break;
                 case MEMORY_BUSY:
-                    printf(" BUSY");
+                    type = "BUSY";
                     break;
             }
-            printf("\n");
+            log("%d) 0x%x-0x%x %s", i, (uint32_t) memory_map[i].base,
+                (uint32_t) (memory_map[i].base + memory_map[i].length - 1), type);
         }
     }
 
-    printf("Initializing Paging...\n");
+    log("Initializing Paging...");
     paging_init();
 
     mem_virt_layout_setup_stack();

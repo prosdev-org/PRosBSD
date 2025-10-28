@@ -1,6 +1,8 @@
 #include <interrupts/pic.h>
+#include <timer/timer.h>
 
 void irq_0_handler() {
+    timer_tick();
     pic_send_eoi(0);
 }
 
