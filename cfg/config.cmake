@@ -5,7 +5,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 add_compile_options(
         -m32
-        -march=i486
+        -march=i586
         -O2
         -g
         -fno-builtin

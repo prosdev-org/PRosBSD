@@ -1,20 +1,19 @@
-add_subdirectory(boot)
-
-file(GLOB_RECURSE KERNEL_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.c" "${CMAKE_CURRENT_SOURCE_DIR}/*.s" "${CMAKE_CURRENT_SOURCE_DIR}/*.S")
-# Exclude boot/ from kernel sources. It is separate.
-list(FILTER KERNEL_SOURCES EXCLUDE REGEX ".*/boot/.*")
-
 include_directories(
         ${CMAKE_BINARY_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/libk/include
 )
+
+add_subdirectory(boot)
+add_subdirectory(core)
+add_subdirectory(libk)
 
 set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/linker.ld")
 
 set(CMAKE_EXE_LINKER_FLAGS "-nostdlib -nodefaultlibs -Wl,${CMAKE_LINKER_FLAGS}")
 
-add_library(kernel ${KERNEL_SOURCES})
+add_library(kernel STATIC
+        $<TARGET_OBJECTS:core>
+        $<TARGET_OBJECTS:libk>
+)
 
 add_custom_target(KERNEL.BIN
         DEPENDS kernel
