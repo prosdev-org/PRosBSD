@@ -52,7 +52,7 @@ int getchar();
 int putchar(int);
 
 // char *fgets(char *restrict, int, FILE *restrict);
-char *gets(char *);
+char *gets_s(char *, size_t);
 
 // int fputs(const char *restrict, FILE *restrict);
 int puts(const char *);

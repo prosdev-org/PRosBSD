@@ -13,10 +13,10 @@ int putchar(const int c) {
     return (char) c;
 }
 
-char *gets(char *str) {
+char *gets_s(char *str, const size_t size) {
     char *s = str;
     int c;
-    while ((c = getchar()) != '\n') {
+    while ((size_t) (s - str) < (size - 1) && (c = getchar()) != '\n') {
         if (c == '\b') {
             if (s != str) {
                 s--;
