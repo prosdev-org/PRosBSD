@@ -4,6 +4,7 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 add_compile_options(
+        -march=i486
         -O2
         -g
         -fno-builtin
