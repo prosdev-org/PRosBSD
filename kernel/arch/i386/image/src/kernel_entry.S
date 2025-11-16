@@ -1,6 +1,6 @@
 _start:
-    call main
+    call _main
     ret
 
 .globl _start
-.extern main
+.extern _main

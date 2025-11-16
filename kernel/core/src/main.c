@@ -1,3 +1,3 @@
-_Noreturn int main() {
+_Noreturn int _main() {
     for (;;);
 }
