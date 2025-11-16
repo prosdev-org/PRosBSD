@@ -31,4 +31,4 @@ ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${PATH}
 
 RUN brew install i686-elf-gcc
 
-CMD ["sh", "-c", "cmake -DCMAKE_TOOLCHAIN_FILE=cfg/toolchain-i686-elf.cmake -S . -B build; cmake --build build"]
+CMD ["sh", "-c", "cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-i686-elf.cmake -S . -B build; cmake --build build"]
