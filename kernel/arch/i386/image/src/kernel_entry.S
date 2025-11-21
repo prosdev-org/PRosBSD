@@ -1,6 +1,6 @@
 _start:
-    call _main
+    call CoreInit_main
     ret
 
 .globl _start
-.extern _main
+.extern CoreInit_main
