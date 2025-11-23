@@ -30,3 +30,5 @@ typedef unsigned int uint32_t;
 #ifdef ARCH_BITS_NEED_uint64_t
 typedef unsigned long long uint64_t;
 #endif
+
+#define ARCH_BITS_addr int
