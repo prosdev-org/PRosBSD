@@ -9,6 +9,9 @@ AlignEscapedNewlines: true
 AlignConsecutiveMacros: true
 AlwaysBreakTemplateDeclarations: Yes
 AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: false
 BraceWrapping:
   AfterCaseLabel: false
   AfterClass: false
@@ -26,7 +29,7 @@ BraceWrapping:
   SplitEmptyFunction: true
   SplitEmptyRecord: true
   SplitEmptyNamespace: true
-BreakBeforeBraces: Custom
+BreakBeforeBraces: Attach
 BreakConstructorInitializers: AfterColon
 BreakConstructorInitializersBeforeComma: false
 ColumnLimit: 120
