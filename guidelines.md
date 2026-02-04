@@ -11,7 +11,7 @@
 - G8. Maintainers do take responsibility for code they merge.
 - G9. Code has to be reviewed by at least two maintainers to be merged to `dev` branch.
 - G10. Architecture of the project and its parts such as VFS, memory models, drivers must be documented.
-- G11. Code style must be consistent with the project's formatting rules. (Do not applicable to third party code code)
+- G11. Code style must be consistent with the project's formatting rules. (Do not applicable to third party code)
 - G12. External API/ABI must be documented and versioned.
 
 ## Programming rules
