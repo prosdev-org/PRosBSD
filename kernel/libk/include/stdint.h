@@ -22,21 +22,21 @@
 #ifndef LIBK_STDINT_H
 #define LIBK_STDINT_H
 
-#define ARCH_BITS_NEED_int8_t
-#define ARCH_BITS_NEED_int16_t
-#define ARCH_BITS_NEED_int32_t
-#define ARCH_BITS_NEED_int64_t
+#define Arch_Bits_NEED_int8_t
+#define Arch_Bits_NEED_int16_t
+#define Arch_Bits_NEED_int32_t
+#define Arch_Bits_NEED_int64_t
 
-#define ARCH_BITS_NEED_uint8_t
-#define ARCH_BITS_NEED_uint16_t
-#define ARCH_BITS_NEED_uint32_t
-#define ARCH_BITS_NEED_uint64_t
+#define Arch_Bits_NEED_uint8_t
+#define Arch_Bits_NEED_uint16_t
+#define Arch_Bits_NEED_uint32_t
+#define Arch_Bits_NEED_uint64_t
 
-#define ARCH_BITS_NEED_intptr_t
-#define ARCH_BITS_NEED_uintptr_t
+#define Arch_Bits_NEED_intptr_t
+#define Arch_Bits_NEED_uintptr_t
 
-#define ARCH_BITS_NEED_intmax_t
-#define ARCH_BITS_NEED_uintmax_t
+#define Arch_Bits_NEED_intmax_t
+#define Arch_Bits_NEED_uintmax_t
 
 #include <arch/bits.h>
 

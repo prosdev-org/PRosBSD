@@ -1,8 +1,8 @@
 #ifndef LIBK_STRING_H
 #define LIBK_STRING_H
 
-#define ARCH_BITS_NEED_NULL
-#define ARCH_BITS_NEED_size_t
+#define Arch_Bits_NEED_NULL
+#define Arch_Bits_NEED_size_t
 
 #include <arch/bits.h>
 #include <unique/public.h>

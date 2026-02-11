@@ -1,6 +1,6 @@
 #include <unique/noreturn.h>
 
-noreturn void CoreInit_main() {
+noreturn void Core_Init_main() {
     for (;;)
         ;
 }
