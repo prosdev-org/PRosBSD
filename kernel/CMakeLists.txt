@@ -4,6 +4,7 @@ foreach (subdir IN LISTS SUBDIRS)
     add_subdirectory(${subdir})
 
     target_compile_options(${subdir} PRIVATE
+            -m32
             -ffreestanding
             -fno-stack-protector
             -fno-omit-frame-pointer
