@@ -1,5 +1,6 @@
 add_library(
         libk STATIC
+        src/stdlib/heap.c
         src/string.c
         src/string_v.c
 )
