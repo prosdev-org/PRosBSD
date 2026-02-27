@@ -6,4 +6,4 @@ add_library(
 )
 
 target_include_directories(libk PUBLIC include)
-target_link_libraries(libk PUBLIC arch)
+target_link_libraries(libk PUBLIC arch core)

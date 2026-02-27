@@ -4,4 +4,4 @@ add_library(arch STATIC
 )
 
 target_include_directories(arch PUBLIC include)
-target_link_libraries(arch PUBLIC libk arch-${TARGET_ARCH})
+target_link_libraries(arch PUBLIC core libk arch-${TARGET_ARCH})

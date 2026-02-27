@@ -1,7 +1,7 @@
 add_library(
         core STATIC
-        src/init.c
+        src/kernel.c
 )
 
 target_include_directories(core PUBLIC include)
-target_link_libraries(core PUBLIC arch)
+target_link_libraries(core PUBLIC arch libk)
