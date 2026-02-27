@@ -1,14 +1,15 @@
-#include <console/video_console.h>
-#include <i386/drivers/vga_text.h>
+#include <arch/init.h>
+#include <kernel.h>
 #include <unique/noreturn.h>
 
 // TODO: CharArrayOutputStream
 static VideoConsole video_console;
 
-noreturn void Kernel_entry() {
-    // TODO: Move to arch init
-    video_console = i386_Drivers_VgaText_init();
+extern noreturn void Kernel_entry() {
+    Arch_init();
+}
 
+void Kernel_main() {
     // Temp demo
     for (size_t x = 0; x < video_console.get_dimension_x(); x++) {
         for (size_t y = 0; y < video_console.get_dimension_y(); y++) {
@@ -22,4 +23,8 @@ noreturn void Kernel_entry() {
 
     for (;;)
         ;
+}
+
+void Kernel_set_video_console(const VideoConsole new_video_console) {
+    video_console = new_video_console;
 }

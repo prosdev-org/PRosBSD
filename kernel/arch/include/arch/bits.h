@@ -1,5 +1,5 @@
 // Don't need an include guard, as this file can be included multiple times
-#include <libarch/bits.h>
+#include <xarch/bits.h>
 
 #ifdef Arch_Bits_NEED_NULL
 
