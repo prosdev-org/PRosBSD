@@ -2,6 +2,7 @@
 #define KERNEL_H
 
 #include <console/video_console.h>
+#include <unique/public.h>
 
 /*
  * The kernel's main procedure.
