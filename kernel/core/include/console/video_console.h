@@ -3,17 +3,7 @@
 
 #include <stddef.h>
 
-typedef struct VideoConsole VideoConsole;
-typedef struct VideoConsole_Character VideoConsole_Character;
-typedef enum VideoConsole_Character_Color VideoConsole_Character_Color;
-
-struct VideoConsole {
-    size_t (*get_dimension_x)();
-    size_t (*get_dimension_y)();
-    void (*write)(VideoConsole_Character character, size_t x, size_t y);
-};
-
-enum VideoConsole_Character_Color {
+typedef enum {
     VideoConsole_Character_Color_BLACK,
     VideoConsole_Character_Color_BLUE,
     VideoConsole_Character_Color_GREEN,
@@ -31,12 +21,18 @@ enum VideoConsole_Character_Color {
     VideoConsole_Character_Color_YELLOW,
     VideoConsole_Character_Color_BRIGHT_WHITE,
     VideoConsole_Character_Color_size
-};
+} VideoConsole_Character_Color;
 
-struct VideoConsole_Character {
+typedef struct {
     char ch;
     VideoConsole_Character_Color foreground_color;
     VideoConsole_Character_Color background_color;
-};
+} VideoConsole_Character;
+
+typedef struct {
+    size_t (*get_dimension_x)();
+    size_t (*get_dimension_y)();
+    void (*write)(VideoConsole_Character character, size_t x, size_t y);
+} VideoConsole;
 
 #endif
