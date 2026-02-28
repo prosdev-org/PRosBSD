@@ -1,6 +1,6 @@
 add_library(
         arch-i386 STATIC
-        src/arch_init.c
+        src/arch_init.cxx
         src/drivers/vga_text.c
 )
 
