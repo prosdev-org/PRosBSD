@@ -4,9 +4,9 @@
 #define Arch_Bits_NEED_size_t
 
 #include <arch/bits.h>
-#include <unique/public.h>
+#include <unique/extern_c.h>
 
-PUBLIC void *malloc(size_t size);
-PUBLIC void free(void *ptr);
+EXTERN_C void *malloc(size_t size);
+EXTERN_C void free(void *ptr);
 
 #endif

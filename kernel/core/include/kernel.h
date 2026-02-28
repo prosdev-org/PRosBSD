@@ -2,14 +2,14 @@
 #define KERNEL_H
 
 #include <console/video_console.h>
-#include <unique/public.h>
+#include <unique/extern_c.h>
 
 /*
  * The kernel's main procedure.
  * Must not be called anywhere except in the Arch_init().
  */
-PUBLIC noreturn void Kernel_main();
+EXTERN_C noreturn void Kernel_main();
 
-PUBLIC void Kernel_set_video_console(VideoConsole new_video_console);
+EXTERN_C void Kernel_set_video_console(VideoConsole new_video_console);
 
 #endif

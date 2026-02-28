@@ -5,7 +5,7 @@
 // TODO: CharArrayOutputStream
 static VideoConsole video_console;
 
-extern noreturn void Kernel_entry() {
+EXTERN_C noreturn void Kernel_entry() {
     Arch_init();
 }
 

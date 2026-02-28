@@ -2,8 +2,8 @@
 #define I386_DRIVERS_VGA_TEXT_H
 
 #include <console/video_console.h>
-#include <unique/public.h>
+#include <unique/extern_c.h>
 
-PUBLIC VideoConsole i386_Drivers_VgaText_init();
+EXTERN_C VideoConsole i386_Drivers_VgaText_init();
 
 #endif
