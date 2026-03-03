@@ -2,19 +2,15 @@
 #include <xarch/bits.h>
 
 #ifdef Arch_Bits_NEED_NULL
-
-#if __cplusplus >= 201103L
-#define NULL nullptr
-#elif defined(__cplusplus)
-#define NULL 0L
-#else
 #define NULL ((void *) 0)
 #endif
 
-#endif
-
 #ifdef Arch_Bits_NEED_size_t
-typedef unsigned Arch_Bits_ADDR size_t;
+
+#ifndef __SIZE_TYPE__
+#define __SIZE_TYPE__ Arch_Bits_ADDR
+#endif
+typedef __SIZE_TYPE__ size_t;
 #endif
 
 #ifdef Arch_Bits_NEED_ptrdiff_t
