@@ -3,7 +3,7 @@ list(APPEND SUBDIRS arch core libk)
 foreach (subdir IN LISTS SUBDIRS)
     add_subdirectory(${subdir})
 
-    target_compile_options(${subdir} PRIVATE
+    target_compile_options(${subdir} PUBLIC
             -m32
             -ffreestanding
             -fno-stack-protector
