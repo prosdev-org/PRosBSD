@@ -1,11 +1,11 @@
 #include <stdint.h>
 #include <string.h>
 
-char *strcpy(char *restrict dest, const char *restrict src) {
+char *strcpy(char *RESTRICT dest, const char *RESTRICT src) {
     return memmove(dest, src, strlen(src) + 1);
 }
 
-char *strncpy(char *restrict dest, const char *restrict src, const size_t count) {
+char *strncpy(char *RESTRICT dest, const char *RESTRICT src, const size_t count) {
     const size_t offset = strnlen(src, count);
     memmove(dest, src, offset);
 
@@ -16,11 +16,11 @@ char *strncpy(char *restrict dest, const char *restrict src, const size_t count)
     return dest;
 }
 
-char *strcat(char *restrict dest, const char *restrict src) {
+char *strcat(char *RESTRICT dest, const char *RESTRICT src) {
     return strcpy(&dest[strlen(dest)], src);
 }
 
-char *strncat(char *restrict dest, const char *restrict src, const size_t count) {
+char *strncat(char *RESTRICT dest, const char *RESTRICT src, const size_t count) {
     const size_t src_len = strlen(src);
     const size_t dest_len = strlen(dest);
 
