@@ -1,7 +1,7 @@
 add_library(
         arch-i386 STATIC
         src/arch_init.cxx
-        src/drivers/vga_text.c
+        src/drivers/vga_text.cxx
 )
 
 target_include_directories(arch-i386 PUBLIC include)
