@@ -1,5 +1,6 @@
 add_library(
         core STATIC
+        src/console/video_console.cxx
         src/kernel.cxx
 )
 

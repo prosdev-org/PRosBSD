@@ -5,7 +5,9 @@
 namespace Arch {
     void init() {
         auto vga_text = I386::Drivers::VgaText(0xC00B8000); // TODO: Drivers registry
-        Kernel::set_video_console(&vga_text);
+        const auto output_stream = vga_text.to_output_stream(); // memory leak
+
+        Kernel::set_output_stream(output_stream);
 
         Kernel::main();
     }

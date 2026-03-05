@@ -1,7 +1,7 @@
 #ifndef KERNEL_HXX
 #define KERNEL_HXX
 
-#include <console/video_console.hxx>
+#include <output_stream.hxx>
 
 namespace Kernel {
     /*
@@ -10,7 +10,7 @@ namespace Kernel {
      */
     noreturn void main();
 
-    void set_video_console(VideoConsole *new_video_console);
+    void set_output_stream(OutputStream *new_output_stream);
 } // namespace Kernel
 
 #endif
