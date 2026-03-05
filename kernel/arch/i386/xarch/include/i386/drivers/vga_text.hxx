@@ -1,5 +1,5 @@
-#ifndef I386_DRIVERS_VGA_TEXT_H
-#define I386_DRIVERS_VGA_TEXT_H
+#ifndef I386_DRIVERS_VGA_TEXT_HXX
+#define I386_DRIVERS_VGA_TEXT_HXX
 
 #include <console/video_console.hxx>
 #include <stdint.h>

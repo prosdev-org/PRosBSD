@@ -1,5 +1,5 @@
-#ifndef CONSOLE_VIDEO_CONSOLE_H
-#define CONSOLE_VIDEO_CONSOLE_H
+#ifndef CONSOLE_VIDEO_CONSOLE_HXX
+#define CONSOLE_VIDEO_CONSOLE_HXX
 
 #include <stddef.h>
 
