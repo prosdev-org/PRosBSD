@@ -2,6 +2,7 @@
 #define KERNEL_HXX
 
 #include <output_stream.hxx>
+#include <unique/noreturn.h>
 
 namespace Kernel {
     /*
@@ -10,7 +11,13 @@ namespace Kernel {
      */
     noreturn void main();
 
+    /*
+     * Set the kernel's OutputStream.
+     * Takes ownership
+     */
     void set_output_stream(OutputStream *new_output_stream);
+
+    OutputStream *get_output_stream();
 } // namespace Kernel
 
 #endif
