@@ -13,6 +13,7 @@ int putchar(const int ch) {
 int puts(const char *str) {
     OutputStream *output_stream = Kernel::get_output_stream();
     output_stream->write_array(str, strlen(str));
+    output_stream->write_object('\n');
     output_stream->flush();
     return 0;
 }

@@ -1,4 +1,5 @@
 #include <console/video_console.hxx>
+#include <string.h>
 
 class VideoConsoleOutputStream final : public OutputStream {
 public:
@@ -13,6 +14,8 @@ private:
     size_t dimension_y;
     VideoConsole::ColoredCharacter *buffer;
     size_t idx;
+
+    void scroll_down();
 };
 
 VideoConsoleOutputStream::VideoConsoleOutputStream(VideoConsole *video_console) {
@@ -31,10 +34,18 @@ void VideoConsoleOutputStream::write(const void *data, const size_t nbytes) {
     // TODO: control characters
     const auto chars = static_cast<const char *>(data);
     for (size_t i = 0; i < nbytes; i++) {
-        if (idx > dimension_x * dimension_y) {
-            return;
-            // TODO: Scroll
+        if (idx >= dimension_x * dimension_y) {
+            scroll_down();
+            idx = dimension_x * (dimension_y - 1);
         }
+
+        if (chars[i] == '\n') {
+            // y++
+            idx -= idx % dimension_x;
+            idx += dimension_x;
+            continue;
+        }
+
         buffer[idx] = {
                 chars[i],
                 VideoConsole::Color::Black,
@@ -49,6 +60,12 @@ void VideoConsoleOutputStream::flush() {
             video_console->write(buffer[x + dimension_x * y], x, y);
         }
     }
+}
+
+// NOLINTNEXTLINE(readability-make-member-function-const)
+void VideoConsoleOutputStream::scroll_down() {
+    memmove(buffer, (buffer + dimension_x), sizeof(buffer[0]) * dimension_x * (dimension_y - 1));
+    memset(buffer + dimension_x * (dimension_y - 1), 0, sizeof(buffer[0]) * dimension_x);
 }
 
 OutputStream *VideoConsole::to_output_stream() {
