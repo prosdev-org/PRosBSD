@@ -15,8 +15,8 @@ public:
     }
 
     template<typename T>
-    void write_array(const T *array, size_t noobjs) {
-        write(array, sizeof(T) * noobjs);
+    void write_array(const T *array, size_t nobjs) {
+        write(array, sizeof(T) * nobjs);
     }
 };
 
