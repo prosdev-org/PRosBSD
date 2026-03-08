@@ -7,10 +7,32 @@ aiming for compatibility with the FreeBSD ABI and memory safety.
 > TODO:
 > - add screenshots, GIFs
 
-## Features
+## Rewrite notice
 
-> [!WARNING]
-> This section is not complete yet.
+> [!IMPORTANT]
+> This project is not dead. Check out the `rewrite/0.2.0` branch.
+
+We decided to rewrite PRosBSD from scratch, as the current version (0.1.0-dev) in the `dev` branch is memory-unsafe crap full of UB's.
+There is no point in continuing to support it further.
+The `rewrite/0.2.0` branch will be merged into the `dev` branch as soon as these features are implemented:
+
+- [x] VGA Text
+- [ ] printf
+- [ ] panic
+- [ ] Debugging macros (e.g., `DEBUG_*`)
+- [ ] Debug over GDB
+- [ ] GDT
+- [ ] IDT
+- [ ] Normal heap
+- [ ] Memory map
+- [ ] Paging
+- [ ] CMOS
+- [ ] PS/2 Keyboard
+- [ ] PIC Timer
+- [ ] Grub
+- [ ] KShell
+- [ ] PATA PIO driver
+- [ ] Some filesystem
 
 ## Building
 
