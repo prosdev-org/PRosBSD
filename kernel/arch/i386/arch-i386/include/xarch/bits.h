@@ -32,3 +32,5 @@ typedef unsigned long long uint64_t;
 #endif
 
 #define Arch_Bits_ADDR int
+
+#define Arch_Bits_long_MAX 0x7fffffffL
