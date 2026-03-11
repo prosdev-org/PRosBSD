@@ -1,11 +1,10 @@
 add_library(
-        libk STATIC
-        src/internal/new_delete.cxx
-        src/stdio.cxx
-        src/stdlib/heap.c
-        src/string.c
-        src/string_v.c
+        libk OBJECT
+        internal/new_delete.cxx
+        stdio.cxx
+        stdlib/heap.c
+        string.c
+        string_v.c
 )
 
-target_include_directories(libk PUBLIC include)
-target_link_libraries(libk PUBLIC arch core)
+target_include_directories(libk PUBLIC "${KERNEL_INCLUDES}")

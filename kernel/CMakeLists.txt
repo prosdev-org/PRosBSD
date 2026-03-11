@@ -1,4 +1,19 @@
-list(APPEND SUBDIRS arch core libk)
+list(
+        APPEND SUBDIRS
+        arch
+        drivers
+        libk
+        machine
+        sys
+)
+
+set(
+        KERNEL_INCLUDES
+        "${CMAKE_SOURCE_DIR}/kernel/include"
+        "${CMAKE_SOURCE_DIR}/kernel/include/arch/${TARGET_ARCH}/archx"
+)
+
+set(KERNEL_SOURCES "")
 
 foreach (subdir IN LISTS SUBDIRS)
     add_subdirectory(${subdir})
@@ -19,19 +34,10 @@ foreach (subdir IN LISTS SUBDIRS)
             >
     )
 
-    target_link_options(${subdir} PRIVATE
-            -nostdlib
-            -Wl,--build-id=none
-    )
-
-    list(APPEND AR_EXTRACT_COMMANDS
-            COMMAND ${CMAKE_AR} x $<TARGET_FILE:${subdir}>
-    )
+    list(APPEND KERNEL_SOURCES $<TARGET_OBJECTS:${subdir}>)
 endforeach ()
 
-add_custom_target(libkernel
-        ${AR_EXTRACT_COMMANDS}
-        COMMAND ${CMAKE_AR} rcs libkernel.a *.obj
-        COMMAND ${CMAKE_RANLIB} libkernel.a
-        DEPENDS arch core libk
+add_library(
+        kernel STATIC
+        ${KERNEL_SOURCES}
 )

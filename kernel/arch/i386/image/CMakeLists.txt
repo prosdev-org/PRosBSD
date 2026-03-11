@@ -7,12 +7,12 @@ set(MEMDISK_PATH "/usr/lib/syslinux/memdisk")
 
 add_custom_command(
         OUTPUT KERNEL_ENTRY.o
-        COMMAND ${CMAKE_ASM_COMPILER} ${CMAKE_ASM_FLAGS} -c ${CMAKE_CURRENT_SOURCE_DIR}/src/kernel_entry.S -o ${CMAKE_CURRENT_BINARY_DIR}/kernel_entry.o
+        COMMAND ${CMAKE_ASM_COMPILER} ${CMAKE_ASM_FLAGS} -c ${CMAKE_CURRENT_SOURCE_DIR}/kernel_entry.S -o ${CMAKE_CURRENT_BINARY_DIR}/kernel_entry.o
         COMMENT "Building 32-bit kernel entry"
 )
 
 add_custom_target(KERNEL.BIN
-        DEPENDS libkernel KERNEL_ENTRY.o
+        DEPENDS kernel KERNEL_ENTRY.o
         COMMAND ${CMAKE_LINKER} ${CMAKE_LINKER_FLAGS} -T ${CMAKE_CURRENT_SOURCE_DIR}/linker.ld -o ${CMAKE_CURRENT_BINARY_DIR}/KERNEL.BIN ${CMAKE_CURRENT_BINARY_DIR}/kernel_entry.o ${CMAKE_BINARY_DIR}/kernel/libkernel.a
         COMMAND ${CMAKE_STRIP} ${CMAKE_CURRENT_BINARY_DIR}/KERNEL.BIN
         COMMAND ${CMAKE_OBJCOPY} ${CMAKE_OBJCOPY_FLAGS} ${CMAKE_CURRENT_BINARY_DIR}/KERNEL.BIN
