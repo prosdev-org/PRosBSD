@@ -20,6 +20,7 @@ foreach (subdir IN LISTS SUBDIRS)
     add_subdirectory(${subdir})
 
     target_compile_options(${subdir} PUBLIC
+            -g
             -m32
             -ffreestanding
             -fno-stack-protector
