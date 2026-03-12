@@ -3,7 +3,7 @@ add_custom_command(
         COMMAND ${CMAKE_ASM_COMPILER} ${CMAKE_ASM_FLAGS} -c ${CMAKE_CURRENT_SOURCE_DIR}/mbr.S -o ${CMAKE_CURRENT_BINARY_DIR}/mbr.o
         COMMAND ${CMAKE_LINKER} ${CMAKE_LINKER_FLAGS} -Ttext 0x7C00 -o ${CMAKE_CURRENT_BINARY_DIR}/MBR.BIN ${CMAKE_CURRENT_BINARY_DIR}/mbr.o
         COMMAND ${CMAKE_OBJCOPY} ${CMAKE_OBJCOPY_FLAGS} ${CMAKE_CURRENT_BINARY_DIR}/MBR.BIN
-        COMMENT "Building MBR (stage 1) of fd.img"
+        COMMENT "image_i386_bootloader: Building MBR.BIN (stage 1) of fd.img"
 )
 
 add_custom_command(
@@ -12,10 +12,10 @@ add_custom_command(
         COMMAND ${CMAKE_ASM_COMPILER} ${CMAKE_ASM_FLAGS} -c ${CMAKE_CURRENT_SOURCE_DIR}/setup.S -o ${CMAKE_CURRENT_BINARY_DIR}/setup.o
         COMMAND ${CMAKE_LINKER} ${CMAKE_LINKER_FLAGS} -Ttext 0x0600 -o ${CMAKE_CURRENT_BINARY_DIR}/SETUP.BIN ${CMAKE_CURRENT_BINARY_DIR}/setup.o
         COMMAND ${CMAKE_OBJCOPY} ${CMAKE_OBJCOPY_FLAGS} ${CMAKE_CURRENT_BINARY_DIR}/SETUP.BIN
-        COMMENT "Building setup (stage 2) of fd.img"
+        COMMENT "image_i386_bootloader: Building SETUP.BIN (stage 2) of fd.img"
 )
 
-add_custom_target(boot
+add_custom_target(bootloader
         DEPENDS MBR.BIN
         DEPENDS SETUP.BIN
 )

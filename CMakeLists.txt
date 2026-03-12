@@ -30,3 +30,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(${CMAKE_BINARY_DIR}/include)
 
 add_subdirectory(kernel)
+add_subdirectory(image)
