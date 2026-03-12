@@ -1,6 +1,5 @@
 add_library(
         libk OBJECT
-        internal/new_delete.cxx
         stdio.cxx
         stdlib/heap.c
         string.c

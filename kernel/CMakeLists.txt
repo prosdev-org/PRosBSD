@@ -3,6 +3,7 @@ list(
         arch
         drivers
         libk
+        libkxx
         machine
         sys
 )
