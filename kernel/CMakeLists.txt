@@ -11,7 +11,7 @@ list(
 set(
         KERNEL_INCLUDES
         "${CMAKE_SOURCE_DIR}/kernel/include"
-        "${CMAKE_SOURCE_DIR}/kernel/include/arch/${TARGET_ARCH}/archx"
+        "${CMAKE_SOURCE_DIR}/kernel/include/arch/${PROJECT_TARGET_ARCH}/archx"
 )
 
 set(KERNEL_SOURCES "")

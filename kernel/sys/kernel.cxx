@@ -12,6 +12,7 @@ namespace Sys::Kernel {
 
     void main() {
         // Temp demo
+        puts("Welcome to PRosBSD v." PROSBSD_VERSION " !");
         puts("             ,        ,\n"
              "            /(        )`\n"
              "            \\ \\___   / |\n"

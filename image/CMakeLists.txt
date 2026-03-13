@@ -1,1 +1,1 @@
-add_subdirectory(${TARGET_ARCH})
+add_subdirectory(${PROJECT_TARGET_ARCH})
