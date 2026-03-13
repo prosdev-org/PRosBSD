@@ -22,11 +22,6 @@ function norun {
 }
 
 
-sudo="sudo"
-function nosudo {
-    echo "[BUILD SCRIPT] Building without sudo"
-    sudo=
-}
 
 
 function help {
@@ -36,7 +31,6 @@ function help {
 "    -d, --delete       - Delete build directory\n"\
 "    -D, --delandexit   - Delete build directory and exit\n"\
 "    -B, --nobuild      - Run without build\n"\
-"    -R, --norun        - Build without run\n"\
 "    -S, --nosudo       - Build without sudo (useful with docker user group)\n"\
 "    -h, --help         - Print this page\n"\
 "Example:\n"\
@@ -53,7 +47,6 @@ while [ -n "$1" ]; do
                            exit ;;
         -B | --nobuild) nobuild ;;
         -R | --norun) norun ;;
-        -S | --nosudo) nosudo ;;
         -h | --help) help
                      exit ;;
         *) echo "[BUILD SCRIPT] Unknown argument: $1"
@@ -69,8 +62,8 @@ done
 
 if [[ $build ]]; then
     echo "[BUILD SCRIPT] Building PRosBSD"
-    docker build --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) -t prosbsd-builder .
-    $sudo docker run --privileged --rm -v "$(pwd):/prosbsd" --mount type=tmpfs,destination=/tmp/image/ -w /prosbsd prosbsd-builder
+    cmake -DCMAKE_TOOLCHAIN_FILE=toolchain/llvm-i686-pc-none-elf.cmake -S . -B build
+    cmake --build build
     if [ "$?" -ne 0 ]; then
         exit 1
     fi

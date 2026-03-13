@@ -20,7 +20,9 @@ foreach (subdir IN LISTS SUBDIRS)
     add_subdirectory(${subdir})
 
     target_compile_options(${subdir} PUBLIC
+            -O3
             -g
+            -march=i486
             -m32
             -ffreestanding
             -fno-stack-protector

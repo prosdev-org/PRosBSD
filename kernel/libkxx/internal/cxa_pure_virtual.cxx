@@ -1,4 +1,6 @@
+#include <unique/extern_c.h>
+
 // NOLINTNEXTLINE(bugprone-reserved-identifier)
-void __cxa_pure_virtual() {
+EXTERN_C void __cxa_pure_virtual() {
     // TODO: panic
 }
