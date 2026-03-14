@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <sys/kernel.hxx>
+#include <sys/panic.hxx>
 #include <unique/extern_c.h>
 
 EXTERN_C int vprintf_(const char *format, va_list va);
@@ -8,8 +9,7 @@ static Sys::OutputStream *output_stream;
 
 EXTERN_C void _putchar(const char ch) {
     if (output_stream == nullptr) {
-        // TODO: panic
-        return;
+        Sys::panic("printf: output_stream is nullptr");
     }
 
     output_stream->write_object(ch);

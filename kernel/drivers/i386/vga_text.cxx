@@ -1,6 +1,7 @@
 #include <drivers/i386/vga_text.hxx>
 #include <string.h>
 #include <string_v.h>
+#include <sys/panic.hxx>
 
 bool Drivers::I386::VgaText::initialized = false;
 
@@ -24,8 +25,7 @@ Drivers::I386::VgaText::VgaText(const uintptr_t buffer_base) {
 
 void Drivers::I386::VgaText::write(const ColoredCharacter &colored_character, const size_t x, const size_t y) {
     if (x >= BUFFER_WIDTH || y >= BUFFER_HEIGHT) {
-        // TODO: panic
-        return;
+        Sys::panic("VGA Text: Invalid coordinates");
     }
 
     buffer[x + BUFFER_WIDTH * y] = to_buf_el(colored_character);
@@ -73,8 +73,8 @@ void Drivers::I386::VgaText::ColorConverter::init() {
 
 uint8_t Drivers::I386::VgaText::ColorConverter::convert(const Color color) {
     const uint8_t converted = map[static_cast<size_t>(color)];
-    // if (converted == INVALID_COLOR) {
-    //     // TODO: panic
-    // }
+    if (converted == INVALID_COLOR) {
+        Sys::panic("VGA Text: Invalid color");
+    }
     return converted;
 }
