@@ -31,6 +31,14 @@ typedef unsigned int uint32_t;
 typedef unsigned long long uint64_t;
 #endif
 
+#ifdef Archx_Bits_NEED_intmax_t
+typedef long long intmax_t;
+#endif
+
+#ifdef Archx_Bits_NEED_uintmax_t
+typedef unsigned long long uintmax_t;
+#endif
+
 #define Archx_Bits_ADDR int
 
 #define Archx_Bits_long_MAX 0x7fffffffL
