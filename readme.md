@@ -17,7 +17,7 @@ There is no point in continuing to support it further.
 The `rewrite/0.2.0` branch will be merged into the `dev` branch as soon as these features are implemented:
 
 - [x] VGA Text
-- [x] printf
+- [ ] printf
 - [x] panic
 - [ ] Debugging macros (e.g., `DEBUG_*`)
 - [ ] Debug over GDB

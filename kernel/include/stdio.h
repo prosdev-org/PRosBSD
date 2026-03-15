@@ -8,6 +8,4 @@ EXTERN_C int putchar(int ch);
 
 EXTERN_C int puts(const char *str);
 
-EXTERN_C int printf(const char *format, ...);
-
 #endif

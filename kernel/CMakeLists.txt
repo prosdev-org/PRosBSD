@@ -45,8 +45,6 @@ foreach (subdir IN LISTS SUBDIRS)
     list(APPEND KERNEL_TARGET_OBJECTS $<TARGET_OBJECTS:${subdir}>)
 endforeach ()
 
-include(contrib/printf.cmake)
-
 add_library(
         kernel STATIC
         ${KERNEL_TARGET_OBJECTS}

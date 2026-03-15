@@ -9,7 +9,8 @@ namespace Sys {
             Machine::Cpu::halt();
         }
         nested = true;
-        printf("Kernel panic: %s", msg);
+        puts("Kernel panic:");
+        puts(msg);
         Machine::Cpu::halt();
     }
 } // namespace Sys
