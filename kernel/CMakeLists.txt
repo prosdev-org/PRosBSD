@@ -13,7 +13,7 @@ add_library(kernel-includes INTERFACE)
 
 target_compile_options(
         kernel-flags INTERFACE
-        -O3
+        -O0
         -g
         -march=i486
         -m32

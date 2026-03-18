@@ -21,6 +21,12 @@ function norun {
     run=
 }
 
+gdb=
+function gdb {
+    echo "[BUILD SCRIPT] Running with GDB"
+    gdb=1
+}
+
 
 
 
@@ -31,7 +37,7 @@ function help {
 "    -d, --delete       - Delete build directory\n"\
 "    -D, --delandexit   - Delete build directory and exit\n"\
 "    -B, --nobuild      - Run without build\n"\
-"    -S, --nosudo       - Build without sudo (useful with docker user group)\n"\
+"    -g, --gdb          - Run QEMU with GDB support\n"\
 "    -h, --help         - Print this page\n"\
 "Example:\n"\
 "    ./build.sh         - Build and run\n"\
@@ -47,6 +53,7 @@ while [ -n "$1" ]; do
                            exit ;;
         -B | --nobuild) nobuild ;;
         -R | --norun) norun ;;
+        -g) gdb ;;
         -h | --help) help
                      exit ;;
         *) echo "[BUILD SCRIPT] Unknown argument: $1"
@@ -71,5 +78,9 @@ fi
 
 if [[ $run ]]; then
     echo "[BUILD SCRIPT] Running PRosBSD"
-    qemu-system-i386 -drive file=build/prosbsd.img,format=raw,if=ide,index=0
+    if [[ $gdb ]]; then
+        qemu-system-i386 -drive file=build/prosbsd.img,format=raw,if=ide,index=0 -d int -no-shutdown -no-reboot -monitor stdio -s -S
+    else
+        qemu-system-i386 -drive file=build/prosbsd.img,format=raw,if=ide,index=0
+    fi
 fi
