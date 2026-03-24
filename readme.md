@@ -20,7 +20,7 @@ The `rewrite/0.2.0` branch will be merged into the `dev` branch as soon as these
 - [ ] printf
 - [x] panic
 - [ ] Debugging macros (e.g., `DEBUG_*`)
-- [ ] Debug over GDB
+- [x] Debug over GDB
 - [ ] GDT
 - [ ] IDT
 - [ ] Normal heap
