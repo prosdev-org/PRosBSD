@@ -1,11 +1,18 @@
 #include <stdint.h>
 #include <string.h>
+#include <unique/assert.h>
 
 char *strcpy(char *RESTRICT dest, const char *RESTRICT src) {
+    ASSERT(dest != NULL);
+    ASSERT(src != NULL);
+
     return memmove(dest, src, strlen(src) + 1);
 }
 
 char *strncpy(char *RESTRICT dest, const char *RESTRICT src, const size_t count) {
+    ASSERT(dest != NULL);
+    ASSERT(src != NULL);
+
     const size_t offset = strnlen(src, count);
     memmove(dest, src, offset);
 
@@ -17,10 +24,16 @@ char *strncpy(char *RESTRICT dest, const char *RESTRICT src, const size_t count)
 }
 
 char *strcat(char *RESTRICT dest, const char *RESTRICT src) {
+    ASSERT(dest != NULL);
+    ASSERT(src != NULL);
+
     return strcpy(&dest[strlen(dest)], src);
 }
 
 char *strncat(char *RESTRICT dest, const char *RESTRICT src, const size_t count) {
+    ASSERT(dest != NULL);
+    ASSERT(src != NULL);
+
     const size_t src_len = strlen(src);
     const size_t dest_len = strlen(dest);
 
@@ -35,6 +48,8 @@ char *strncat(char *RESTRICT dest, const char *RESTRICT src, const size_t count)
 }
 
 size_t strlen(const char *str) {
+    ASSERT(str != NULL);
+
     for (size_t i = 0;; i++) {
         if (str[i] == '\0') {
             return i;
@@ -43,6 +58,8 @@ size_t strlen(const char *str) {
 }
 
 size_t strnlen(const char *str, const size_t count) {
+    ASSERT(str != NULL);
+
     for (size_t i = 0; i < count; i++) {
         if (str[i] == '\0') {
             return i;
@@ -53,6 +70,9 @@ size_t strnlen(const char *str, const size_t count) {
 }
 
 int strcmp(const char *lhs, const char *rhs) {
+    ASSERT(lhs != NULL);
+    ASSERT(rhs != NULL);
+
     const unsigned char *l = (unsigned char *) lhs;
     const unsigned char *r = (unsigned char *) rhs;
 
@@ -67,6 +87,9 @@ int strcmp(const char *lhs, const char *rhs) {
 }
 
 int strncmp(const char *lhs, const char *rhs, const size_t count) {
+    ASSERT(lhs != NULL);
+    ASSERT(rhs != NULL);
+
     if (count == 0) {
         return 0;
     }
@@ -85,6 +108,8 @@ int strncmp(const char *lhs, const char *rhs, const size_t count) {
 }
 
 char *strchr(const char *str, const int ch) {
+    ASSERT(str != NULL);
+
     if ((char) ch == '\0') {
         return (char *) &str[strlen(str)];
     }
@@ -101,6 +126,8 @@ char *strchr(const char *str, const int ch) {
 }
 
 char *strrchr(const char *str, const int ch) {
+    ASSERT(str != NULL);
+
     if ((char) ch == '\0') {
         return (char *) &str[strlen(str)];
     }
@@ -118,6 +145,8 @@ char *strrchr(const char *str, const int ch) {
 }
 
 void *memchr(const void *ptr, const int ch, const size_t count) {
+    ASSERT(ptr != NULL);
+
     const unsigned char *s = ptr;
 
     for (size_t i = 0; i < count; i++) {
@@ -130,6 +159,9 @@ void *memchr(const void *ptr, const int ch, const size_t count) {
 }
 
 int memcmp(const void *lhs, const void *rhs, const size_t count) {
+    ASSERT(lhs != NULL);
+    ASSERT(rhs != NULL);
+
     const unsigned char *l = lhs;
     const unsigned char *r = rhs;
 
@@ -144,6 +176,8 @@ int memcmp(const void *lhs, const void *rhs, const size_t count) {
 }
 
 void *memset(void *dest, const int ch, const size_t count) {
+    ASSERT(dest != NULL);
+
     unsigned char *d = dest;
 
     for (size_t i = 0; i < count; i++) {
@@ -154,6 +188,9 @@ void *memset(void *dest, const int ch, const size_t count) {
 }
 
 void *memcpy(void *dest, const void *src, const size_t count) {
+    ASSERT(dest != NULL);
+    ASSERT(src != NULL);
+
     unsigned char *d = dest;
     const unsigned char *s = src;
 
@@ -165,6 +202,9 @@ void *memcpy(void *dest, const void *src, const size_t count) {
 }
 
 void *memmove(void *dest, const void *src, const size_t count) {
+    ASSERT(dest != NULL);
+    ASSERT(src != NULL);
+
     if (dest == src) {
         return dest;
     }

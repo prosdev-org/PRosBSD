@@ -18,7 +18,6 @@ namespace Drivers::I386 {
         static constexpr size_t BUFFER_HEIGHT = 25;
         static constexpr size_t BUFFER_SIZE = sizeof(uint16_t) * BUFFER_WIDTH * BUFFER_HEIGHT;
 
-        static bool initialized;
         static void init();
         static uint16_t to_buf_el(kxx::Ref<const ColoredCharacter> colored_character);
 

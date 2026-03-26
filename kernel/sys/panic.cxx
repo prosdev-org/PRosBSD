@@ -9,6 +9,7 @@ namespace Sys {
             Machine::Cpu::halt();
         }
         nested = true;
+        // TODO: use print
         puts("Kernel panic:");
         puts(msg);
         Machine::Cpu::halt();

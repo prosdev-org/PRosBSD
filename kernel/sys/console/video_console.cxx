@@ -24,6 +24,7 @@ namespace Sys {
         dimension_x = video_console->get_dimension_x();
         dimension_y = video_console->get_dimension_y();
         buffer = new VideoConsole::ColoredCharacter[dimension_x * dimension_y];
+        memset(buffer, 0, sizeof(buffer[0]) * dimension_x * dimension_y);
         idx = 0;
     }
 

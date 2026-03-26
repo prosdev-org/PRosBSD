@@ -1,11 +1,10 @@
 #include <drivers/i386/vga_text.hxx>
 #include <string.h>
 #include <string_v.h>
-#include <sys/panic.hxx>
-
-bool Drivers::I386::VgaText::initialized = false;
+#include <unique/assert.h>
 
 void Drivers::I386::VgaText::init() {
+    static bool initialized = false;
     if (initialized) {
         return;
     }
@@ -19,14 +18,12 @@ Drivers::I386::VgaText::VgaText(const uintptr_t buffer_base) {
     init();
 
     this->buffer = reinterpret_cast<uint16_t *>(buffer_base);
-
     memset_v(buffer, 0, BUFFER_SIZE);
 }
 
 void Drivers::I386::VgaText::write(kxx::Ref<const ColoredCharacter> colored_character, size_t x, size_t y) {
-    if (x >= BUFFER_WIDTH || y >= BUFFER_HEIGHT) {
-        Sys::panic("VGA Text: Invalid coordinates");
-    }
+    ASSERT(x < BUFFER_WIDTH);
+    ASSERT(y < BUFFER_HEIGHT);
 
     buffer[x + BUFFER_WIDTH * y] = to_buf_el(colored_character);
 }
@@ -72,9 +69,10 @@ void Drivers::I386::VgaText::ColorConverter::init() {
 }
 
 uint8_t Drivers::I386::VgaText::ColorConverter::convert(const Color color) {
+    ASSERT(static_cast<size_t>(color) < sizeof(map) / sizeof(map[0]));
+
     const uint8_t converted = map[static_cast<size_t>(color)];
-    if (converted == INVALID_COLOR) {
-        Sys::panic("VGA Text: Invalid color");
-    }
+    ASSERT(converted != INVALID_COLOR);
+
     return converted;
 }
