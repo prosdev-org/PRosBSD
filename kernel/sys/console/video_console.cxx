@@ -58,7 +58,9 @@ namespace Sys {
     void VideoConsoleOutputStream::flush() {
         for (size_t y = 0; y < dimension_y; y++) {
             for (size_t x = 0; x < dimension_x; x++) {
-                video_console->write(buffer[x + dimension_x * y], x, y);
+                video_console->write(
+                        kxx::Ref<const VideoConsole::ColoredCharacter>(buffer[x + dimension_x * y]),
+                        x, y);
             }
         }
     }

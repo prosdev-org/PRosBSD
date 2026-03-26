@@ -14,9 +14,14 @@ namespace Sys::Kernel {
     /*
      * Set the kernel's OutputStream.
      * Takes ownership
+     *
+     * new_output_stream @nullable
      */
     void set_output_stream(OutputStream *new_output_stream);
 
+    /*
+     * return @nullable
+     */
     OutputStream *get_output_stream();
 } // namespace Sys::Kernel
 
