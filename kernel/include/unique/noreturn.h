@@ -2,9 +2,9 @@
 #define LIBK_UNIQUE_NORETURN_H
 
 #ifdef __cplusplus
-#define noreturn [[noreturn]]
+#define NORETURN [[noreturn]]
 #else
-#define noreturn _Noreturn
+#define NORETURN _Noreturn
 #endif
 
 #endif

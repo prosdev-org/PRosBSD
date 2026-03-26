@@ -4,7 +4,7 @@
 #include <unique/noreturn.h>
 
 namespace Machine::Cpu {
-    noreturn void halt();
+    NORETURN void halt();
 }
 
 #endif

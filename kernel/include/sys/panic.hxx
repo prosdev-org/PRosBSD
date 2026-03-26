@@ -4,7 +4,7 @@
 #include <unique/noreturn.h>
 
 namespace Sys {
-    noreturn void panic(const char *msg);
+    NORETURN void panic(const char *msg);
 }
 
 #endif

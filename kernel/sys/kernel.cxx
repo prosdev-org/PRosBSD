@@ -3,7 +3,7 @@
 #include <sys/kernel.hxx>
 #include <unique/extern_c.h>
 
-EXTERN_C noreturn void Kernel_entry() {
+EXTERN_C NORETURN void Kernel_entry() {
     Machine::init();
 }
 

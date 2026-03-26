@@ -9,7 +9,7 @@ namespace Sys::Kernel {
      * The kernel's main procedure.
      * Must not be called anywhere except in the Arch_init().
      */
-    noreturn void main();
+    NORETURN void main();
 
     /*
      * Set the kernel's OutputStream.
