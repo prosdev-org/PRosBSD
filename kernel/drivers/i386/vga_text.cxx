@@ -2,6 +2,7 @@
 #include <string.h>
 #include <string_v.h>
 #include <unique/assert.h>
+#include <unique/countof.h>
 
 void Drivers::I386::VgaText::init() {
     static bool initialized = false;
@@ -69,7 +70,7 @@ void Drivers::I386::VgaText::ColorConverter::init() {
 }
 
 uint8_t Drivers::I386::VgaText::ColorConverter::convert(const Color color) {
-    ASSERT(static_cast<size_t>(color) < sizeof(map) / sizeof(map[0]));
+    ASSERT(static_cast<size_t>(color) < COUNTOF(map));
 
     const uint8_t converted = map[static_cast<size_t>(color)];
     ASSERT(converted != INVALID_COLOR);
