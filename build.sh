@@ -79,8 +79,8 @@ fi
 if [[ $run ]]; then
     echo "[BUILD SCRIPT] Running PRosBSD"
     if [[ $gdb ]]; then
-        qemu-system-i386 -drive file=build/prosbsd.img,format=raw,if=ide,index=0 -d int -no-shutdown -no-reboot -monitor stdio -s -S
+        qemu-system-i386 -cdrom build/prosbsd.iso -d int -no-shutdown -no-reboot -monitor stdio -s -S
     else
-        qemu-system-i386 -drive file=build/prosbsd.img,format=raw,if=ide,index=0
+        qemu-system-i386 -cdrom build/prosbsd.iso
     fi
 fi
