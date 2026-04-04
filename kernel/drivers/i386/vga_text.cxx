@@ -22,7 +22,7 @@ Drivers::I386::VgaText::VgaText(const uintptr_t buffer_base) {
     memset_v(buffer, 0, BUFFER_SIZE);
 }
 
-void Drivers::I386::VgaText::write(kxx::Ref<const ColoredCharacter> colored_character, size_t x, size_t y) {
+void Drivers::I386::VgaText::write(const ColoredCharacter colored_character, const size_t x, const size_t y) {
     ASSERT(x < BUFFER_WIDTH);
     ASSERT(y < BUFFER_HEIGHT);
 
@@ -37,14 +37,14 @@ size_t Drivers::I386::VgaText::get_dimension_y() {
     return BUFFER_HEIGHT;
 }
 
-uint16_t Drivers::I386::VgaText::to_buf_el(kxx::Ref<const ColoredCharacter> colored_character) {
-    const uint8_t background = ColorConverter::convert((*colored_character).background);
-    const uint8_t foreground = ColorConverter::convert((*colored_character).foreground);
+uint16_t Drivers::I386::VgaText::to_buf_el(const ColoredCharacter colored_character) {
+    const uint8_t background = ColorConverter::convert(colored_character.background);
+    const uint8_t foreground = ColorConverter::convert(colored_character.foreground);
 
     const uint8_t attribute = foreground | (background << 4);
     // static_cast<uint8_t> is required to avoid sign extension
     // e.g., -1 -> 255, not -1 -> 65535
-    return static_cast<uint16_t>(static_cast<uint8_t>((*colored_character).ch)) | (static_cast<uint16_t>(attribute) << 8);
+    return static_cast<uint16_t>(static_cast<uint8_t>(colored_character.ch)) | (static_cast<uint16_t>(attribute) << 8);
 }
 
 uint8_t Drivers::I386::VgaText::ColorConverter::map[static_cast<size_t>(Color::_count)];

@@ -1,7 +1,6 @@
 #ifndef SYS_CONSOLE_VIDEO_CONSOLE_HXX
 #define SYS_CONSOLE_VIDEO_CONSOLE_HXX
 
-#include <libkxx/ref.hxx>
 #include <stddef.h>
 #include <sys/output_stream.hxx>
 
@@ -35,7 +34,7 @@ namespace Sys {
         };
 
         virtual ~VideoConsole() = default;
-        virtual void write(kxx::Ref<const ColoredCharacter> colored_character, size_t x, size_t y) = 0;
+        virtual void write(ColoredCharacter colored_character, size_t x, size_t y) = 0;
         virtual size_t get_dimension_x() = 0;
         virtual size_t get_dimension_y() = 0;
         /*
