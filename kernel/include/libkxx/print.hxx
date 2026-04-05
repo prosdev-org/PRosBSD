@@ -1,10 +1,12 @@
 #ifndef LIBKXX_PRINT_HXX
 #define LIBKXX_PRINT_HXX
 
+#include <libkxx/string.hxx>
 #include <sys/kernel.hxx>
 #include <sys/output_stream.hxx>
 
 namespace kxx {
+    void _print_internal(Sys::OutputStream *output_stream, const String &string);
     void _print_internal(Sys::OutputStream *output_stream, const char *str);
     void _print_internal(Sys::OutputStream *output_stream, char ch);
 

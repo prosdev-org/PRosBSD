@@ -190,6 +190,7 @@ void *memset(void *dest, const int ch, const size_t count) {
 void *memcpy(void *dest, const void *src, const size_t count) {
     ASSERT(dest != NULL);
     ASSERT(src != NULL);
+    ASSERT((uintptr_t) dest - (uintptr_t) src + count >= 2 * count);
 
     unsigned char *d = dest;
     const unsigned char *s = src;
