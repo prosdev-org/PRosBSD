@@ -8,4 +8,10 @@ namespace kxx {
 
         output_stream->write_array(str, strlen(str));
     }
+
+    void _print_internal(Sys::OutputStream *output_stream, const char ch) {
+        ASSERT(output_stream != nullptr);
+
+        output_stream->write_object(ch);
+    }
 } // namespace kxx

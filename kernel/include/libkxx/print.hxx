@@ -6,6 +6,7 @@
 
 namespace kxx {
     void _print_internal(Sys::OutputStream *output_stream, const char *str);
+    void _print_internal(Sys::OutputStream *output_stream, char ch);
 
     template<typename... Args>
     void print(Args... args) {
