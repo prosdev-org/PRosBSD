@@ -1,11 +1,7 @@
 #include <sys/panic.hxx>
 #include <unique/assert.h>
 
-void ASSERT_fail(const char *statement, const char *file, int line, const char *function) {
-    Sys::panic("Assertation failed");
-    // TODO: use arguments
-    (void) statement;
-    (void) file;
+void ASSERT_fail(const char *statement, const char *file, const int line, const char *function) {
     (void) line;
-    (void) function;
+    Sys::panic("Assertation failed: ", statement, " (", file, ": ", function, ")");
 }
