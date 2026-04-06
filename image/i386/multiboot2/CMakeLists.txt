@@ -8,7 +8,7 @@ add_dependencies(image grub2_image)
 
 add_custom_command(
         OUTPUT kernel_bootstrap.o
-        COMMAND ${CMAKE_ASM_COMPILER} ${CMAKE_ASM_FLAGS} -c ${CMAKE_CURRENT_SOURCE_DIR}/kernel_bootstrap.S -o ${CMAKE_CURRENT_BINARY_DIR}/kernel_bootstrap.o
+        COMMAND ${CMAKE_ASM_COMPILER} ${CMAKE_ASM_FLAGS} ${target_triple_option} -c ${CMAKE_CURRENT_SOURCE_DIR}/kernel_bootstrap.S -o ${CMAKE_CURRENT_BINARY_DIR}/kernel_bootstrap.o
         COMMENT "image_i386_multiboot2: Building 32-bit kernel bootstrap"
 )
 

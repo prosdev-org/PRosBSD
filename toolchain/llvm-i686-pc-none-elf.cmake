@@ -9,11 +9,6 @@ set(target_triple_option --target=i686-pc-none-elf)
 
 add_compile_options(${target_triple_option})
 
-set(
-        CMAKE_ASM_FLAGS
-        ${CMAKE_ASM_FLAGS}
-        ${target_triple_option}
-)
 
 set(CMAKE_AR llvm-ar)
 set(CMAKE_RANLIB llvm-ranlib)

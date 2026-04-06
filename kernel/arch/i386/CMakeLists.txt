@@ -1,4 +1,5 @@
 add_library(
         arch OBJECT
-        dummy.c
+        cpu/gdt.cxx
+        cpu/gdt.S
 )

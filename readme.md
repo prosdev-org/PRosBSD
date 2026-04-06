@@ -21,7 +21,7 @@ The `rewrite/0.2.0` branch will be merged into the `dev` branch as soon as these
 - [x] panic
 - [ ] Debugging macros (e.g., `DEBUG_*`)
 - [x] Debug over GDB
-- [ ] GDT
+- [x] GDT
 - [ ] IDT
 - [ ] Normal heap
 - [ ] Memory map
