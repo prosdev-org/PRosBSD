@@ -1,3 +1,5 @@
+#include <arch/i386/cpu/gdt.hxx>
+
 .globl Arch_I386_Cpu_Gdt_init
 
 gdt:
@@ -52,7 +54,7 @@ gdt_ref:
 tss_base:
     .long 0x00000000 # last TSS
     .long 0x00000000 # ESP0
-    .long DATA_SEG   # SS0
+    .long ARCH_I386_GDT_KERN_DATA_SEG # SS0
     .long 0x00000000 # ESP1
     .long 0x00000000 # SS1
     .long 0x00000000 # ESP2
@@ -78,12 +80,6 @@ tss_base:
     .word 0x0000 # debug flag
     .word 0x0000 # I/O Permission Bitmap offset
 
-.set CODE_SEG, 0x08 # Ring 0
-.set DATA_SEG, 0x10 # Ring 0
-.set USER_CODE_SEG, 0x18 | 3 # Ring 3
-.set USER_DATA_SEG, 0x20 | 3 # Ring 3
-.set TSS_SEG, 0x28
-
 Arch_I386_Cpu_Gdt_init:
     lgdt gdt_ref
 
@@ -96,7 +92,7 @@ Arch_I386_Cpu_Gdt_init:
 
     movl $0xC009F000, tss_base+4
 
-    mov $TSS_SEG, %ax
+    mov $ARCH_I386_GDT_TSS_SEG, %ax
     ltr %ax
 
     ret
