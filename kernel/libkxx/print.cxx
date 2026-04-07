@@ -48,7 +48,7 @@ namespace kxx {
             divisor /= 10;
         }
 
-        while (value != 0) {
+        while (divisor != 0) {
             output_stream->write_object(static_cast<char>('0' + value / divisor));
             value %= divisor;
             divisor /= 10;
