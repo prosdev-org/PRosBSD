@@ -22,7 +22,7 @@ The `rewrite/0.2.0` branch will be merged into the `dev` branch as soon as these
 - [ ] Debugging macros (e.g., `DEBUG_*`)
 - [x] Debug over GDB
 - [x] GDT
-- [ ] IDT
+- [x] IDT
 - [ ] Normal heap
 - [ ] Memory map
 - [ ] Paging

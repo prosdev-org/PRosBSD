@@ -1,0 +1,72 @@
+#include <arch/i386/cpu/gdt.hxx>
+#include <arch/i386/interrupts/idt.hxx>
+#include <arch/i386/interrupts/isr.hxx>
+#include <arch/i386/interrupts/pic8259.hxx>
+#include <stdint.h>
+#include <unique/countof.h>
+
+namespace Arch::I386::Interrupts::Idt {
+    // If ISR addr == 0xcafebabe ->
+    struct Entry {
+        uint16_t isr_low; // 0xbabe
+        uint16_t kernel_code_seg;
+        uint8_t reserved; // always 0
+        uint8_t attributes;
+        uint16_t isr_high; // 0xcafe
+    } __attribute__((packed));
+
+    struct Idtr {
+        uint16_t limit;
+        uint32_t base;
+    } __attribute__((packed));
+
+    __attribute__((aligned(0x10))) // for performance
+    static Entry idt[256];
+
+    static Idtr idtr;
+
+    void set_entry(const uintptr_t isr, const uint8_t attributes, const uint8_t idx) {
+        Entry &entry = idt[idx];
+
+        entry.isr_low = isr & 0xFFFF;
+        entry.kernel_code_seg = ARCH_I386_GDT_KERN_CODE_SEG;
+        entry.reserved = 0;
+        entry.attributes = attributes;
+        entry.isr_high = isr >> 16;
+    }
+
+    void init() {
+        idtr.base = reinterpret_cast<uintptr_t>(idt);
+        idtr.limit = static_cast<uint16_t>(sizeof(Entry) * COUNTOF(idt) - 1);
+
+        constexpr uint8_t attributes = 0x8E;
+
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_0_stub), attributes, 0);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_1_stub), attributes, 1);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_2_stub), attributes, 2);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_3_stub), attributes, 3);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_4_stub), attributes, 4);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_5_stub), attributes, 5);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_6_stub), attributes, 6);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_7_stub), attributes, 7);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_8_stub), attributes, 8);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_9_stub), attributes, 9);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_10_stub), attributes, 10);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_11_stub), attributes, 11);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_12_stub), attributes, 12);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_13_stub), attributes, 13);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_14_stub), attributes, 14);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_15_stub), attributes, 15);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_16_stub), attributes, 16);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_17_stub), attributes, 17);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_18_stub), attributes, 18);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_19_stub), attributes, 19);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_20_stub), attributes, 20);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_21_stub), attributes, 21);
+
+        Pic8259::mask_all();
+
+        __asm__ volatile("lidt %0" ::"m"(idtr));
+        __asm__ volatile("sti");
+    }
+} // namespace Arch::I386::Interrupts::Idt
