@@ -2,6 +2,9 @@
 
 .globl Arch_I386_Cpu_Gdt_init
 
+.section .data
+.align 8
+
 gdt:
     .quad 0
 
@@ -38,7 +41,7 @@ gdt:
     .byte 0x00
 
 tss_entry:
-    .word 0x0068 # limit (104)
+    .word 0x0067 # limit (104)
     .word 0x0000 # base (0-15)
     .byte 0x00 # base (16-23)
     .byte 0x89 # P=1, DPL=00, Type=1001 (32-bit TSS available)
@@ -47,50 +50,38 @@ tss_entry:
 
 gdt_end:
 
+.align 4
 gdt_ref:
     .word gdt_end - gdt - 1
     .long gdt
 
+.align 4
 tss_base:
-    .long 0x00000000 # last TSS
-    .long 0x00000000 # ESP0
-    .long ARCH_I386_GDT_KERN_DATA_SEG # SS0
-    .long 0x00000000 # ESP1
-    .long 0x00000000 # SS1
-    .long 0x00000000 # ESP2
-    .long 0x00000000 # SS2
-    .long 0x00000000 # CR3
-    .long 0x00000000 # EIP
-    .long 0x00000000 # EFLAGS
-    .long 0x00000000 # EAX
-    .long 0x00000000 # ECX
-    .long 0x00000000 # EDX
-    .long 0x00000000 # EBX
-    .long 0x00000000 # ESP
-    .long 0x00000000 # EBP
-    .long 0x00000000 # ESI
-    .long 0x00000000 # EDI
-    .long 0x00000000 # ES
-    .long 0x00000000 # CS
-    .long 0x00000000 # SS
-    .long 0x00000000 # DS
-    .long 0x00000000 # FS
-    .long 0x00000000 # GS
-    .long 0x00000000 # LDTR
-    .word 0x0000 # debug flag
-    .word 0x0000 # I/O Permission Bitmap offset
+    .long 0, 0, ARCH_I386_GDT_KERN_DATA_SEG
+    .fill 22, 4, 0
+    .word 0
+    .word 0x68 # IO Bitmap offset = size(TSS)
+
+.section .text
 
 Arch_I386_Cpu_Gdt_init:
     lgdt gdt_ref
+    ljmp $ARCH_I386_GDT_KERN_CODE_SEG, $.reload_cs
+.reload_cs:
+    mov $ARCH_I386_GDT_KERN_DATA_SEG, %ax
+    mov %ax, %ds
+    mov %ax, %es
+    mov %ax, %fs
+    mov %ax, %gs
+    mov %ax, %ss
 
     lea tss_base, %eax
-    movw %ax, tss_base+2
-
+    movw %ax, (tss_entry+2) # Base 0-15
     shrl $16, %eax
-    movb %al, tss_base+4
-    movb %ah, tss_base+7
+    movb %al, (tss_entry+4) # Base 16-23
+    movb %ah, (tss_entry+7) # Base 24-31
 
-    movl $0xC009F000, tss_base+4
+    movl $0xC009F000, (tss_base+4)
 
     mov $ARCH_I386_GDT_TSS_SEG, %ax
     ltr %ax
