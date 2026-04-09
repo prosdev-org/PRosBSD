@@ -2,10 +2,10 @@
 #define DRIVERS_I386_VGA_TEXT_HXX
 
 #include <stdint.h>
-#include <sys/console/video_console.hxx>
+#include <sys/text_screen.hxx>
 
 namespace Drivers::I386 {
-    class VgaText final : public Sys::VideoConsole {
+    class VgaText final : public Sys::TextScreen {
     public:
         explicit VgaText(uintptr_t buffer_base);
         void write(ColoredCharacter colored_character, size_t x, size_t y) override;
