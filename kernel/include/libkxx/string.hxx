@@ -6,7 +6,7 @@
 namespace kxx {
     class String {
     public:
-        String();
+        String() = default;
         explicit String(const char *src);
         String(const char *src, size_t count);
         ~String();
@@ -20,9 +20,9 @@ namespace kxx {
         void push_back(char ch);
 
     private:
-        char *back;
-        size_t size;
-        size_t capacity;
+        char *back = nullptr;
+        size_t size = 0;
+        size_t capacity = 0;
     };
 } // namespace kxx
 
