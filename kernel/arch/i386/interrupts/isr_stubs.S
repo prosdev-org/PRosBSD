@@ -21,6 +21,17 @@
         iret
 .endm
 
+.macro ISR_PIC8259 num
+    .extern Arch_I386_Interrupts_Isr_Pic8259_\num\()
+    .global Arch_I386_Interrupts_Isr_Pic8259_\num\()_stub
+    Arch_I386_Interrupts_Isr_Pic8259_\num\()_stub:
+        pusha
+        cld
+        call Arch_I386_Interrupts_Isr_Pic8259_\num\()
+        popa
+        iret
+.endm
+
 ISR_NO_ERR 0
 ISR_NO_ERR 1
 ISR_NO_ERR 2
@@ -43,3 +54,20 @@ ISR_NO_ERR 18
 ISR_NO_ERR 19
 ISR_NO_ERR 20
 ISR_ERR 21
+
+ISR_PIC8259 0
+ISR_PIC8259 1
+ISR_PIC8259 2
+ISR_PIC8259 3
+ISR_PIC8259 4
+ISR_PIC8259 5
+ISR_PIC8259 6
+ISR_PIC8259 7
+ISR_PIC8259 8
+ISR_PIC8259 9
+ISR_PIC8259 10
+ISR_PIC8259 11
+ISR_PIC8259 12
+ISR_PIC8259 13
+ISR_PIC8259 14
+ISR_PIC8259 15

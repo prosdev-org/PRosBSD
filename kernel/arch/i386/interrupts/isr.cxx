@@ -1,4 +1,5 @@
 #include <arch/i386/interrupts/isr.hxx>
+#include <arch/i386/interrupts/pic8259.hxx>
 #include <sys/panic.hxx>
 
 namespace Arch::I386::Interrupts::Isr {
@@ -88,5 +89,69 @@ namespace Arch::I386::Interrupts::Isr {
 
     void Arch_I386_Interrupts_Isr_21() {
         Sys::panic("ISR: Control Protection Exception");
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_0() {
+        Pic8259::send_end_of_interrupt(0);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_1() {
+        Pic8259::send_end_of_interrupt(1);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_2() {
+        Pic8259::send_end_of_interrupt(2);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_3() {
+        Pic8259::send_end_of_interrupt(3);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_4() {
+        Pic8259::send_end_of_interrupt(4);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_5() {
+        Pic8259::send_end_of_interrupt(5);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_6() {
+        Pic8259::send_end_of_interrupt(6);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_7() {
+        Pic8259::send_end_of_interrupt(7);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_8() {
+        Pic8259::send_end_of_interrupt(8);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_9() {
+        Pic8259::send_end_of_interrupt(9);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_10() {
+        Pic8259::send_end_of_interrupt(10);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_11() {
+        Pic8259::send_end_of_interrupt(11);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_12() {
+        Pic8259::send_end_of_interrupt(12);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_13() {
+        Pic8259::send_end_of_interrupt(13);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_14() {
+        Pic8259::send_end_of_interrupt(14);
+    }
+
+    void Arch_I386_Interrupts_Isr_Pic8259_15() {
+        Pic8259::send_end_of_interrupt(15);
     }
 } // namespace Arch::I386::Interrupts::Isr

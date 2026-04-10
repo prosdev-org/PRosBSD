@@ -64,7 +64,25 @@ namespace Arch::I386::Interrupts::Idt {
         set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_20_stub), attributes, 20);
         set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_21_stub), attributes, 21);
 
-        Pic8259::mask_all();
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_0_stub), attributes, 32);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_1_stub), attributes, 33);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_2_stub), attributes, 34);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_3_stub), attributes, 35);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_4_stub), attributes, 36);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_5_stub), attributes, 37);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_6_stub), attributes, 38);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_7_stub), attributes, 39);
+
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_8_stub), attributes, 40);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_9_stub), attributes, 41);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_10_stub), attributes, 42);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_11_stub), attributes, 43);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_12_stub), attributes, 44);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_13_stub), attributes, 45);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_14_stub), attributes, 46);
+        set_entry(reinterpret_cast<uintptr_t>(Isr::Arch_I386_Interrupts_Isr_Pic8259_15_stub), attributes, 47);
+
+        Pic8259::init(32, 40);
 
         __asm__ volatile("lidt %0" ::"m"(idtr));
         __asm__ volatile("sti");
