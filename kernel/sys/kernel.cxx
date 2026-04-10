@@ -1,5 +1,4 @@
 #include <libkxx/print.hxx>
-#include <libkxx/string.hxx>
 #include <machine/init.hxx>
 #include <sys/kernel.hxx>
 #include <unique/extern_c.h>
@@ -33,8 +32,6 @@ namespace Sys::Kernel {
                      "         ______( (_  / \\______/\n"
                      "       ,'  ,-----'   |\n"
                      "       `--{__________)\n");
-
-        kxx::println("kxx::println "_s, "and ", "kxx::String "_s, "are ", "very cool!");
 
         for (;;)
             ;

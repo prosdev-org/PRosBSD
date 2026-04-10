@@ -3,18 +3,12 @@
 #include <unique/assert.h>
 
 namespace kxx {
-    void _print_internal(Sys::OutputStream *output_stream, const String &string) {
+    void _print_internal(Sys::OutputStream *output_stream, const StringView &string_view) {
         ASSERT(output_stream != nullptr);
 
-        for (size_t i = 0; i < string.get_size(); i++) {
-            output_stream->write_object(string.get(i));
+        for (size_t i = 0; i < string_view.get_size(); i++) {
+            output_stream->write_object(string_view.get(i));
         }
-    }
-
-    void _print_internal(Sys::OutputStream *output_stream, const char *str) {
-        ASSERT(output_stream != nullptr);
-
-        output_stream->write_array(str, strlen(str));
     }
 
     void _print_internal(Sys::OutputStream *output_stream, const char ch) {

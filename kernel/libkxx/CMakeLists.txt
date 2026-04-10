@@ -4,4 +4,5 @@ add_library(
         internal/new_delete.cxx
         print.cxx
         string.cxx
+        string_view.cxx
 )

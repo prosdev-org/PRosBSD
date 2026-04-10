@@ -5,6 +5,8 @@
 
 namespace kxx {
     class String {
+        friend class StringView;
+
     public:
         String() = default;
         explicit String(const char *src);
