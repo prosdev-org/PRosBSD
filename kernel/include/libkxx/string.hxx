@@ -1,7 +1,7 @@
 #ifndef LIBKXX_STRING_HXX
 #define LIBKXX_STRING_HXX
 
-#include <stddef.h>
+#include <libkxx/vector.hxx>
 
 namespace kxx {
     class String {
@@ -11,7 +11,7 @@ namespace kxx {
         String() = default;
         explicit String(const char *src);
         String(const char *src, size_t count);
-        ~String();
+        ~String() = default;
         String(const String &other);
         String(String &&other);
         String &operator=(const String &other);
@@ -22,9 +22,7 @@ namespace kxx {
         void push_back(char ch);
 
     private:
-        char *back = nullptr;
-        size_t size = 0;
-        size_t capacity = 0;
+        Vector<char> vector;
     };
 } // namespace kxx
 

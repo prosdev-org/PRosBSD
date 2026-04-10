@@ -10,8 +10,8 @@ namespace kxx {
     }
 
     StringView::StringView(const String &src) {
-        back = src.back;
-        size = src.size;
+        back = src.vector.back;
+        size = src.vector.size;
     }
 
     size_t StringView::get_size() const {
