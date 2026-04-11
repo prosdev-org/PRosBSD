@@ -1,5 +1,6 @@
 #include <arch/i386/interrupts/isr.hxx>
 #include <arch/i386/interrupts/pic8259.hxx>
+#include <machine/interrupts.hxx>
 #include <sys/panic.hxx>
 
 namespace Arch::I386::Interrupts::Isr {
@@ -92,66 +93,82 @@ namespace Arch::I386::Interrupts::Isr {
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_0() {
+        Machine::Interrupts::call_handlers(0);
         Pic8259::send_end_of_interrupt(0);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_1() {
+        Machine::Interrupts::call_handlers(1);
         Pic8259::send_end_of_interrupt(1);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_2() {
+        Machine::Interrupts::call_handlers(2);
         Pic8259::send_end_of_interrupt(2);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_3() {
+        Machine::Interrupts::call_handlers(3);
         Pic8259::send_end_of_interrupt(3);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_4() {
+        Machine::Interrupts::call_handlers(4);
         Pic8259::send_end_of_interrupt(4);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_5() {
+        Machine::Interrupts::call_handlers(5);
         Pic8259::send_end_of_interrupt(5);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_6() {
+        Machine::Interrupts::call_handlers(6);
         Pic8259::send_end_of_interrupt(6);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_7() {
+        Machine::Interrupts::call_handlers(7);
         Pic8259::send_end_of_interrupt(7);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_8() {
+        Machine::Interrupts::call_handlers(8);
         Pic8259::send_end_of_interrupt(8);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_9() {
+        Machine::Interrupts::call_handlers(9);
         Pic8259::send_end_of_interrupt(9);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_10() {
+        Machine::Interrupts::call_handlers(10);
         Pic8259::send_end_of_interrupt(10);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_11() {
+        Machine::Interrupts::call_handlers(11);
         Pic8259::send_end_of_interrupt(11);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_12() {
+        Machine::Interrupts::call_handlers(12);
         Pic8259::send_end_of_interrupt(12);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_13() {
+        Machine::Interrupts::call_handlers(13);
         Pic8259::send_end_of_interrupt(13);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_14() {
+        Machine::Interrupts::call_handlers(14);
         Pic8259::send_end_of_interrupt(14);
     }
 
     void Arch_I386_Interrupts_Isr_Pic8259_15() {
+        Machine::Interrupts::call_handlers(15);
         Pic8259::send_end_of_interrupt(15);
     }
 } // namespace Arch::I386::Interrupts::Isr

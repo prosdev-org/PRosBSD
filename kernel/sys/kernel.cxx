@@ -12,15 +12,19 @@ namespace Sys::Kernel {
 
     static kxx::UniquePtr<OutputStream> &(*output_stream)();
 
-    EXTERN_C NORETURN void Kernel_entry() {
+    void setup_storage() {
         static Storage storage = {
-                kxx::UniquePtr(static_cast<OutputStream *>(new DummyOutputStream)),
+                .output_stream = kxx::UniquePtr(static_cast<OutputStream *>(
+                        new DummyOutputStream)),
         };
 
         output_stream = []() -> kxx::UniquePtr<OutputStream> & {
             return storage.output_stream;
         };
+    }
 
+    EXTERN_C NORETURN void Kernel_entry() {
+        setup_storage();
         Machine::init();
     }
 

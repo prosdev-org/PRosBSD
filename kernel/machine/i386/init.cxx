@@ -3,6 +3,7 @@
 #include <drivers/i386/vga_text.hxx>
 #include <libkxx/move.hxx>
 #include <machine/init.hxx>
+#include <machine/interrupts.hxx>
 #include <sys/kernel.hxx>
 
 namespace Machine {
@@ -14,6 +15,7 @@ namespace Machine {
 
         Arch::I386::Cpu::Gdt::init();
         Arch::I386::Interrupts::Idt::init();
+        Interrupts::init();
 
         Sys::Kernel::main();
     }
