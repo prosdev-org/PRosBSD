@@ -34,6 +34,7 @@ namespace kxx {
 
     template<typename T>
     UniquePtr<T>::UniquePtr(UniquePtr &&other) {
+        delete back;
         back = other.back;
         other.back = nullptr;
     }
@@ -44,6 +45,7 @@ namespace kxx {
             return *this;
         }
 
+        delete back;
         back = other.back;
         other.back = nullptr;
 
@@ -90,6 +92,7 @@ namespace kxx {
 
     template<typename T>
     UniquePtr<T[]>::UniquePtr(UniquePtr &&other) {
+        delete[] back;
         back = other.back;
         other.back = nullptr;
     }
@@ -100,6 +103,7 @@ namespace kxx {
             return *this;
         }
 
+        delete[] back;
         back = other.back;
         other.back = nullptr;
 
