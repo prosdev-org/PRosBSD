@@ -1,3 +1,4 @@
+#include <libkxx/unique_ptr.hxx>
 #include <string.h>
 #include <sys/text_screen.hxx>
 
@@ -5,7 +6,6 @@ namespace Sys {
     class TextScreenToOutputStreamAdapter final : public OutputStream {
     public:
         explicit TextScreenToOutputStreamAdapter(TextScreen *text_screen);
-        ~TextScreenToOutputStreamAdapter() override;
         void write(const void *data, size_t nbytes) override;
         void flush() override;
 
@@ -13,7 +13,7 @@ namespace Sys {
         TextScreen *text_screen;
         size_t dimension_x;
         size_t dimension_y;
-        TextScreen::ColoredCharacter *buffer;
+        kxx::UniquePtr<TextScreen::ColoredCharacter[]> buffer;
         size_t idx;
 
         void scroll_down();
@@ -23,13 +23,9 @@ namespace Sys {
         this->text_screen = text_screen;
         dimension_x = text_screen->get_dimension_x();
         dimension_y = text_screen->get_dimension_y();
-        buffer = new TextScreen::ColoredCharacter[dimension_x * dimension_y];
-        memset(buffer, 0, sizeof(buffer[0]) * dimension_x * dimension_y);
+        buffer = kxx::UniquePtr<TextScreen::ColoredCharacter[]>(new TextScreen::ColoredCharacter[dimension_x * dimension_y]);
+        memset(&buffer[0], 0, sizeof(buffer[0]) * dimension_x * dimension_y);
         idx = 0;
-    }
-
-    TextScreenToOutputStreamAdapter::~TextScreenToOutputStreamAdapter() {
-        delete buffer;
     }
 
     void TextScreenToOutputStreamAdapter::write(const void *data, const size_t nbytes) {
@@ -68,8 +64,8 @@ namespace Sys {
 
     // NOLINTNEXTLINE(readability-make-member-function-const)
     void TextScreenToOutputStreamAdapter::scroll_down() {
-        memmove(buffer, (buffer + dimension_x), sizeof(buffer[0]) * dimension_x * (dimension_y - 1));
-        memset(buffer + dimension_x * (dimension_y - 1), 0, sizeof(buffer[0]) * dimension_x);
+        memmove(&buffer[0], &buffer[dimension_x], sizeof(buffer[0]) * dimension_x * (dimension_y - 1));
+        memset(&buffer[dimension_x * (dimension_y - 1)], 0, sizeof(buffer[0]) * dimension_x);
     }
 
     OutputStream *TextScreen::as_output_stream() {
