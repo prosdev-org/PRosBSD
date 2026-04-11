@@ -1,6 +1,7 @@
 #ifndef SYS_KERNEL_HXX
 #define SYS_KERNEL_HXX
 
+#include <libkxx/unique_ptr.hxx>
 #include <sys/output_stream.hxx>
 #include <unique/noreturn.h>
 
@@ -11,18 +12,9 @@ namespace Sys::Kernel {
      */
     NORETURN void main();
 
-    /*
-     * Set the kernel's OutputStream.
-     * Takes ownership
-     *
-     * new_output_stream @nullable
-     */
-    void set_output_stream(OutputStream *new_output_stream);
+    void set_output_stream(kxx::UniquePtr<OutputStream> &&new_output_stream);
 
-    /*
-     * return @nullable
-     */
-    OutputStream *get_output_stream();
+    OutputStream &get_output_stream();
 } // namespace Sys::Kernel
 
 #endif

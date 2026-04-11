@@ -68,8 +68,7 @@ namespace Sys {
         memset(&buffer[dimension_x * (dimension_y - 1)], 0, sizeof(buffer[0]) * dimension_x);
     }
 
-    OutputStream *TextScreen::as_output_stream() {
-        const auto output_stream = new TextScreenToOutputStreamAdapter(this);
-        return output_stream;
+    kxx::UniquePtr<OutputStream> TextScreen::as_output_stream() {
+        return kxx::UniquePtr(static_cast<OutputStream *>(new TextScreenToOutputStreamAdapter(this)));
     }
 } // namespace Sys

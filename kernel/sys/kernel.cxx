@@ -1,14 +1,28 @@
 #include <libkxx/print.hxx>
+#include <libkxx/unique_ptr.hxx>
 #include <machine/init.hxx>
+#include <sys/dummy_output_stream.hxx>
 #include <sys/kernel.hxx>
 #include <unique/extern_c.h>
 
-EXTERN_C NORETURN void Kernel_entry() {
-    Machine::init();
-}
-
 namespace Sys::Kernel {
-    static OutputStream *output_stream;
+    struct Storage {
+        kxx::UniquePtr<OutputStream> output_stream;
+    };
+
+    static kxx::UniquePtr<OutputStream> &(*output_stream)();
+
+    EXTERN_C NORETURN void Kernel_entry() {
+        static Storage storage = {
+                kxx::UniquePtr(static_cast<OutputStream *>(new DummyOutputStream)),
+        };
+
+        output_stream = []() -> kxx::UniquePtr<OutputStream> & {
+            return storage.output_stream;
+        };
+
+        Machine::init();
+    }
 
     void main() {
         // Temp demo
@@ -37,12 +51,11 @@ namespace Sys::Kernel {
             ;
     }
 
-    void set_output_stream(OutputStream *new_output_stream) {
-        delete output_stream;
-        output_stream = new_output_stream;
+    void set_output_stream(kxx::UniquePtr<OutputStream> &&new_output_stream) {
+        output_stream() = kxx::move(new_output_stream);
     }
 
-    OutputStream *get_output_stream() {
-        return output_stream;
+    OutputStream &get_output_stream() {
+        return *output_stream();
     }
 } // namespace Sys::Kernel
