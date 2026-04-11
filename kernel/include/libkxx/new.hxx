@@ -1,5 +1,5 @@
-#ifndef LIBKXX_NEW_KXX
-#define LIBKXX_NEW_KXX
+#ifndef LIBKXX_NEW_HXX
+#define LIBKXX_NEW_HXX
 
 #include <stddef.h>
 
