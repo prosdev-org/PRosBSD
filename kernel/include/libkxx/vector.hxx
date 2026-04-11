@@ -206,6 +206,9 @@ namespace kxx {
 
     template<typename T>
     void Vector<T>::copy_init_to_back(const T *src, const size_t count) {
+        ASSERT(src != nullptr);
+        ASSERT(count <= size);
+
         for (size_t i = 0; i < count; i++) {
             new (&back[i]) T(src[i]);
         }
@@ -213,6 +216,9 @@ namespace kxx {
 
     template<typename T>
     void Vector<T>::move_init_to_back(T *src, const size_t count) {
+        ASSERT(src != nullptr);
+        ASSERT(count <= size);
+
         for (size_t i = 0; i < count; i++) {
             new (&back[i]) T(move(src[i]));
         }
