@@ -8,6 +8,16 @@ list(
         sys
 )
 
+list(
+        APPEND OBJLIBS
+        arch-${PROJECT_TARGET_ARCH}
+        drivers-${PROJECT_TARGET_ARCH}
+        libk
+        libkxx
+        machine-${PROJECT_TARGET_ARCH}
+        sys
+)
+
 add_library(kernel-flags INTERFACE)
 add_library(kernel-includes INTERFACE)
 
@@ -41,8 +51,11 @@ set(KERNEL_TARGET_OBJECTS "")
 
 foreach (subdir IN LISTS SUBDIRS)
     add_subdirectory(${subdir})
-    target_link_libraries(${subdir} PUBLIC kernel-flags kernel-includes)
-    list(APPEND KERNEL_TARGET_OBJECTS $<TARGET_OBJECTS:${subdir}>)
+endforeach ()
+
+foreach (objlib IN LISTS OBJLIBS)
+    target_link_libraries(${objlib} PUBLIC kernel-flags kernel-includes)
+    list(APPEND KERNEL_TARGET_OBJECTS $<TARGET_OBJECTS:${objlib}>)
 endforeach ()
 
 add_library(

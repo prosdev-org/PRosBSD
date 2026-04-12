@@ -1,5 +1,5 @@
 add_library(
-        arch OBJECT
+        arch-i386 OBJECT
         cpu/gdt.cxx
         cpu/gdt.S
         interrupts/idt.cxx

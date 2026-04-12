@@ -1,4 +1,4 @@
 add_library(
-        drivers OBJECT
+        drivers-i386 OBJECT
         vga_text.cxx
 )

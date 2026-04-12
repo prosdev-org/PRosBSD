@@ -1,5 +1,5 @@
 add_library(
-        machine OBJECT
+        machine-i386 OBJECT
         cpu.cxx
         init.cxx
         interrupts.cxx
