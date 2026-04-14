@@ -1,10 +1,12 @@
-#include <drivers/i386/vga_text.hxx>
+#include <devices/i386/isa_bus.hxx>
+#include <devices/i386/vga_text.hxx>
 #include <string.h>
 #include <string_v.h>
+#include <sys/kernel.hxx>
 #include <unique/assert.h>
 #include <unique/countof.h>
 
-void Drivers::I386::VgaText::init() {
+void Devices::I386::VgaText::ensure_init() {
     static bool initialized = false;
     if (initialized) {
         return;
@@ -15,29 +17,45 @@ void Drivers::I386::VgaText::init() {
     initialized = true;
 }
 
-Drivers::I386::VgaText::VgaText(const uintptr_t buffer_base) {
-    init();
+bool Devices::I386::VgaText::match(const AutoConf::MatchInfo &match_info) {
+    ASSERT(match_info.parent != nullptr);
 
-    this->buffer = reinterpret_cast<uint16_t *>(buffer_base);
-    memset_v(buffer, 0, BUFFER_SIZE);
+    if (strcmp(match_info.parent->driver_header.name, "isabus") != 0) {
+        return false;
+    }
+
+    const auto bus_connection_info = (IsaBus::ConnectionInfo *) match_info.bus_connection_info;
+    return bus_connection_info->device_type == IsaBus::VgaText;
 }
 
-void Drivers::I386::VgaText::write(const ColoredCharacter colored_character, const size_t x, const size_t y) {
+Devices::I386::VgaText::VgaText(
+        const AutoConf::DriverHeader &driver_header,
+        const AutoConf::MatchInfo &match_info) : Device(driver_header, match_info.parent) {
+    ensure_init();
+
+    constexpr uintptr_t buffer_base = 0xC00B8000;
+    this->buffer = reinterpret_cast<uint16_t *>(buffer_base);
+    memset_v(buffer, 0, BUFFER_SIZE);
+
+    Sys::Kernel::set_output_stream(as_output_stream());
+}
+
+void Devices::I386::VgaText::write(const ColoredCharacter colored_character, const size_t x, const size_t y) {
     ASSERT(x < BUFFER_WIDTH);
     ASSERT(y < BUFFER_HEIGHT);
 
     buffer[x + BUFFER_WIDTH * y] = to_buf_el(colored_character);
 }
 
-size_t Drivers::I386::VgaText::get_dimension_x() {
+size_t Devices::I386::VgaText::get_dimension_x() {
     return BUFFER_WIDTH;
 }
 
-size_t Drivers::I386::VgaText::get_dimension_y() {
+size_t Devices::I386::VgaText::get_dimension_y() {
     return BUFFER_HEIGHT;
 }
 
-uint16_t Drivers::I386::VgaText::to_buf_el(const ColoredCharacter colored_character) {
+uint16_t Devices::I386::VgaText::to_buf_el(const ColoredCharacter colored_character) {
     const uint8_t background = ColorConverter::convert(colored_character.background);
     const uint8_t foreground = ColorConverter::convert(colored_character.foreground);
 
@@ -47,9 +65,9 @@ uint16_t Drivers::I386::VgaText::to_buf_el(const ColoredCharacter colored_charac
     return static_cast<uint16_t>(static_cast<uint8_t>(colored_character.ch)) | (static_cast<uint16_t>(attribute) << 8);
 }
 
-uint8_t Drivers::I386::VgaText::ColorConverter::map[static_cast<size_t>(Color::_count)];
+uint8_t Devices::I386::VgaText::ColorConverter::map[static_cast<size_t>(Color::_count)];
 
-void Drivers::I386::VgaText::ColorConverter::init() {
+void Devices::I386::VgaText::ColorConverter::init() {
     memset(map, INVALID_COLOR, static_cast<size_t>(Color::_count));
     map[static_cast<size_t>(Color::Black)] = 0;
     map[static_cast<size_t>(Color::Blue)] = 1;
@@ -69,7 +87,7 @@ void Drivers::I386::VgaText::ColorConverter::init() {
     map[static_cast<size_t>(Color::BrightWhite)] = 15;
 }
 
-uint8_t Drivers::I386::VgaText::ColorConverter::convert(const Color color) {
+uint8_t Devices::I386::VgaText::ColorConverter::convert(const Color color) {
     ASSERT(static_cast<size_t>(color) < COUNTOF(map));
 
     const uint8_t converted = map[static_cast<size_t>(color)];

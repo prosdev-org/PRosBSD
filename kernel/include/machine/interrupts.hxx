@@ -1,6 +1,8 @@
 #ifndef MACHINE_INTERRUPTS_HXX
 #define MACHINE_INTERRUPTS_HXX
 
+#include <stdint.h>
+
 namespace Machine::Interrupts {
     constexpr uint8_t interrupts_count = 16;
 

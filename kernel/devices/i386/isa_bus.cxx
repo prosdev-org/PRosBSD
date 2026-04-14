@@ -1,0 +1,36 @@
+#include <devices/auto_conf.hxx>
+#include <devices/i386/isa_bus.hxx>
+#include <devices/main_bus.hxx>
+#include <string.h>
+
+namespace Devices::I386 {
+    bool IsaBus::match(const AutoConf::MatchInfo &match_info) {
+        ASSERT(match_info.parent != nullptr);
+
+        if (strcmp(match_info.parent->driver_header.name, "mainbus") != 0) {
+            return false;
+        }
+
+        const auto *bus_connection_info = (MainBus::ConnectionInfo *) match_info.bus_connection_info;
+        return bus_connection_info->device_type == MainBus::IsaBus;
+    }
+
+    IsaBus::IsaBus(
+            const AutoConf::DriverHeader &driver_header,
+            const AutoConf::MatchInfo &match_info) : Device(driver_header, match_info.parent) {
+        ASSERT(parent != nullptr);
+
+        // VgaText
+        {
+            ConnectionInfo connection_info;
+            connection_info.device_type = VgaText;
+
+            const AutoConf::MatchInfo child_match_info = {
+                    .parent = this,
+                    .bus_connection_info = &connection_info};
+
+            const AutoConf::DriverHeader child_driver_header = AutoConf::match_driver(child_match_info);
+            children.push_back(child_driver_header.construct(child_match_info));
+        }
+    }
+} // namespace Devices::I386

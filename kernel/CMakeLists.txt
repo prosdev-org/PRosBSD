@@ -1,7 +1,7 @@
 list(
         APPEND SUBDIRS
         arch
-        drivers
+        devices
         libk
         libkxx
         machine
@@ -11,7 +11,8 @@ list(
 list(
         APPEND OBJLIBS
         arch-${PROJECT_TARGET_ARCH}
-        drivers-${PROJECT_TARGET_ARCH}
+        devices
+        devices-${PROJECT_TARGET_ARCH}
         libk
         libkxx
         machine-${PROJECT_TARGET_ARCH}
