@@ -36,13 +36,6 @@ The `rewrite/0.2.0` branch will be merged into the `dev` branch as soon as these
 
 ## Building
 
-> [!IMPORTANT]
-> This method uses docker to provide you all the dependencies.
-> You need to [install it](https://docs.docker.com/engine/install/) before using this method.
-
-> [!WARNING]
-> Do not run this script as root. It is not supported.
-
 ```bash
 ./build.sh -R
 ```
