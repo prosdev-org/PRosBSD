@@ -1,7 +1,8 @@
 #include <devices/auto_conf/registry.hxx>
+#include <devices/dummy.hxx>
 #include <devices/i386/isa_bus.hxx>
-#include <devices/main_bus.hxx>
 #include <devices/i386/vga_text.hxx>
+#include <devices/main_bus.hxx>
 #include <unique/countof.h>
 
 namespace Devices::AutoConf::Registry {
@@ -33,7 +34,7 @@ namespace Devices::AutoConf::Registry {
                     },
                     .construct = [](const MatchInfo &match_info) -> kxx::UniquePtr<Device> {
                         constexpr size_t idx = 2; // have to be the same, as the index in this array
-                        return kxx::UniquePtr<Device>(new Devices::I386::VgaText(driver_headers[idx], match_info));
+                        return kxx::UniquePtr<Device>(new I386::VgaText(driver_headers[idx], match_info));
                     },
             },
             {
@@ -42,8 +43,9 @@ namespace Devices::AutoConf::Registry {
                     .match = [](const MatchInfo &) -> bool {
                         return true;
                     },
-                    .construct = [](const MatchInfo &) -> kxx::UniquePtr<Device> {
-                        return kxx::UniquePtr<Device>(nullptr);
+                    .construct = [](const MatchInfo &match_info) -> kxx::UniquePtr<Device> {
+                        constexpr size_t idx = 3;
+                        return kxx::UniquePtr<Device>(new Dummy(driver_headers[idx], match_info));
                     },
             },
     };

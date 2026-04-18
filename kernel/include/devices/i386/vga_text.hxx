@@ -38,6 +38,6 @@ namespace Devices::I386 {
             static uint8_t map[];
         };
     };
-} // namespace Drivers::I386
+} // namespace Devices::I386
 
 #endif

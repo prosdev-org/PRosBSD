@@ -10,8 +10,8 @@ namespace Devices {
         static bool match(const AutoConf::MatchInfo &match_info);
 
         MainBus(
-            const AutoConf::DriverHeader &device_header,
-            const AutoConf::MatchInfo &match_info);
+                const AutoConf::DriverHeader &device_header,
+                const AutoConf::MatchInfo &match_info);
 
         enum DeviceType {
             Dummy,
