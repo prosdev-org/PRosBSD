@@ -16,11 +16,20 @@ namespace Devices::I386 {
         enum DeviceType {
             Dummy,
             VgaText,
+            I8253,
         };
 
         struct ConnectionInfo final : AutoConf::BusConnectionInfo {
             DeviceType device_type = Dummy;
         };
+
+        union ConnectionInfoConverter {
+            const AutoConf::BusConnectionInfo *general;
+            const ConnectionInfo *isa_bus;
+        };
+
+    private:
+        void create_child(DeviceType device_type);
     };
 } // namespace Devices::I386
 

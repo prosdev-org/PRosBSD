@@ -20,17 +20,19 @@ namespace Devices::I386 {
             const AutoConf::MatchInfo &match_info) : Device(driver_header, match_info.parent) {
         ASSERT(parent != nullptr);
 
-        // VgaText
-        {
-            ConnectionInfo connection_info;
-            connection_info.device_type = VgaText;
+        create_child(VgaText);
+        create_child(I8253);
+    }
 
-            const AutoConf::MatchInfo child_match_info = {
-                    .parent = this,
-                    .bus_connection_info = &connection_info};
+    void IsaBus::create_child(const DeviceType device_type) {
+        ConnectionInfo connection_info;
+        connection_info.device_type = device_type;
 
-            const AutoConf::DriverHeader child_driver_header = AutoConf::match_driver(child_match_info);
-            children.push_back(child_driver_header.construct(child_match_info));
-        }
+        const AutoConf::MatchInfo child_match_info = {
+                .parent = this,
+                .bus_connection_info = &connection_info};
+
+        const AutoConf::DriverHeader child_driver_header = AutoConf::match_driver(child_match_info);
+        children.push_back(child_driver_header.construct(child_match_info));
     }
 } // namespace Devices::I386

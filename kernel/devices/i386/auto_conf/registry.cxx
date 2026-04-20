@@ -1,5 +1,6 @@
 #include <devices/auto_conf/registry.hxx>
 #include <devices/dummy.hxx>
+#include <devices/i386/i8253.hxx>
 #include <devices/i386/isa_bus.hxx>
 #include <devices/i386/vga_text.hxx>
 #include <devices/main_bus.hxx>
@@ -38,13 +39,23 @@ namespace Devices::AutoConf::Registry {
                     },
             },
             {
+                    .name = "i8253",
+                    .match = [](const MatchInfo &match_info) -> bool {
+                        return I386::I8253::match(match_info);
+                    },
+                    .construct = [](const MatchInfo &match_info) -> kxx::UniquePtr<Device> {
+                        constexpr size_t idx = 3;
+                        return kxx::UniquePtr<Device>(new I386::I8253(driver_headers[idx], match_info));
+                    },
+            },
+            {
                     // have to be at the end
                     .name = "dummy",
                     .match = [](const MatchInfo &) -> bool {
                         return true;
                     },
                     .construct = [](const MatchInfo &match_info) -> kxx::UniquePtr<Device> {
-                        constexpr size_t idx = 3;
+                        constexpr size_t idx = 4;
                         return kxx::UniquePtr<Device>(new Dummy(driver_headers[idx], match_info));
                     },
             },

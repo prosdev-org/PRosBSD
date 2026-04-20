@@ -5,6 +5,7 @@
 
 namespace Machine::Cpu {
     NORETURN void halt();
-}
+    void relax();
+} // namespace Machine::Cpu
 
 #endif

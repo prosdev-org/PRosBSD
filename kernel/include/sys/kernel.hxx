@@ -3,6 +3,7 @@
 
 #include <libkxx/unique_ptr.hxx>
 #include <sys/output_stream.hxx>
+#include <sys/timer.hxx>
 #include <unique/noreturn.h>
 
 namespace Sys::Kernel {
@@ -13,8 +14,10 @@ namespace Sys::Kernel {
     NORETURN void main();
 
     void set_output_stream(kxx::UniquePtr<OutputStream> &&new_output_stream);
-
     OutputStream &get_output_stream();
+
+    void set_timer(kxx::UniquePtr<Timer> &&new_timer);
+    Timer &get_timer();
 } // namespace Sys::Kernel
 
 #endif

@@ -1,6 +1,7 @@
 list(
         APPEND SUBDIRS
         arch
+        contrib
         devices
         libk
         libkxx
@@ -11,6 +12,7 @@ list(
 list(
         APPEND OBJLIBS
         arch-${PROJECT_TARGET_ARCH}
+        contrib-arith64
         devices
         devices-${PROJECT_TARGET_ARCH}
         libk

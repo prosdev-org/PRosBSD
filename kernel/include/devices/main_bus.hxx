@@ -21,6 +21,9 @@ namespace Devices {
         struct ConnectionInfo final : AutoConf::BusConnectionInfo {
             DeviceType device_type = Dummy;
         };
+
+    private:
+        void create_child(DeviceType device_type);
     };
 } // namespace Devices
 

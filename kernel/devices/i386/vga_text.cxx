@@ -24,8 +24,11 @@ bool Devices::I386::VgaText::match(const AutoConf::MatchInfo &match_info) {
         return false;
     }
 
-    const auto bus_connection_info = (IsaBus::ConnectionInfo *) match_info.bus_connection_info;
-    return bus_connection_info->device_type == IsaBus::VgaText;
+    const IsaBus::ConnectionInfoConverter converter = {
+            .general = match_info.bus_connection_info,
+    };
+
+    return converter.isa_bus->device_type == IsaBus::VgaText;
 }
 
 Devices::I386::VgaText::VgaText(

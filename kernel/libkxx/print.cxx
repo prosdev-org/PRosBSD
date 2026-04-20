@@ -1,3 +1,4 @@
+#include <libkxx/math.hxx>
 #include <libkxx/print.hxx>
 
 namespace kxx {
@@ -37,5 +38,24 @@ namespace kxx {
             value %= divisor;
             divisor /= 10;
         }
+    }
+
+    void _print_internal_digits(Sys::OutputStream &output_stream, const uint32_t digits, uint32_t value) {
+        ASSERT(digits <= 10);
+
+        uint32_t divisor = Math::pow(10, digits - 1);
+        while (divisor != 0) {
+            output_stream.write_object(static_cast<char>('0' + value / divisor));
+            value %= divisor;
+            divisor /= 10;
+        }
+    }
+
+    void _print_internal(Sys::OutputStream &output_stream, const Sys::Time::Duration time_duration) {
+        _print_internal(output_stream, '[');
+        _print_internal(output_stream, static_cast<uint32_t>(time_duration.as_seconds()));
+        _print_internal(output_stream, '.');
+        _print_internal_digits(output_stream, 6, static_cast<uint32_t>(time_duration.as_micros() % 1000000ULL));
+        _print_internal(output_stream, ']');
     }
 } // namespace kxx

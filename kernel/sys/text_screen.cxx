@@ -19,6 +19,10 @@ namespace Sys {
         void scroll_down();
     };
 
+    kxx::UniquePtr<OutputStream> TextScreen::as_output_stream() {
+        return kxx::UniquePtr(static_cast<OutputStream *>(new TextScreenToOutputStreamAdapter(this)));
+    }
+
     TextScreenToOutputStreamAdapter::TextScreenToOutputStreamAdapter(TextScreen *text_screen) {
         this->text_screen = text_screen;
         dimension_x = text_screen->get_dimension_x();
@@ -66,9 +70,5 @@ namespace Sys {
     void TextScreenToOutputStreamAdapter::scroll_down() {
         memmove(&buffer[0], &buffer[dimension_x], sizeof(buffer[0]) * dimension_x * (dimension_y - 1));
         memset(&buffer[dimension_x * (dimension_y - 1)], 0, sizeof(buffer[0]) * dimension_x);
-    }
-
-    kxx::UniquePtr<OutputStream> TextScreen::as_output_stream() {
-        return kxx::UniquePtr(static_cast<OutputStream *>(new TextScreenToOutputStreamAdapter(this)));
     }
 } // namespace Sys

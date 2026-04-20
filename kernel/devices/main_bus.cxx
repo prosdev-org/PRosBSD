@@ -10,18 +10,18 @@ namespace Devices {
             const AutoConf::DriverHeader &device_header,
             const AutoConf::MatchInfo &match_info) : Device(device_header, match_info.parent) {
         ASSERT(match_info.parent == nullptr);
+        create_child(IsaBus);
+    }
 
-        // IsaBus
-        {
-            ConnectionInfo connection_info;
-            connection_info.device_type = IsaBus;
+    void MainBus::create_child(const DeviceType device_type) {
+        ConnectionInfo connection_info;
+        connection_info.device_type = device_type;
 
-            const AutoConf::MatchInfo child_match_info = {
-                    .parent = this,
-                    .bus_connection_info = &connection_info};
+        const AutoConf::MatchInfo child_match_info = {
+                .parent = this,
+                .bus_connection_info = &connection_info};
 
-            const AutoConf::DriverHeader child_driver_header = AutoConf::match_driver(child_match_info);
-            children.push_back(child_driver_header.construct(child_match_info));
-        }
+        const AutoConf::DriverHeader child_driver_header = AutoConf::match_driver(child_match_info);
+        children.push_back(child_driver_header.construct(child_match_info));
     }
 } // namespace Devices

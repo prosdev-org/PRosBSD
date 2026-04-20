@@ -28,7 +28,7 @@ The `rewrite/0.2.0` branch will be merged into the `dev` branch as soon as these
 - [ ] Paging
 - [ ] CMOS
 - [ ] PS/2 Keyboard
-- [ ] PIC Timer
+- [x] I8253 Timer
 - [x] Grub
 - [ ] KShell
 - [ ] PATA PIO driver
