@@ -33,6 +33,7 @@ namespace kxx {
         void set(T &&obj, size_t idx);
         void push_back(const T &obj);
         void push_back(T &&obj);
+        void pop_back();
 
     private:
         static T *alloc_back(size_t new_capacity);
@@ -182,6 +183,13 @@ namespace kxx {
 
         new (&back[size]) T(move(obj));
         size++;
+    }
+
+    template<typename T>
+    void Vector<T>::pop_back() {
+        ASSERT(size > 0);
+
+        size--;
     }
 
     template<typename T>

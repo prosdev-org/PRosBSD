@@ -17,6 +17,7 @@ namespace Devices::I386 {
             Dummy,
             VgaText,
             I8253,
+            I8042,
         };
 
         struct ConnectionInfo final : AutoConf::BusConnectionInfo {

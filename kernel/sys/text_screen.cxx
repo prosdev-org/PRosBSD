@@ -1,6 +1,7 @@
 #include <libkxx/unique_ptr.hxx>
 #include <string.h>
 #include <sys/text_screen.hxx>
+#include <unique/assert.h>
 
 namespace Sys {
     class TextScreenToOutputStreamAdapter final : public OutputStream {
@@ -17,6 +18,7 @@ namespace Sys {
         size_t idx;
 
         void scroll_down();
+        void write_char(char ch, size_t i);
     };
 
     kxx::UniquePtr<OutputStream> TextScreen::as_output_stream() {
@@ -33,6 +35,8 @@ namespace Sys {
     }
 
     void TextScreenToOutputStreamAdapter::write(const void *data, const size_t nbytes) {
+        ASSERT(data != nullptr);
+
         // TODO: control characters
         const auto chars = static_cast<const char *>(data);
         for (size_t i = 0; i < nbytes; i++) {
@@ -41,18 +45,23 @@ namespace Sys {
                 idx = dimension_x * (dimension_y - 1);
             }
 
-            if (chars[i] == '\n') {
-                // y++
-                idx -= idx % dimension_x;
-                idx += dimension_x;
-                continue;
+            switch (chars[i]) {
+                case '\n': {
+                    // y++
+                    idx -= idx % dimension_x;
+                    idx += dimension_x;
+                } break;
+                case '\b': {
+                    if (idx != 0) {
+                        idx--;
+                    }
+                    write_char('\0', idx);
+                } break;
+                default: {
+                    write_char(chars[i], idx);
+                    idx++;
+                }
             }
-
-            buffer[idx] = {
-                    chars[i],
-                    TextScreen::Color::Black,
-                    TextScreen::Color::BrightWhite},
-            idx++;
         }
     }
 
@@ -70,5 +79,13 @@ namespace Sys {
     void TextScreenToOutputStreamAdapter::scroll_down() {
         memmove(&buffer[0], &buffer[dimension_x], sizeof(buffer[0]) * dimension_x * (dimension_y - 1));
         memset(&buffer[dimension_x * (dimension_y - 1)], 0, sizeof(buffer[0]) * dimension_x);
+    }
+
+    // NOLINTNEXTLINE(readability-make-member-function-const)
+    void TextScreenToOutputStreamAdapter::write_char(const char ch, const size_t i) {
+        buffer[i] = {
+                ch,
+                TextScreen::Color::Black,
+                TextScreen::Color::BrightWhite};
     }
 } // namespace Sys

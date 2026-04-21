@@ -22,6 +22,7 @@ namespace Devices::I386 {
 
         create_child(VgaText);
         create_child(I8253);
+        create_child(I8042);
     }
 
     void IsaBus::create_child(const DeviceType device_type) {
