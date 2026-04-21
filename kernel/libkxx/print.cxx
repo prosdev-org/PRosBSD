@@ -76,6 +76,10 @@ namespace kxx {
         ASSERT(digits <= 10);
 
         uint32_t divisor = Math::ipow(10U, digits - 1U);
+        if (digits < 10) {
+            value %= divisor * 10;
+        }
+
         while (divisor != 0) {
             output_stream.write_object(static_cast<char>('0' + value / divisor));
             value %= divisor;
@@ -87,6 +91,10 @@ namespace kxx {
         ASSERT(digits <= 19);
 
         uint32_t divisor = Math::ipow(10ULL, digits - 1ULL);
+        if (digits < 19) {
+            value %= divisor * 10;
+        }
+
         while (divisor != 0) {
             output_stream.write_object(static_cast<char>('0' + value / divisor));
             value %= divisor;
