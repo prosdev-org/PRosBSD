@@ -11,6 +11,8 @@ namespace kxx {
     void _print_internal(Sys::OutputStream &output_stream, char ch);
     void _print_internal(Sys::OutputStream &output_stream, int32_t value);
     void _print_internal(Sys::OutputStream &output_stream, uint32_t value);
+    void _print_internal(Sys::OutputStream &output_stream, int64_t value);
+    void _print_internal(Sys::OutputStream &output_stream, uint64_t value);
     void _print_internal(Sys::OutputStream &output_stream, Sys::Time::Duration time_duration);
 
     template<typename... Args>
