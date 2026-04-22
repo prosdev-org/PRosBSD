@@ -20,7 +20,24 @@ namespace kxx {
         char ch = '\0';
         for (;;) {
             input_stream.read_object(&ch);
-            print(ch);
+            bool should_print = true;
+            const bool backspacing = ch == '\b';
+
+            if (backspacing) {
+                if (string.get_size() == 0) {
+                    should_print = false;
+                } else {
+                    string.pop_back();
+                }
+            }
+
+            if (should_print) {
+                print(ch);
+            }
+
+            if (backspacing) {
+                continue;
+            }
 
             if (ch == '\n') {
                 break;

@@ -54,4 +54,8 @@ namespace kxx {
     void String::push_back(const char ch) {
         vector.push_back(ch);
     }
+
+    void String::pop_back() {
+        vector.pop_back();
+    }
 } // namespace kxx

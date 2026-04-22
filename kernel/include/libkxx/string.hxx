@@ -20,6 +20,7 @@ namespace kxx {
         [[nodiscard]] char get(size_t idx) const;
         void set(char ch, size_t idx);
         void push_back(char ch);
+        void pop_back();
 
     private:
         Vector<char> vector;

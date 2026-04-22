@@ -194,6 +194,10 @@ namespace kxx {
 
     template<typename T>
     T *Vector<T>::alloc_back(const size_t new_capacity) {
+        if (new_capacity == 0) {
+            return nullptr;
+        }
+
         return reinterpret_cast<T *>(new uint8_t[sizeof(T) * new_capacity]);
     }
 
@@ -214,6 +218,10 @@ namespace kxx {
 
     template<typename T>
     void Vector<T>::copy_init_to_back(const T *src, const size_t count) {
+        if (count == 0) {
+            return;
+        }
+
         ASSERT(src != nullptr);
         ASSERT(count <= size);
 
@@ -224,6 +232,10 @@ namespace kxx {
 
     template<typename T>
     void Vector<T>::move_init_to_back(T *src, const size_t count) {
+        if (count == 0) {
+            return;
+        }
+
         ASSERT(src != nullptr);
         ASSERT(count <= size);
 

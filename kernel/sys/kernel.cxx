@@ -1,8 +1,8 @@
-#include <libkxx/input.hxx>
 #include <libkxx/print.hxx>
 #include <libkxx/unique_ptr.hxx>
 #include <machine/cpu.hxx>
 #include <machine/init.hxx>
+#include <shell/shell.hxx>
 #include <sys/dummy_input_stream.hxx>
 #include <sys/dummy_output_stream.hxx>
 #include <sys/dummy_timer.hxx>
@@ -72,8 +72,11 @@ namespace Sys::Kernel {
                      "       ,'  ,-----'   |\n"
                      "       `--{__________)\n");
 
+        Shell::init();
+        Shell::loop();
+
         for (;;) {
-            kxx::input();
+            Machine::Cpu::relax();
         }
     }
 

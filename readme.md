@@ -30,7 +30,7 @@ The `rewrite/0.2.0` branch will be merged into the `dev` branch as soon as these
 - [x] PS/2 Keyboard
 - [x] I8253 Timer
 - [x] Grub
-- [ ] KShell
+- [x] KShell
 - [ ] PATA PIO driver
 - [ ] Some filesystem
 

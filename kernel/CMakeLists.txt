@@ -6,6 +6,7 @@ list(
         libk
         libkxx
         machine
+        shell
         sys
 )
 
@@ -18,6 +19,7 @@ list(
         libk
         libkxx
         machine-${PROJECT_TARGET_ARCH}
+        shell
         sys
 )
 
