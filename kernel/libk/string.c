@@ -97,14 +97,13 @@ int strncmp(const char *lhs, const char *rhs, const size_t count) {
     const unsigned char *l = (unsigned char *) lhs;
     const unsigned char *r = (unsigned char *) rhs;
 
-    size_t i = 0;
-    for (; i < count && l[i] != '\0'; i++) {
+    for (size_t i = 0; i < count && l[i] != '\0'; i++) {
         if (l[i] != r[i]) {
-            break;
+            return l[i] - r[i];
         }
     }
 
-    return l[i] - r[i];
+    return 0;
 }
 
 char *strchr(const char *str, const int ch) {
@@ -165,14 +164,13 @@ int memcmp(const void *lhs, const void *rhs, const size_t count) {
     const unsigned char *l = lhs;
     const unsigned char *r = rhs;
 
-    size_t i = 0;
-    for (; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         if (l[i] != r[i]) {
-            break;
+            return l[i] - r[i];
         }
     }
 
-    return l[i] - r[i];
+    return 0;
 }
 
 void *memset(void *dest, const int ch, const size_t count) {
