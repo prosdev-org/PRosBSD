@@ -1,8 +1,8 @@
 #include <arch/i386/port_io.hxx>
 #include <devices/i386/i8253.hxx>
 #include <devices/i386/isa_bus.hxx>
+#include <libkxx/string_view.hxx>
 #include <machine/interrupts.hxx>
-#include <string.h>
 #include <sys/kernel.hxx>
 
 namespace Devices::I386 {
@@ -18,7 +18,7 @@ namespace Devices::I386 {
     bool I8253::match(const AutoConf::MatchInfo &match_info) {
         ASSERT(match_info.parent != nullptr);
 
-        if (strcmp(match_info.parent->driver_header.name, "isabus") != 0) {
+        if (kxx::StringView(match_info.parent->driver_header.name) != "isabus") {
             return false;
         }
 

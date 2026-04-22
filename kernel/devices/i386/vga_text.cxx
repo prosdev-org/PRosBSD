@@ -1,5 +1,6 @@
 #include <devices/i386/isa_bus.hxx>
 #include <devices/i386/vga_text.hxx>
+#include <libkxx/string_view.hxx>
 #include <string.h>
 #include <string_v.h>
 #include <sys/kernel.hxx>
@@ -20,7 +21,7 @@ void Devices::I386::VgaText::ensure_init() {
 bool Devices::I386::VgaText::match(const AutoConf::MatchInfo &match_info) {
     ASSERT(match_info.parent != nullptr);
 
-    if (strcmp(match_info.parent->driver_header.name, "isabus") != 0) {
+    if (kxx::StringView(match_info.parent->driver_header.name) != "isabus") {
         return false;
     }
 

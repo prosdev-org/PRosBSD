@@ -24,4 +24,20 @@ namespace kxx {
 
         return back[idx];
     }
+
+    bool StringView::operator==(const StringView &other) const {
+        if (size != other.size) {
+            return false;
+        }
+
+        return strncmp(back, other.back, size) == 0;
+    }
+
+    bool StringView::operator!=(const StringView &other) const {
+        if (size != other.size) {
+            return true;
+        }
+
+        return strncmp(back, other.back, size) != 0;
+    }
 } // namespace kxx

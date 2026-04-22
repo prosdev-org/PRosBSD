@@ -12,6 +12,8 @@ namespace kxx {
         StringView(const String &src);
         [[nodiscard]] size_t get_size() const;
         [[nodiscard]] char get(size_t idx) const;
+        bool operator==(const StringView &other) const;
+        bool operator!=(const StringView &other) const;
 
     private:
         const char *back = nullptr;

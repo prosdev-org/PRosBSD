@@ -1,13 +1,13 @@
 #include <devices/auto_conf.hxx>
 #include <devices/i386/isa_bus.hxx>
 #include <devices/main_bus.hxx>
-#include <string.h>
+#include <libkxx/string_view.hxx>
 
 namespace Devices::I386 {
     bool IsaBus::match(const AutoConf::MatchInfo &match_info) {
         ASSERT(match_info.parent != nullptr);
 
-        if (strcmp(match_info.parent->driver_header.name, "mainbus") != 0) {
+        if (kxx::StringView(match_info.parent->driver_header.name) != "mainbus") {
             return false;
         }
 

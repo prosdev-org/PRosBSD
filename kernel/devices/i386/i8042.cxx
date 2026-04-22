@@ -1,7 +1,7 @@
 #include <arch/i386/port_io.hxx>
 #include <devices/i386/i8042.hxx>
 #include <devices/i386/isa_bus.hxx>
-#include <string.h>
+#include <libkxx/string_view.hxx>
 #include <sys/kernel.hxx>
 #include <unique/countof.h>
 
@@ -9,7 +9,7 @@ namespace Devices::I386 {
     bool I8042::match(const AutoConf::MatchInfo &match_info) {
         ASSERT(match_info.parent != nullptr);
 
-        if (strcmp(match_info.parent->driver_header.name, "isabus") != 0) {
+        if (kxx::StringView(match_info.parent->driver_header.name) != "isabus") {
             return false;
         }
 
