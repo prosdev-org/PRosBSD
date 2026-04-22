@@ -73,7 +73,7 @@ namespace Sys::Kernel {
                      "       `--{__________)\n");
 
         for (;;) {
-            kxx::print(kxx::input());
+            kxx::input();
         }
     }
 

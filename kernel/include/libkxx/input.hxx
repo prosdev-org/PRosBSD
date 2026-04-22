@@ -1,8 +1,11 @@
-#ifndef LIBKXX_INPUT_KXX
-#define LIBKXX_INPUT_KXX
+#ifndef LIBKXX_INPUT_HXX
+#define LIBKXX_INPUT_HXX
+
+#include <libkxx/string.hxx>
 
 namespace kxx {
-    char input();
+    char input_char();
+    String input();
 } // namespace kxx
 
 #endif
