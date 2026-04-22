@@ -146,7 +146,7 @@ int __ctzdi2(arith64_u64 a)
 // Calculate both the quotient and remainder of the unsigned division of a by
 // b. The return value is the quotient, and the remainder is placed in variable
 // pointed to by c (if it's not NULL).
-arith64_u64 __divmoddi4(arith64_u64 a, arith64_u64 b, arith64_u64 *c)
+arith64_u64 __udivmoddi4(arith64_u64 a, arith64_u64 b, arith64_u64 *c)
 {
     if (b > a)                                  // divisor > numerator?
     {
@@ -191,7 +191,7 @@ arith64_u64 __divmoddi4(arith64_u64 a, arith64_u64 b, arith64_u64 *c)
 // Return the quotient of the signed division of a by b.
 arith64_s64 __divdi3(arith64_s64 a, arith64_s64 b)
 {
-    arith64_u64 q = __divmoddi4(arith64_abs(a), arith64_abs(b), (void *)0);
+    arith64_u64 q = __udivmoddi4(arith64_abs(a), arith64_abs(b), (void *)0);
     return arith64_neg(q, a^b); // negate q if a and b signs are different
 }
 
@@ -225,7 +225,7 @@ arith64_u64 __lshrdi3(arith64_u64 a, int b)
 arith64_s64 __moddi3(arith64_s64 a, arith64_s64 b)
 {
     arith64_u64 r;
-    __divmoddi4(arith64_abs(a), arith64_abs(b), &r);
+    __udivmoddi4(arith64_abs(a), arith64_abs(b), &r);
     return arith64_neg(r, a); // negate remainder if numerator is negative
 }
 
@@ -257,13 +257,13 @@ int __popcountdi2(arith64_u64 a)
 // Return the quotient of the unsigned division of a by b.
 arith64_u64 __udivdi3(arith64_u64 a, arith64_u64 b)
 {
-    return __divmoddi4(a, b, (void *)0);
+    return __udivmoddi4(a, b, (void *)0);
 }
 
 // Return the remainder of the unsigned division of a by b.
 arith64_u64 __umoddi3(arith64_u64 a, arith64_u64 b)
 {
     arith64_u64 r;
-    __divmoddi4(a, b, &r);
+    __udivmoddi4(a, b, &r);
     return r;
 }
