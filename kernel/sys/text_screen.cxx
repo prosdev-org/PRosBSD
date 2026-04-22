@@ -17,7 +17,8 @@ namespace Sys {
         kxx::UniquePtr<TextScreen::ColoredCharacter[]> buffer;
         size_t idx;
 
-        void scroll_down();
+        void ensure_scroll();
+        void scroll();
         void write_char(char ch, size_t i);
     };
 
@@ -40,16 +41,15 @@ namespace Sys {
         // TODO: control characters
         const auto chars = static_cast<const char *>(data);
         for (size_t i = 0; i < nbytes; i++) {
-            if (idx >= dimension_x * dimension_y) {
-                scroll_down();
-                idx = dimension_x * (dimension_y - 1);
-            }
+            ensure_scroll();
 
             switch (chars[i]) {
                 case '\n': {
                     // y++
                     idx -= idx % dimension_x;
                     idx += dimension_x;
+
+                    ensure_scroll();
                 } break;
                 case '\b': {
                     if (idx != 0) {
@@ -75,8 +75,15 @@ namespace Sys {
         }
     }
 
+    void TextScreenToOutputStreamAdapter::ensure_scroll() {
+        while (idx >= dimension_x * dimension_y) {
+            scroll();
+            idx = dimension_x * (dimension_y - 1);
+        }
+    }
+
     // NOLINTNEXTLINE(readability-make-member-function-const)
-    void TextScreenToOutputStreamAdapter::scroll_down() {
+    void TextScreenToOutputStreamAdapter::scroll() {
         memmove(&buffer[0], &buffer[dimension_x], sizeof(buffer[0]) * dimension_x * (dimension_y - 1));
         memset(&buffer[dimension_x * (dimension_y - 1)], 0, sizeof(buffer[0]) * dimension_x);
     }
