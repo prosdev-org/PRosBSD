@@ -2,6 +2,7 @@
 #include <libkxx/print.hxx>
 #include <libkxx/string.hxx>
 #include <shell/command.hxx>
+#include <shell/echo.hxx>
 #include <shell/shell.hxx>
 #include <shell/uname.hxx>
 
@@ -83,6 +84,7 @@ namespace Shell {
 
     void init() {
         setup_storage();
+        commands().push_back(Echo::get_command());
         commands().push_back(Uname::get_command());
     }
 
