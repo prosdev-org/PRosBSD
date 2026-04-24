@@ -30,7 +30,7 @@ namespace kxx {
             return false;
         }
 
-        return strncmp(back, other.back, size) == 0;
+        return memcmp(back, other.back, size) == 0;
     }
 
     bool StringView::operator!=(const StringView &other) const {
@@ -38,6 +38,6 @@ namespace kxx {
             return true;
         }
 
-        return strncmp(back, other.back, size) != 0;
+        return memcmp(back, other.back, size) != 0;
     }
 } // namespace kxx
