@@ -5,6 +5,7 @@
 #include <shell/echo.hxx>
 #include <shell/shell.hxx>
 #include <shell/uname.hxx>
+#include <ctype.h>
 
 namespace Shell {
     struct Storage {
@@ -37,7 +38,7 @@ namespace Shell {
         bool in_spacing = false;
 
         for (size_t i = 0; i < string_view.get_size(); i++) {
-            if (string_view.get(i) == ' ') {
+            if (isspace(string_view.get(i))) {
                 if (in_spacing) {
                     continue;
                 }

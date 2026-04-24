@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <libkxx/unique_ptr.hxx>
 #include <string.h>
 #include <sys/text_screen.hxx>
@@ -17,6 +18,8 @@ namespace Sys {
         kxx::UniquePtr<TextScreen::ColoredCharacter[]> buffer;
         size_t idx;
 
+        void handle_cntrl(char ch);
+        void handle_printable(char ch);
         void ensure_scroll();
         void scroll();
         void write_char(char ch, size_t i);
@@ -38,30 +41,17 @@ namespace Sys {
     void TextScreenToOutputStreamAdapter::write(const void *data, const size_t nbytes) {
         ASSERT(data != nullptr);
 
-        // TODO: control characters
         const auto chars = static_cast<const char *>(data);
         for (size_t i = 0; i < nbytes; i++) {
             ensure_scroll();
 
-            switch (chars[i]) {
-                case '\n': {
-                    // y++
-                    idx -= idx % dimension_x;
-                    idx += dimension_x;
-
-                    ensure_scroll();
-                } break;
-                case '\b': {
-                    if (idx != 0) {
-                        idx--;
-                    }
-                    write_char('\0', idx);
-                } break;
-                default: {
-                    write_char(chars[i], idx);
-                    idx++;
-                }
+            if (iscntrl(chars[i])) {
+                handle_cntrl(chars[i]);
+            } else {
+                handle_printable(chars[i]);
             }
+
+            ensure_scroll();
         }
     }
 
@@ -73,6 +63,28 @@ namespace Sys {
                         x, y);
             }
         }
+    }
+
+    void TextScreenToOutputStreamAdapter::handle_cntrl(const char ch) {
+        switch (ch) {
+            case '\n': {
+                // y++
+                idx -= idx % dimension_x;
+                idx += dimension_x;
+            } break;
+            case '\b': {
+                if (idx != 0) {
+                    idx--;
+                }
+                write_char('\0', idx);
+            } break;
+            default:;
+        }
+    }
+
+    void TextScreenToOutputStreamAdapter::handle_printable(const char ch) {
+        write_char(ch, idx);
+        idx++;
     }
 
     void TextScreenToOutputStreamAdapter::ensure_scroll() {
