@@ -15,6 +15,8 @@ namespace Sys {
         TextScreen *text_screen;
         size_t dimension_x;
         size_t dimension_y;
+        TextScreen::Color background;
+        TextScreen::Color foreground;
         kxx::UniquePtr<TextScreen::ColoredCharacter[]> buffer;
         size_t idx;
 
@@ -33,8 +35,15 @@ namespace Sys {
         this->text_screen = text_screen;
         dimension_x = text_screen->get_dimension_x();
         dimension_y = text_screen->get_dimension_y();
+
+        background = TextScreen::Color::Black;
+        foreground = TextScreen::Color::BrightWhite;
+
         buffer = kxx::UniquePtr<TextScreen::ColoredCharacter[]>(new TextScreen::ColoredCharacter[dimension_x * dimension_y]);
-        memset(&buffer[0], 0, sizeof(buffer[0]) * dimension_x * dimension_y);
+        for (size_t i = 0; i < dimension_x * dimension_y; i++) {
+            write_char('\0', i);
+        }
+
         idx = 0;
     }
 
@@ -68,9 +77,11 @@ namespace Sys {
     void TextScreenToOutputStreamAdapter::handle_cntrl(const char ch) {
         switch (ch) {
             case '\n': {
-                // y++
-                idx -= idx % dimension_x;
-                idx += dimension_x;
+                const size_t new_idx = (idx / dimension_x + 1) * dimension_x;
+                for (size_t i = idx; i < new_idx; i++) {
+                    write_char('\0', i);
+                }
+                idx = new_idx;
             } break;
             case '\b': {
                 if (idx != 0) {
@@ -101,14 +112,16 @@ namespace Sys {
     // NOLINTNEXTLINE(readability-make-member-function-const)
     void TextScreenToOutputStreamAdapter::scroll() {
         memmove(&buffer[0], &buffer[dimension_x], sizeof(buffer[0]) * dimension_x * (dimension_y - 1));
-        memset(&buffer[dimension_x * (dimension_y - 1)], 0, sizeof(buffer[0]) * dimension_x);
+        for (size_t i = dimension_x * (dimension_y - 1); i < dimension_x * dimension_y; i++) {
+            write_char('\0', i);
+        }
     }
 
     // NOLINTNEXTLINE(readability-make-member-function-const)
     void TextScreenToOutputStreamAdapter::write_char(const char ch, const size_t i) {
         buffer[i] = {
                 ch,
-                TextScreen::Color::Black,
-                TextScreen::Color::BrightWhite};
+                background,
+                foreground};
     }
 } // namespace Sys
