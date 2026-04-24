@@ -78,6 +78,10 @@ namespace Sys {
                 }
                 write_char('\0', idx);
             } break;
+            case '\t': {
+                constexpr size_t tab_width = 4;
+                idx = (idx / tab_width + 1) * tab_width;
+            } break;
             default:;
         }
     }
