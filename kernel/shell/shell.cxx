@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <libkxx/input.hxx>
 #include <libkxx/print.hxx>
 #include <libkxx/string.hxx>
@@ -5,7 +6,6 @@
 #include <shell/echo.hxx>
 #include <shell/shell.hxx>
 #include <shell/uname.hxx>
-#include <ctype.h>
 
 namespace Shell {
     struct Storage {
