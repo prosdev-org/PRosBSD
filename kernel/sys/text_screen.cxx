@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <libkxx/bitmap.hxx>
 #include <libkxx/unique_ptr.hxx>
 #include <string.h>
 #include <sys/text_screen.hxx>
@@ -17,6 +18,7 @@ namespace Sys {
         size_t dimension_y;
         TextScreen::Color background;
         TextScreen::Color foreground;
+        kxx::UniquePtr<kxx::Bitmap> should_flush;
         kxx::UniquePtr<TextScreen::ColoredCharacter[]> buffer;
         size_t idx;
 
@@ -25,13 +27,18 @@ namespace Sys {
         void ensure_scroll();
         void scroll();
         void write_char(char ch, size_t i);
+        [[nodiscard]] size_t calc_x(size_t i) const;
+        [[nodiscard]] size_t calc_y(size_t i) const;
     };
 
     kxx::UniquePtr<OutputStream> TextScreen::as_output_stream() {
-        return kxx::UniquePtr(static_cast<OutputStream *>(new TextScreenToOutputStreamAdapter(this)));
+        return kxx::UniquePtr(
+                static_cast<OutputStream *>(
+                        new TextScreenToOutputStreamAdapter(this)));
     }
 
-    TextScreenToOutputStreamAdapter::TextScreenToOutputStreamAdapter(TextScreen *text_screen) {
+    TextScreenToOutputStreamAdapter::TextScreenToOutputStreamAdapter(
+            TextScreen *text_screen) {
         this->text_screen = text_screen;
         dimension_x = text_screen->get_dimension_x();
         dimension_y = text_screen->get_dimension_y();
@@ -39,12 +46,17 @@ namespace Sys {
         background = TextScreen::Color::Black;
         foreground = TextScreen::Color::BrightWhite;
 
-        buffer = kxx::UniquePtr<TextScreen::ColoredCharacter[]>(new TextScreen::ColoredCharacter[dimension_x * dimension_y]);
+        should_flush = kxx::UniquePtr(new kxx::Bitmap(dimension_x * dimension_y));
+
+        buffer = kxx::UniquePtr<TextScreen::ColoredCharacter[]>(
+                new TextScreen::ColoredCharacter[dimension_x * dimension_y]);
         for (size_t i = 0; i < dimension_x * dimension_y; i++) {
             write_char('\0', i);
         }
 
         idx = 0;
+
+        flush();
     }
 
     void TextScreenToOutputStreamAdapter::write(const void *data, const size_t nbytes) {
@@ -65,11 +77,14 @@ namespace Sys {
     }
 
     void TextScreenToOutputStreamAdapter::flush() {
-        for (size_t y = 0; y < dimension_y; y++) {
-            for (size_t x = 0; x < dimension_x; x++) {
+        for (size_t i = 0; i < dimension_x * dimension_y; i++) {
+            if (should_flush->get(i)) {
+                const size_t x = calc_x(i);
+                const size_t y = calc_y(i);
+
                 text_screen->write(
-                        buffer[x + dimension_x * y],
-                        x, y);
+                        buffer[x + dimension_x * y], x, y);
+                should_flush->set(false, i);
             }
         }
     }
@@ -115,6 +130,8 @@ namespace Sys {
         for (size_t i = dimension_x * (dimension_y - 1); i < dimension_x * dimension_y; i++) {
             write_char('\0', i);
         }
+
+        should_flush->set_all();
     }
 
     // NOLINTNEXTLINE(readability-make-member-function-const)
@@ -123,5 +140,14 @@ namespace Sys {
                 ch,
                 background,
                 foreground};
+        should_flush->set(true, i);
+    }
+
+    size_t TextScreenToOutputStreamAdapter::calc_x(const size_t i) const {
+        return i % dimension_x;
+    }
+
+    size_t TextScreenToOutputStreamAdapter::calc_y(const size_t i) const {
+        return i / dimension_x;
     }
 } // namespace Sys

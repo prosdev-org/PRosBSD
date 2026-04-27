@@ -1,5 +1,6 @@
 add_library(
         libkxx OBJECT
+        bitmap.cxx
         internal/cxa_atexit.cxx
         internal/cxa_pure_virtual.cxx
         internal/dso_handle.cxx
