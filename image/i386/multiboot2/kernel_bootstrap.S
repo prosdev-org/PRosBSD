@@ -20,16 +20,17 @@ multiboot2_header_end:
 .section .multiboot2.text, "ax"
 
 .extern Kernel_entry
+.extern __bootstrap_stack_top
 
 .globl _start
 _start:
     cli
 
-    mov $0x9F000, %esp
+    mov $__bootstrap_stack_top - 0xC0000000, %esp
 
     call Paging_setup
 
-    mov $0xC009F000, %esp
+    mov $__bootstrap_stack_top, %esp
 
     call Kernel_entry
 halt:

@@ -44,5 +44,12 @@ SECTIONS {
         __bss_end = .;
     }
 
+    .bootstrap_stack ALIGN(4K) : AT(ADDR(.bootstrap_stack) - 0xC0000000) {
+        __bootstrap_stack_start = .;
+        . += 0x4000;
+        __bootstrap_stack_top = .;
+        __bootstrap_stack_end = .;
+    }
+
     __kernel_end = .;
 }
