@@ -7,9 +7,11 @@
 
 namespace Machine {
     void init() {
+        Interrupts::init();
+
         Arch::I386::Cpu::Gdt::init();
         Arch::I386::Interrupts::Idt::init();
-        Interrupts::init();
+
         Devices::AutoConf::init();
 
         Sys::Kernel::main();
