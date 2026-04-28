@@ -6,6 +6,7 @@ list(
         libk
         libkxx
         machine
+        multiboot2
         shell
         sys
 )
@@ -19,6 +20,7 @@ list(
         libk
         libkxx
         machine-${PROJECT_TARGET_ARCH}
+        multiboot2-${PROJECT_TARGET_ARCH}
         shell
         sys
 )

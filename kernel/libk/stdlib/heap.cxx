@@ -1,34 +1,33 @@
 // TODO: this implementation is very temporary. Change it as soon as possible.
 
+#include <multiboot2/memory_map.hxx>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/panic.hxx>
 
-#define HEAP_START     0xC0200000
-#define HEAP_END       0xC0210000
-#define HEAP_ALIGNMENT 16
-
-static uintptr_t address = HEAP_START;
+constexpr uintptr_t heap_alignment = 16;
 
 void *malloc(size_t size) {
+    static uintptr_t address = Multiboot2::MemoryMap::get_heap_start();
+
     if (size == 0) {
         Sys::panic("malloc: allocated 0 bytes");
     }
 
-    if (size % HEAP_ALIGNMENT != 0) {
-        size += HEAP_ALIGNMENT - (size % HEAP_ALIGNMENT);
+    if (size % heap_alignment != 0) {
+        size += heap_alignment - (size % heap_alignment);
     }
 
     const auto ptr = reinterpret_cast<void *>(address);
     address += size;
 
-    if (address > HEAP_END) {
+    if (address > Multiboot2::MemoryMap::get_heap_end()) {
         Sys::panic("malloc: out of memory");
     }
 
-    // TODO: DGB
+    // TODO: DEBUG
     memset(ptr, 0xCD, size);
     return ptr;
 }

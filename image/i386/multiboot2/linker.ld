@@ -46,9 +46,15 @@ SECTIONS {
 
     .bootstrap_stack ALIGN(4K) : AT(ADDR(.bootstrap_stack) - 0xC0000000) {
         __bootstrap_stack_start = .;
-        . += 0x4000;
+        . += 0x3FF0;
         __bootstrap_stack_top = .;
         __bootstrap_stack_end = .;
+    }
+
+    .heap ALIGN(4K) : AT(ADDR(.heap) - 0xC0000000) {
+        __heap_start = .;
+        . += 0x10000;
+        __heap_end = .;
     }
 
     __kernel_end = .;
