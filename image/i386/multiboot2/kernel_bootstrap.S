@@ -20,11 +20,12 @@ multiboot2_header_end:
 .section .multiboot2.text, "ax"
 
 .extern Kernel_entry
+.extern multiboot2_boot_info_phys
 .extern __bootstrap_stack_top
 
 .globl _start
 _start:
-    cli
+    mov %ebx, multiboot2_boot_info_phys - 0xC0000000
 
     mov $__bootstrap_stack_top - 0xC0000000, %esp
 

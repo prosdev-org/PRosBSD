@@ -3,6 +3,7 @@
 #include <devices/auto_conf.hxx>
 #include <machine/init.hxx>
 #include <machine/interrupts.hxx>
+#include <multiboot2/init.hxx>
 #include <sys/kernel.hxx>
 
 namespace Machine {
@@ -13,6 +14,8 @@ namespace Machine {
         Arch::I386::Interrupts::Idt::init();
 
         Devices::AutoConf::init();
+
+        Multiboot2::init();
 
         Sys::Kernel::main();
     }
