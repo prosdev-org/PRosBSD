@@ -131,7 +131,7 @@ namespace Sys {
             write_char('\0', i);
         }
 
-        should_flush->set_all();
+        should_flush->set_all(true);
     }
 
     // NOLINTNEXTLINE(readability-make-member-function-const)

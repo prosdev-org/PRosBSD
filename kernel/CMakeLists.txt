@@ -9,6 +9,7 @@ list(
         multiboot2
         shell
         sys
+        vmem
 )
 
 list(
@@ -23,6 +24,8 @@ list(
         multiboot2-${PROJECT_TARGET_ARCH}
         shell
         sys
+        vmem
+        vmem-${PROJECT_TARGET_ARCH}
 )
 
 add_library(kernel-flags INTERFACE)

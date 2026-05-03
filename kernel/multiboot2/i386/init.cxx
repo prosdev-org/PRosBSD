@@ -1,5 +1,7 @@
 #include <libkxx/print.hxx>
+#include <multiboot2/memory_map.hxx>
 #include <multiboot2/tags/bootloader_name.hxx>
+#include <multiboot2/tags/memory_map.hxx>
 #include <multiboot2/tags/tag_begin.hxx>
 #include <unique/extern_c.h>
 
@@ -37,6 +39,27 @@ namespace Multiboot2 {
                 kxx::println(
                         "Bootloader name: ",
                         converter.bootloader_name->get_string());
+            } break;
+            case TagType::MemoryMap: {
+                const Tags::MemoryMapConverter converter = {
+                        .general = tag_begin,
+                };
+
+                auto available =
+                        converter.memory_map->get_regions({
+                                .enum_type =
+                                        Tags::MemoryMap::RegionType::Available,
+                        });
+
+                MemoryMap::init(kxx::move(available));
+
+                uint64_t total_length = 0;
+                for (size_t i = 0; i < MemoryMap::get_available().get_size(); i++) {
+                    total_length += MemoryMap::get_available().get(i).length;
+                }
+
+                kxx::println("Total memory: ", total_length / 1024 / 1024, "MiB");
+
             } break;
             default:;
         }

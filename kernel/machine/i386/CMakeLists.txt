@@ -3,4 +3,5 @@ add_library(
         cpu.cxx
         init.cxx
         interrupts.cxx
+        paging.cxx
 )

@@ -17,8 +17,8 @@ namespace kxx {
         [[nodiscard]] size_t get_size() const;
         [[nodiscard]] bool get(size_t idx) const;
         void set(bool bit, size_t idx);
-        void clear_all();
-        void set_all();
+        void set_range(bool bit, size_t start, size_t end);
+        void set_all(bool bit);
 
     private:
         static void calc_idxes(

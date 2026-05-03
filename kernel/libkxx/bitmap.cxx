@@ -6,7 +6,7 @@
 namespace kxx {
     Bitmap::Bitmap(const size_t size) : size(size) {
         bytes = kxx::UniquePtr<Byte[]>(new Byte[get_nbytes()]);
-        clear_all();
+        set_all(false);
     }
 
     Bitmap::Bitmap(const Bitmap &other) : size(other.size) {
@@ -64,18 +64,41 @@ namespace kxx {
         bytes[bytes_idx].set_bit(bit, in_byte_bit);
     }
 
-    // NOLINTNEXTLINE(readability-make-member-function-const)
-    void Bitmap::clear_all() {
-        for (size_t i = 0; i < size / 8; i++) {
-            bytes[i] = 0;
+    void Bitmap::set_range(const bool bit, const size_t start, const size_t end) {
+        size_t aligned_start = start;
+        size_t aligned_end = end;
+
+        if (aligned_start % 8 != 0) {
+            aligned_start = (aligned_start / 8 + 1) * 8;
+        }
+
+        if (aligned_end % 8 != 7) {
+            aligned_end = (aligned_end / 8 - 1) * 8 + 7;
+        }
+
+        for (size_t i = start; i < aligned_start; i++) {
+            set(bit, i);
+        }
+
+        for (size_t i = aligned_end + 1; i <= end; i++) {
+            set(bit, i);
+        }
+
+        if (bit) {
+            memset(
+                    &bytes[aligned_start / 8],
+                    0xff,
+                    (aligned_end + 1 - aligned_start) / 8);
+        } else {
+            memset(
+                    &bytes[aligned_start / 8],
+                    0,
+                    (aligned_end + 1 - aligned_start) / 8);
         }
     }
 
-    // NOLINTNEXTLINE(readability-make-member-function-const)
-    void Bitmap::set_all() {
-        for (size_t i = 0; i < size / 8; i++) {
-            bytes[i] = UINT8_MAX;
-        }
+    void Bitmap::set_all(const bool bit) {
+        set_range(bit, 0, size - 1);
     }
 
     void Bitmap::calc_idxes(

@@ -10,7 +10,7 @@
 constexpr uintptr_t heap_alignment = 16;
 
 void *malloc(size_t size) {
-    static uintptr_t address = Multiboot2::MemoryMap::get_heap_start();
+    static uintptr_t address = Multiboot2::MemoryMap::get_bootstrap_heap_start();
 
     if (size == 0) {
         Sys::panic("malloc: allocated 0 bytes");
@@ -23,7 +23,7 @@ void *malloc(size_t size) {
     const auto ptr = reinterpret_cast<void *>(address);
     address += size;
 
-    if (address > Multiboot2::MemoryMap::get_heap_end()) {
+    if (address > Multiboot2::MemoryMap::get_bootstrap_heap_end()) {
         Sys::panic("malloc: out of memory");
     }
 

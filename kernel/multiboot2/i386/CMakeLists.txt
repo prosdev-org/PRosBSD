@@ -3,4 +3,5 @@ add_library(
         init.cxx
         memory_map.cxx
         tags/bootloader_name.cxx
+        tags/memory_map.cxx
 )

@@ -5,6 +5,8 @@
 #include <machine/interrupts.hxx>
 #include <multiboot2/init.hxx>
 #include <sys/kernel.hxx>
+#include <vmem/memory_map.hxx>
+#include <vmem/page_frame_allocator.hxx>
 
 namespace Machine {
     void init() {
@@ -16,6 +18,9 @@ namespace Machine {
         Devices::AutoConf::init();
 
         Multiboot2::init();
+
+        VMem::MemoryMap::init();
+        VMem::PageFrameAllocator::init();
 
         Sys::Kernel::main();
     }

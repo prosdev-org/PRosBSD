@@ -52,9 +52,9 @@ SECTIONS {
     }
 
     .heap ALIGN(4K) : AT(ADDR(.heap) - 0xC0000000) {
-        __heap_start = .;
-        . += 0x10000;
-        __heap_end = .;
+        __bootstrap_heap_start = .;
+        . += 0x40000;
+        __bootstrap_heap_end = .;
     }
 
     __kernel_end = .;

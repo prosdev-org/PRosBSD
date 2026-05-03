@@ -47,6 +47,24 @@ namespace kxx::Math {
 
         return value;
     }
+
+    template<typename T>
+    constexpr T max(const T val1, const T val2) {
+        if (val1 > val2) {
+            return val1;
+        } else {
+            return val2;
+        }
+    }
+
+    template<typename T>
+    constexpr T min(const T val1, const T val2) {
+        if (val1 < val2) {
+            return val1;
+        } else {
+            return val2;
+        }
+    }
 } // namespace kxx::Math
 
 #endif
