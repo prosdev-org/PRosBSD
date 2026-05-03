@@ -6,7 +6,8 @@
 #include <unique/extern_c.h>
 
 namespace Multiboot2 {
-    EXTERN_C uintptr_t multiboot2_boot_info_phys = 0;
+    EXTERN_C uintptr_t multiboot2_boot_info_phys;
+    uintptr_t multiboot2_boot_info_phys = 0;
 
     constexpr uintptr_t tag_alignment = 8;
     uint32_t total_tags_size;
