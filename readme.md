@@ -24,7 +24,7 @@ The `rewrite/0.2.0` branch will be merged into the `dev` branch as soon as these
 - [x] GDT
 - [x] IDT
 - [ ] Normal heap
-- [ ] Memory map
+- [x] Memory map
 - [ ] Paging
 - [ ] CMOS
 - [x] PS/2 Keyboard
