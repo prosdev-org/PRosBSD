@@ -58,7 +58,19 @@ namespace Sys::Kernel {
     void main() {
         log("Welcome to PRosBSD v." PROSBSD_VERSION " !\n"
             "Copyright (c) 2025-2026 PRosDev.org. All rights reserved.\n"
-            "PRosBSD is distributed under the BSD 3-Clause license.");
+            "PRosBSD is distributed under the BSD 3-Clause license.\n"
+            ",-.----.                                   ,---,                     ,---, \n"
+            "\\    /  \\   __  ,-.   ,---.              ,---.'|                   ,---.'| \n"
+            "|   :    |,' ,'/ /|  '   ,'\\   .--.--.   |   | :     .--.--.       |   | : \n"
+            "|   | .\\ :'  | |' | /   /   | /  /    '  :   : :    /  /    '      |   | | \n"
+            ".   : |: ||  |   ,'.   ; ,. :|  :  /`./  :     |,-.|  :  /`./    ,--.__| | \n"
+            "|   |  \\ :'  :  /  '   | |: :|  :  ;_    |   : '  ||  :  ;_     /   ,'   | \n"
+            "|   : .  ||  | '   '   | .; : \\  \\    `. |   |  / : \\  \\    `. .   '  /  | \n"
+            ":     |`-';  : |   |   :    |  `----.   \\'   : |: |  `----.   \\'   ; |:  | \n"
+            ":   : :   |  , ;    \\   \\  /  /  /`--'  /|   | '/ : /  /`--'  /|   | '/  ' \n"
+            "|   | :    ---'      `----'  '--'.     / |   :    |'--'.     / |   :    :| \n"
+            "`---'.|                        `--'---'  /    \\  /   `--'---'   \\   \\  /   \n"
+            "  `---`                                  `-'----'                `----'    ");
 
         Shell::init();
         Shell::loop();
