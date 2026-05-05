@@ -1,7 +1,12 @@
 #include <devices/auto_conf.hxx>
 #include <devices/main_bus.hxx>
+#include <unique/log.hxx>
 
 namespace Devices {
+    static kxx::StringView get_logger_prefix() {
+        return "devices/main_bus";
+    }
+
     bool MainBus::match(const AutoConf::MatchInfo &match_info) {
         return match_info.parent == nullptr;
     }
@@ -9,11 +14,15 @@ namespace Devices {
     MainBus::MainBus(
             const AutoConf::DriverHeader &device_header,
             const AutoConf::MatchInfo &match_info) : Device(device_header, match_info.parent) {
+        LOG("initializing");
+
         ASSERT(match_info.parent == nullptr);
         create_child(IsaBus);
     }
 
     void MainBus::create_child(const DeviceType device_type) {
+        LOG("creating child: type: ", device_type);
+
         ConnectionInfo connection_info;
         connection_info.device_type = device_type;
 

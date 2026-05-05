@@ -10,6 +10,8 @@
 #include <sys/log.hxx>
 #include <unique/extern_c.h>
 
+#include "unique/log.hxx"
+
 namespace Sys::Kernel {
     struct Storage {
         kxx::UniquePtr<OutputStream> output_stream;
@@ -49,28 +51,14 @@ namespace Sys::Kernel {
         Machine::init();
     }
 
+    kxx::StringView get_logger_prefix() {
+        return "sys/kernel";
+    }
+
     void main() {
-        // Temp demo
-        log("Welcome to PRosBSD v." PROSBSD_VERSION " !");
-        kxx::println("             ,        ,\n"
-                     "            /(        )`\n"
-                     "            \\ \\___   / |\n"
-                     "            /- _  `-/  '\n"
-                     "           (/\\/ \\ \\   /\\\n"
-                     "           / /   | `    \\\n"
-                     "           O O   ) /    |\n"
-                     "           `-^--'`<     '\n"
-                     "          (_.)  _  )   /\n"
-                     "           `.___/`    /\n"
-                     "             `-----' /\n"
-                     "<----.     __ / __   \\\n"
-                     "<----|====O)))==) \\) /====|\n"
-                     "<----'    `--' `.__,' \\\n"
-                     "             |        |\n"
-                     "              \\       /       /\\\n"
-                     "         ______( (_  / \\______/\n"
-                     "       ,'  ,-----'   |\n"
-                     "       `--{__________)\n");
+        log("Welcome to PRosBSD v." PROSBSD_VERSION " !\n"
+            "Copyright (c) 2025-2026 PRosDev.org. All rights reserved.\n"
+            "PRosBSD is distributed under the BSD 3-Clause license.");
 
         Shell::init();
         Shell::loop();
@@ -82,6 +70,10 @@ namespace Sys::Kernel {
 
     void set_output_stream(kxx::UniquePtr<OutputStream> &&new_output_stream) {
         output_stream() = kxx::move(new_output_stream);
+        LOG(
+                "set new OutputStream (",
+                reinterpret_cast<void *>(&*output_stream()),
+                ")");
     }
 
     OutputStream &get_output_stream() {
@@ -90,6 +82,10 @@ namespace Sys::Kernel {
 
     void set_input_stream(kxx::UniquePtr<InputStream> &&new_input_stream) {
         input_stream() = kxx::move(new_input_stream);
+        LOG(
+                "set new InputStream (",
+                reinterpret_cast<void *>(&*input_stream()),
+                ")");
     }
 
     InputStream &get_input_stream() {
@@ -98,6 +94,10 @@ namespace Sys::Kernel {
 
     void set_timer(kxx::UniquePtr<Timer> &&new_timer) {
         timer() = kxx::move(new_timer);
+        LOG(
+                "set new Timer (",
+                reinterpret_cast<void *>(&*timer()),
+                ")");
     }
 
     Timer &get_timer() {

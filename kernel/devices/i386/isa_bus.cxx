@@ -2,8 +2,13 @@
 #include <devices/i386/isa_bus.hxx>
 #include <devices/main_bus.hxx>
 #include <libkxx/string_view.hxx>
+#include <unique/log.hxx>
 
 namespace Devices::I386 {
+    static kxx::StringView get_logger_prefix() {
+        return "devices/i386/isa_bus";
+    }
+
     bool IsaBus::match(const AutoConf::MatchInfo &match_info) {
         ASSERT(match_info.parent != nullptr);
 
@@ -18,6 +23,8 @@ namespace Devices::I386 {
     IsaBus::IsaBus(
             const AutoConf::DriverHeader &driver_header,
             const AutoConf::MatchInfo &match_info) : Device(driver_header, match_info.parent) {
+        LOG("initializing");
+
         ASSERT(parent != nullptr);
 
         create_child(VgaText);
@@ -26,6 +33,8 @@ namespace Devices::I386 {
     }
 
     void IsaBus::create_child(const DeviceType device_type) {
+        LOG("creating child: type: ", device_type);
+
         ConnectionInfo connection_info;
         connection_info.device_type = device_type;
 

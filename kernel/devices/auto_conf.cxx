@@ -3,6 +3,7 @@
 #include <devices/device.hxx>
 #include <libkxx/print.hxx>
 #include <libkxx/unique_ptr.hxx>
+#include <unique/log.hxx>
 
 namespace Devices::AutoConf {
     struct Storage {
@@ -23,7 +24,13 @@ namespace Devices::AutoConf {
 
     static bool initialized = false;
 
+    kxx::StringView get_logger_prefix() {
+        return "devices/auto_conf";
+    }
+
     void init() {
+        LOG("initializing");
+
         setup_storage();
 
         constexpr MatchInfo match_info = {
@@ -35,7 +42,10 @@ namespace Devices::AutoConf {
     const DriverHeader &match_driver(const MatchInfo &match_info) {
         for (size_t i = 0; i < Registry::get_driver_headers_count(); i++) {
             if (Registry::get_driver_header(i).match(match_info)) {
-                return Registry::get_driver_header(i);
+                const DriverHeader &driver_header = Registry::get_driver_header(i);
+                LOG("matched device driver: ", driver_header.name);
+
+                return driver_header;
             }
         }
 

@@ -1,6 +1,7 @@
 #include <libkxx/unique_ptr.hxx>
 #include <libkxx/vector.hxx>
 #include <machine/interrupts.hxx>
+#include <unique/log.hxx>
 
 namespace Machine::Interrupts {
     struct Storage {
@@ -22,12 +23,23 @@ namespace Machine::Interrupts {
 
     static bool initialized = false;
 
+    kxx::StringView get_logger_prefix() {
+        return "machine/interrupts";
+    }
+
     void init() {
+        LOG("initializing");
+
         setup_storage();
         initialized = true;
     }
 
     void bind_handler(Handler *handler, const uint8_t idx) {
+        LOG(
+                "binding handler (",
+                reinterpret_cast<void *>(handler),
+                ") to idx ", idx);
+
         ASSERT(initialized);
         ASSERT(handler != nullptr);
         ASSERT(idx < interrupts_count);

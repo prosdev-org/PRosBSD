@@ -1,5 +1,6 @@
 #include <libkxx/math.hxx>
 #include <libkxx/print.hxx>
+#include <libkxx/to_hex.hxx>
 
 namespace kxx {
     void _print_internal(Sys::OutputStream &output_stream, const StringView &string_view) {
@@ -100,6 +101,12 @@ namespace kxx {
             value %= divisor;
             divisor /= 10;
         }
+    }
+
+    void _print_internal(Sys::OutputStream &output_stream, void *ptr) {
+        _print_internal(
+                output_stream,
+                to_hex(reinterpret_cast<uintptr_t>(ptr)));
     }
 
     void _print_internal(Sys::OutputStream &output_stream, const Sys::Time::Duration time_duration) {

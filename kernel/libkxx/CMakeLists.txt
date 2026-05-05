@@ -9,4 +9,5 @@ add_library(
         print.cxx
         string.cxx
         string_view.cxx
+        to_hex.cxx
 )

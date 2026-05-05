@@ -4,8 +4,13 @@
 #include <libkxx/string_view.hxx>
 #include <sys/kernel.hxx>
 #include <unique/countof.h>
+#include <unique/log.hxx>
 
 namespace Devices::I386 {
+    static kxx::StringView get_logger_prefix() {
+        return "devices/i386/i8042";
+    }
+
     bool I8042::match(const AutoConf::MatchInfo &match_info) {
         ASSERT(match_info.parent != nullptr);
 
@@ -23,6 +28,7 @@ namespace Devices::I386 {
     I8042::I8042(
             const AutoConf::DriverHeader &driver_header,
             const AutoConf::MatchInfo &match_info) : Device(driver_header, match_info.parent) {
+        LOG("initializing");
         // TODO: init I8042
 
         constexpr uint8_t interrupt_idx = 1;

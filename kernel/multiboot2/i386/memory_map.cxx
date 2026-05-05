@@ -1,7 +1,9 @@
 #include <libkxx/math.hxx>
+#include <libkxx/to_hex.hxx>
 #include <machine/paging.hxx>
 #include <multiboot2/memory_map.hxx>
 #include <unique/extern_c.h>
+#include <unique/log.hxx>
 #include <vmem/i386/layout.hxx>
 
 namespace Multiboot2::MemoryMap {
@@ -22,8 +24,15 @@ namespace Multiboot2::MemoryMap {
         };
     }
 
+    kxx::StringView get_logger_prefix() {
+        return "multiboot2/memory_map";
+    }
+
     void sanitize_available() {
+        LOG("sanitizing");
+
         kxx::Vector<Tags::MemoryMap::Region> new_available;
+        uint64_t total_length = 0;
 
         for (size_t i = 0; i < available().get_size(); i++) {
             const Tags::MemoryMap::Region region = available().get(i);
@@ -49,17 +58,30 @@ namespace Multiboot2::MemoryMap {
             end -= end % Machine::Paging::get_page_size();
 
             if (start <= end) {
-                new_available.push_back({
+                const Tags::MemoryMap::Region sanitized_region = {
                         .base_addr = start,
-                        .length = end - start + 1,
-                });
+                        .length = end - start + 1};
+
+                total_length += sanitized_region.length;
+
+                LOG(
+                        "sanitized available region:\n"
+                        "base: ",
+                        kxx::to_hex(sanitized_region.base_addr),
+                        ", length: ",
+                        kxx::to_hex(sanitized_region.length));
+
+                new_available.push_back(sanitized_region);
             }
         }
 
+        LOG("total available: ", total_length / 1024 / 1024, "MiB");
         available() = new_available;
     }
 
     void init(kxx::Vector<Tags::MemoryMap::Region> &&new_available) {
+        LOG("initializing");
+
         setup_storage(kxx::move(new_available));
         sanitize_available();
     }

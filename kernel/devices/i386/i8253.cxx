@@ -4,6 +4,7 @@
 #include <libkxx/string_view.hxx>
 #include <machine/interrupts.hxx>
 #include <sys/kernel.hxx>
+#include <unique/log.hxx>
 
 namespace Devices::I386 {
     class I8253ToTimerAdapter final : public Sys::Timer {
@@ -14,6 +15,10 @@ namespace Devices::I386 {
     private:
         I8253 *i8253;
     };
+
+    static kxx::StringView get_logger_prefix() {
+        return "devices/i386/i8253";
+    }
 
     bool I8253::match(const AutoConf::MatchInfo &match_info) {
         ASSERT(match_info.parent != nullptr);
@@ -35,9 +40,14 @@ namespace Devices::I386 {
         constexpr uint8_t command_port = 0x43;
         constexpr uint8_t channel0_data_port = 0x40;
 
+        LOG("initializing");
+
         Arch::I386::PortIO::out(0x36, command_port);
         Arch::I386::PortIO::out(divisor & 0xff, channel0_data_port);
         Arch::I386::PortIO::out(divisor >> 8, channel0_data_port);
+
+        LOG("target_freq: ", target_freq);
+        LOG("divisor: ", divisor);
 
         constexpr uint8_t interrupt_idx = 0;
         Machine::Interrupts::bind_handler(this, interrupt_idx);

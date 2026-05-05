@@ -4,6 +4,7 @@
 #include <multiboot2/tags/memory_map.hxx>
 #include <multiboot2/tags/tag_begin.hxx>
 #include <unique/extern_c.h>
+#include <unique/log.hxx>
 
 namespace Multiboot2 {
     EXTERN_C uintptr_t multiboot2_boot_info_phys;
@@ -11,6 +12,10 @@ namespace Multiboot2 {
 
     constexpr uintptr_t tag_alignment = 8;
     uint32_t total_tags_size;
+
+    kxx::StringView get_logger_prefix() {
+        return "multiboot2";
+    }
 
     Tags::TagHeader *next_tag() {
         static uint32_t next_tag_addr = multiboot2_boot_info_phys + tag_alignment;
@@ -31,15 +36,13 @@ namespace Multiboot2 {
 
     void handle_tag(const Tags::TagHeader *tag_begin) {
         switch (tag_begin->type.value) {
-            // Demo
             case TagType::BootloaderName: {
                 const Tags::BootloaderNameConverter converter = {
                         .general = tag_begin,
                 };
 
-                kxx::println(
-                        "Bootloader name: ",
-                        converter.bootloader_name->get_string());
+                LOG("bootloader name: ",
+                    converter.bootloader_name->get_string());
             } break;
             case TagType::MemoryMap: {
                 const Tags::MemoryMapConverter converter = {
@@ -53,20 +56,14 @@ namespace Multiboot2 {
                         });
 
                 MemoryMap::init(kxx::move(available));
-
-                uint64_t total_length = 0;
-                for (size_t i = 0; i < MemoryMap::get_available().get_size(); i++) {
-                    total_length += MemoryMap::get_available().get(i).length;
-                }
-
-                kxx::println("Total memory: ", total_length / 1024 / 1024, "MiB");
-
             } break;
             default:;
         }
     }
 
     void init() {
+        LOG("initializing");
+
         struct TagsHeader {
             uint32_t total_size;
             uint32_t reserved;

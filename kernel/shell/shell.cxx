@@ -6,6 +6,7 @@
 #include <shell/echo.hxx>
 #include <shell/shell.hxx>
 #include <shell/uname.hxx>
+#include <unique/log.hxx>
 
 namespace Shell {
     struct Storage {
@@ -20,6 +21,15 @@ namespace Shell {
         commands = []() -> kxx::Vector<Command> & {
             return storage.commands;
         };
+    }
+
+    kxx::StringView get_logger_prefix() {
+        return "shell";
+    }
+
+    void register_command(const Command &command) {
+        LOG("registering command: ", command.name);
+        commands().push_back(command);
     }
 
     void push_non_empty_current_string(
@@ -84,9 +94,11 @@ namespace Shell {
     }
 
     void init() {
+        LOG("initializing");
+
         setup_storage();
-        commands().push_back(Echo::get_command());
-        commands().push_back(Uname::get_command());
+        register_command(Echo::get_command());
+        register_command(Uname::get_command());
     }
 
     void loop() {

@@ -1,6 +1,7 @@
 #include <libkxx/bitmap.hxx>
 #include <machine/paging.hxx>
 #include <sys/panic.hxx>
+#include <unique/log.hxx>
 #include <vmem/memory_map.hxx>
 #include <vmem/page_frame_allocator.hxx>
 
@@ -23,24 +24,40 @@ namespace VMem::PageFrameAllocator {
         };
     }
 
+    kxx::StringView get_logger_prefix() {
+        return "vmem/pfa";
+    }
+
     size_t phys_addr_to_idx(const PhysAddr phys_addr) {
         ASSERT(phys_addr.value <= 0xffff'ffff);
         return phys_addr.value / Machine::Paging::get_page_size();
     }
 
     void init() {
+        LOG("initializing");
+
         setup_storage();
 
         bitmap().set_all(true);
 
         const auto &available = MemoryMap::get_available();
 
+        uint32_t available_pages = 0;
+
         for (size_t i = 0; i < available.get_size(); i++) {
-            bitmap().set_range(
-                    false,
-                    phys_addr_to_idx(available.get(i).start),
-                    phys_addr_to_idx(available.get(i).end));
+            const size_t start_page = phys_addr_to_idx(available.get(i).start);
+            const size_t end_page = phys_addr_to_idx(available.get(i).end);
+
+            available_pages += end_page - start_page + 1;
+
+            bitmap().set_range(false, start_page, end_page);
         }
+
+        LOG(
+                "available pages: ", available_pages,
+                " (",
+                available_pages * 4,
+                "KiB)");
     }
 
     PageFrame alloc() {
