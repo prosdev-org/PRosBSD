@@ -9,8 +9,7 @@
 #include <sys/kernel.hxx>
 #include <sys/log.hxx>
 #include <unique/extern_c.h>
-
-#include "unique/log.hxx"
+#include <unique/log.hxx>
 
 namespace Sys::Kernel {
     struct Storage {
