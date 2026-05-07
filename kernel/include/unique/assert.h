@@ -8,4 +8,10 @@
 
 EXTERN_C NORETURN void ASSERT_fail(const char *statement, const char *file, int line, const char *function);
 
+#ifndef __cplusplus
+
+#define static_assert _Static_assert
+
+#endif
+
 #endif

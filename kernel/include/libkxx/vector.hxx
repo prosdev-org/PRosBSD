@@ -37,6 +37,7 @@ namespace kxx {
 
     private:
         static T *alloc_back(size_t new_capacity);
+        static void delete_back(T *back_to_delete);
 
         T *back = nullptr;
         size_t size = 0;
@@ -45,7 +46,7 @@ namespace kxx {
         void resize();
         void copy_init_to_back(const T *src, size_t count);
         void move_init_to_back(T *src, size_t count);
-        void delete_back();
+
         void delete_back_with_content();
     };
 
@@ -202,6 +203,12 @@ namespace kxx {
     }
 
     template<typename T>
+    // NOLINTNEXTLINE(readability-make-member-function-const)
+    void Vector<T>::delete_back(T *back_to_delete) {
+        delete[] reinterpret_cast<uint8_t *>(back_to_delete);
+    }
+
+    template<typename T>
     void Vector<T>::resize() {
         if (back == nullptr) {
             size = 0;
@@ -212,7 +219,7 @@ namespace kxx {
             auto old_back = back;
             back = alloc_back(capacity);
             move_init_to_back(old_back, size);
-            delete_back();
+            delete_back(old_back);
         }
     }
 
@@ -245,17 +252,11 @@ namespace kxx {
     }
 
     template<typename T>
-    // NOLINTNEXTLINE(readability-make-member-function-const)
-    void Vector<T>::delete_back() {
-        delete[] reinterpret_cast<uint8_t *>(back);
-    }
-
-    template<typename T>
     void Vector<T>::delete_back_with_content() {
         for (size_t i = 0; i < size; i++) {
             back[i].~T();
         }
-        delete_back();
+        delete_back(back);
     }
 } // namespace kxx
 

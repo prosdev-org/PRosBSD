@@ -53,7 +53,7 @@ SECTIONS {
 
     .heap ALIGN(4K) : AT(ADDR(.heap) - 0xC0000000) {
         __bootstrap_heap_start = .;
-        . += 0x40000;
+        . += 0x4FFFF;
         __bootstrap_heap_end = .;
     }
 

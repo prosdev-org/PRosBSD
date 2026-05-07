@@ -35,10 +35,9 @@ namespace Machine::Interrupts {
     }
 
     void bind_handler(Handler *handler, const uint8_t idx) {
-        LOG(
-                "binding handler (",
-                reinterpret_cast<void *>(handler),
-                ") to idx ", idx);
+        LOG("binding handler (",
+            reinterpret_cast<void *>(handler),
+            ") to idx ", idx);
 
         ASSERT(initialized);
         ASSERT(handler != nullptr);

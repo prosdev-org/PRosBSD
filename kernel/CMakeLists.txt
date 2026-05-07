@@ -16,6 +16,7 @@ list(
         APPEND OBJLIBS
         arch-${PROJECT_TARGET_ARCH}
         contrib-arith64
+        contrib-o1heap
         devices
         devices-${PROJECT_TARGET_ARCH}
         libk

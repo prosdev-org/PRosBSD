@@ -30,13 +30,14 @@ namespace kxx {
 
         uint64_t divisor = UINT64_MAX / 16 + 1;
         while (divisor != 0) {
+            char ch = '\0';
             if (const uint32_t digit_idx = value / divisor; digit_idx >= 10) {
-                string.push_back(
-                        static_cast<char>('a' + digit_idx - 10));
+                ch = static_cast<char>('a' + digit_idx - 10);
             } else {
-                string.push_back(
-                        static_cast<char>('0' + value / divisor));
+                ch = static_cast<char>('0' + value / divisor);
             }
+
+            string.push_back(ch);
 
             value %= divisor;
             divisor /= 16;

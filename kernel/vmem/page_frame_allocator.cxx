@@ -53,11 +53,9 @@ namespace VMem::PageFrameAllocator {
             bitmap().set_range(false, start_page, end_page);
         }
 
-        LOG(
-                "available pages: ", available_pages,
-                " (",
-                available_pages * 4,
-                "KiB)");
+        LOG("available pages: ",
+            available_pages,
+            " (", available_pages * 4, "KiB)");
     }
 
     PageFrame alloc() {

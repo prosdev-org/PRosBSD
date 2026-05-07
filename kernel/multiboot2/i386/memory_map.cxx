@@ -64,12 +64,14 @@ namespace Multiboot2::MemoryMap {
 
                 total_length += sanitized_region.length;
 
-                LOG(
-                        "sanitized available region:\n"
-                        "base: ",
-                        kxx::to_hex(sanitized_region.base_addr),
-                        ", length: ",
-                        kxx::to_hex(sanitized_region.length));
+                const kxx::String base_addr_str =
+                    kxx::to_hex(sanitized_region.base_addr);
+                const kxx::String length_str =
+                    kxx::to_hex(sanitized_region.length);
+
+                LOG("sanitized available region:\n"
+                    "base: ", base_addr_str,
+                    ", length: ", length_str);
 
                 new_available.push_back(sanitized_region);
             }

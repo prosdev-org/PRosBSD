@@ -1,3 +1,4 @@
+#include <libkxx/heap.hxx>
 #include <libkxx/print.hxx>
 #include <libkxx/unique_ptr.hxx>
 #include <machine/cpu.hxx>
@@ -55,6 +56,8 @@ namespace Sys::Kernel {
     }
 
     void main() {
+        kxx::Heap::log_info();
+
         log("Welcome to PRosBSD v." PROSBSD_VERSION " !\n"
             "Copyright (c) 2025-2026 PRosDev.org. All rights reserved.\n"
             "PRosBSD is distributed under the BSD 3-Clause license.\n"
@@ -81,10 +84,9 @@ namespace Sys::Kernel {
 
     void set_output_stream(kxx::UniquePtr<OutputStream> &&new_output_stream) {
         output_stream() = kxx::move(new_output_stream);
-        LOG(
-                "set new OutputStream (",
-                reinterpret_cast<void *>(&*output_stream()),
-                ")");
+        LOG("set new OutputStream (",
+            reinterpret_cast<void *>(&*output_stream()),
+            ")");
     }
 
     OutputStream &get_output_stream() {
@@ -93,10 +95,9 @@ namespace Sys::Kernel {
 
     void set_input_stream(kxx::UniquePtr<InputStream> &&new_input_stream) {
         input_stream() = kxx::move(new_input_stream);
-        LOG(
-                "set new InputStream (",
-                reinterpret_cast<void *>(&*input_stream()),
-                ")");
+        LOG("set new InputStream (",
+            reinterpret_cast<void *>(&*input_stream()),
+            ")");
     }
 
     InputStream &get_input_stream() {
@@ -105,10 +106,9 @@ namespace Sys::Kernel {
 
     void set_timer(kxx::UniquePtr<Timer> &&new_timer) {
         timer() = kxx::move(new_timer);
-        LOG(
-                "set new Timer (",
-                reinterpret_cast<void *>(&*timer()),
-                ")");
+        LOG("set new Timer (",
+            reinterpret_cast<void *>(&*timer()),
+            ")");
     }
 
     Timer &get_timer() {

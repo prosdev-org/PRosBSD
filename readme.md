@@ -23,7 +23,7 @@ The `rewrite/0.2.0` branch will be merged into the `dev` branch as soon as these
 - [x] Debug over GDB
 - [x] GDT
 - [x] IDT
-- [ ] Normal heap
+- [x] O1Heap
 - [x] Memory map
 - [ ] Paging
 - [ ] CMOS
