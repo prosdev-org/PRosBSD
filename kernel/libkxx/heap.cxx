@@ -42,6 +42,10 @@ static void ensure_init() {
 void *malloc(const size_t size) {
     ensure_init();
 
+    if (size == 0) {
+        return nullptr;
+    }
+
     const auto block = static_cast<Block *>(
             o1heapAllocate(o1heap_instance, size + sizeof(Header)));
 
