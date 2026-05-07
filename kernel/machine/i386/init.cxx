@@ -8,6 +8,7 @@
 #include <unique/log.hxx>
 #include <vmem/memory_map.hxx>
 #include <vmem/page_frame_allocator.hxx>
+#include <vmem/paging.hxx>
 
 namespace Machine {
     kxx::StringView get_logger_prefix() {
@@ -28,6 +29,7 @@ namespace Machine {
 
         VMem::MemoryMap::init();
         VMem::PageFrameAllocator::init();
+        VMem::Paging::init();
 
         LOG("passing control to Kernel::main()");
         Sys::Kernel::main();

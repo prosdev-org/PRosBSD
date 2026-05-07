@@ -17,8 +17,10 @@ namespace VMem::I386::Layout {
     constexpr uintptr_t low_map_start = 0xc000'0000;
     constexpr uintptr_t low_map_end = 0xc03f'ffff;
 
-    // TODO
-    constexpr uintptr_t kernel_space_end = 0xc03f'ffff;
+    constexpr uintptr_t page_mapping_start = 0xffc0'0000;
+    constexpr uintptr_t page_mapping_end = 0xffff'ffff;
+
+    constexpr uintptr_t kernel_space_end = 0xffff'ffff;
 
     constexpr uintptr_t end = 0xffff'ffff;
 } // namespace VMem::I386::Layout

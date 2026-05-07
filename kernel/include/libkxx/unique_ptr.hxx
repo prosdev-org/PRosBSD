@@ -17,6 +17,7 @@ namespace kxx {
         T &operator*() const;
         T *operator->() const;
         T &operator[](size_t idx) const = delete;
+        bool is_nullptr() const;
 
     private:
         T *back = nullptr;
@@ -60,6 +61,11 @@ namespace kxx {
     template<typename T>
     T *UniquePtr<T>::operator->() const {
         return back;
+    }
+
+    template<typename T>
+    bool UniquePtr<T>::is_nullptr() const {
+        return back == nullptr;
     }
 
     template<typename T>
