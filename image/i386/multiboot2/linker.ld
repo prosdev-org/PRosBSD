@@ -44,14 +44,14 @@ SECTIONS {
         __bss_end = .;
     }
 
-    .bootstrap_stack ALIGN(4K) : AT(ADDR(.bootstrap_stack) - 0xC0000000) {
+    .bootstrap_stack ALIGN(4K) (NOLOAD) : AT(ADDR(.bootstrap_stack) - 0xC0000000) {
         __bootstrap_stack_start = .;
         . += 0x3FF0;
         __bootstrap_stack_top = .;
         __bootstrap_stack_end = .;
     }
 
-    .heap ALIGN(4K) : AT(ADDR(.heap) - 0xC0000000) {
+    .heap ALIGN(4K) (NOLOAD) : AT(ADDR(.heap) - 0xC0000000) {
         __bootstrap_heap_start = .;
         . += 0x4FFFF;
         __bootstrap_heap_end = .;
