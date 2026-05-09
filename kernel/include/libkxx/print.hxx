@@ -9,10 +9,14 @@
 namespace kxx {
     void _print_internal(Sys::OutputStream &output_stream, const StringView &string_view);
     void _print_internal(Sys::OutputStream &output_stream, char ch);
-    void _print_internal(Sys::OutputStream &output_stream, int32_t value);
-    void _print_internal(Sys::OutputStream &output_stream, uint32_t value);
-    void _print_internal(Sys::OutputStream &output_stream, int64_t value);
-    void _print_internal(Sys::OutputStream &output_stream, uint64_t value);
+    void _print_internal(Sys::OutputStream &output_stream, int value);
+    void _print_internal(Sys::OutputStream &output_stream, unsigned int value);
+    void _print_internal(Sys::OutputStream &output_stream, long value);
+    void _print_internal(Sys::OutputStream &output_stream,
+                         unsigned long value);
+    void _print_internal(Sys::OutputStream &output_stream, long long value);
+    void _print_internal(Sys::OutputStream &output_stream,
+                         unsigned long long value);
     void _print_internal(Sys::OutputStream &output_stream, void *ptr);
     void _print_internal(Sys::OutputStream &output_stream, Sys::Time::Duration time_duration);
 

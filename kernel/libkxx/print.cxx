@@ -13,7 +13,7 @@ namespace kxx {
         output_stream.write_object(ch);
     }
 
-    void _print_internal(Sys::OutputStream &output_stream, const int32_t value) {
+    void _print_internal(Sys::OutputStream &output_stream, const int value) {
         if (value < 0) {
             output_stream.write_object('-');
         }
@@ -21,20 +21,13 @@ namespace kxx {
         _print_internal(output_stream, Math::abs(value));
     }
 
-    void _print_internal(Sys::OutputStream &output_stream, uint32_t value) {
+    void _print_internal(Sys::OutputStream &output_stream, unsigned int value) {
         if (value == 0) {
             output_stream.write_object('0');
             return;
         }
 
-        // MAX_U32 ~= 4.29 * (10 ** 9) -> (10 ** 9)
-        constexpr uint32_t initial_divisor = Math::ipow(10U, 9U);
-
-        uint32_t divisor = initial_divisor;
-        while (value / divisor == 0) {
-            value %= divisor;
-            divisor /= 10;
-        }
+        unsigned int divisor = Math::ipow(10, Math::ilog(10, value));
 
         while (divisor != 0) {
             output_stream.write_object(static_cast<char>('0' + value / divisor));
@@ -43,7 +36,7 @@ namespace kxx {
         }
     }
 
-    void _print_internal(Sys::OutputStream &output_stream, const int64_t value) {
+    void _print_internal(Sys::OutputStream &output_stream, const long value) {
         if (value < 0) {
             output_stream.write_object('-');
         }
@@ -51,20 +44,36 @@ namespace kxx {
         _print_internal(output_stream, Math::abs(value));
     }
 
-    void _print_internal(Sys::OutputStream &output_stream, uint64_t value) {
+    void _print_internal(Sys::OutputStream &output_stream, unsigned long value) {
         if (value == 0) {
             output_stream.write_object('0');
             return;
         }
 
-        // MAX_U64 ~= 1.84 * (10 ** 19) -> (10 ** 19)
-        constexpr uint64_t initial_divisor = Math::ipow(10ULL, 19ULL);
+        unsigned int divisor = Math::ipow(10UL, Math::ilog(10UL, value));
 
-        uint64_t divisor = initial_divisor;
-        while (value / divisor == 0) {
+        while (divisor != 0) {
+            output_stream.write_object(static_cast<char>('0' + value / divisor));
             value %= divisor;
             divisor /= 10;
         }
+    }
+
+    void _print_internal(Sys::OutputStream &output_stream, const long long value) {
+        if (value < 0) {
+            output_stream.write_object('-');
+        }
+
+        _print_internal(output_stream, Math::abs(value));
+    }
+
+    void _print_internal(Sys::OutputStream &output_stream, unsigned long long value) {
+        if (value == 0) {
+            output_stream.write_object('0');
+            return;
+        }
+
+        unsigned int divisor = Math::ipow(10ULL, Math::ilog(10ULL, value));
 
         while (divisor != 0) {
             output_stream.write_object(static_cast<char>('0' + value / divisor));
@@ -104,9 +113,8 @@ namespace kxx {
     }
 
     void _print_internal(Sys::OutputStream &output_stream, void *ptr) {
-        _print_internal(
-                output_stream,
-                to_hex(reinterpret_cast<uintptr_t>(ptr)));
+        _print_internal(output_stream,
+                        to_hex(reinterpret_cast<uintptr_t>(ptr)));
     }
 
     void _print_internal(Sys::OutputStream &output_stream, const Sys::Time::Duration time_duration) {
