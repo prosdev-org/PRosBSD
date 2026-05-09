@@ -88,7 +88,7 @@ namespace kxx::Math {
 
         unsigned long result = ilog2(value) / (ilog2(base) + 1);
 
-        while ((ipow(base, result) <= UINT_MAX / base) &&
+        while ((ipow(base, result) <= ULONG_MAX / base) &&
                ipow(base, result + 1) <= value) {
             result++;
         }
@@ -103,7 +103,7 @@ namespace kxx::Math {
 
         unsigned long long result = ilog2(value) / (ilog2(base) + 1);
 
-        while ((ipow(base, result) <= UINT_MAX / base) &&
+        while ((ipow(base, result) <= ULLONG_MAX / base) &&
                ipow(base, result + 1) <= value) {
             result++;
         }
