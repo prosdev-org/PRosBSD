@@ -21,11 +21,11 @@ namespace Sys {
 
         const auto chars = static_cast<char *>(dest);
         for (size_t i = 0; i < nbytes; i++) {
-            while (!keyboard->has_last()) {
+            while (!keyboard->has_next()) {
                 Machine::Cpu::relax();
             }
 
-            chars[i] = keyboard->get_last();
+            chars[i] = keyboard->get_next();
         }
     }
 

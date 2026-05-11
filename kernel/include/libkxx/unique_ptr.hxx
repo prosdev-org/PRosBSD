@@ -17,7 +17,9 @@ namespace kxx {
         T &operator*() const;
         T *operator->() const;
         T &operator[](size_t idx) const = delete;
-        bool is_nullptr() const;
+        [[nodiscard]] T *get_raw();
+        [[nodiscard]] const T *get_const_raw() const;
+        [[nodiscard]] bool is_nullptr() const;
 
     private:
         T *back = nullptr;
@@ -64,6 +66,16 @@ namespace kxx {
     }
 
     template<typename T>
+    T *UniquePtr<T>::get_raw() {
+        return back;
+    }
+
+    template<typename T>
+    const T *UniquePtr<T>::get_const_raw() const {
+        return back;
+    }
+
+    template<typename T>
     bool UniquePtr<T>::is_nullptr() const {
         return back == nullptr;
     }
@@ -81,6 +93,9 @@ namespace kxx {
         T &operator*() const = delete;
         T *operator->() const = delete;
         T &operator[](size_t idx) const;
+        [[nodiscard]] T *get_raw();
+        [[nodiscard]] const T *get_const_raw() const;
+        [[nodiscard]] bool is_nullptr() const;
 
     private:
         T *back = nullptr;
@@ -119,6 +134,21 @@ namespace kxx {
     template<typename T>
     T &UniquePtr<T[]>::operator[](const size_t idx) const {
         return back[idx];
+    }
+
+    template<typename T>
+    T *UniquePtr<T[]>::get_raw() {
+        return back;
+    }
+
+    template<typename T>
+    const T *UniquePtr<T[]>::get_const_raw() const {
+        return back;
+    }
+
+    template<typename T>
+    bool UniquePtr<T[]>::is_nullptr() const {
+        return back == nullptr;
     }
 } // namespace kxx
 

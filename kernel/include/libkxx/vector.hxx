@@ -3,7 +3,6 @@
 
 #include <libkxx/move.hxx>
 #include <libkxx/new.hxx>
-#include <stddef.h>
 #include <stdint.h>
 #include <unique/assert.h>
 
@@ -11,6 +10,8 @@ namespace kxx {
     template<typename T>
     class Vector {
         friend class StringView;
+        template<typename LinkedListT>
+        friend class LinkedList;
 
     public:
         Vector() = default;
@@ -39,15 +40,14 @@ namespace kxx {
         static T *alloc_back(size_t new_capacity);
         static void delete_back(T *back_to_delete);
 
+        void resize();
+        void copy_init(const T *src, size_t count);
+        void move_init(T *src, size_t count);
+        void delete_back_with_content();
+
         T *back = nullptr;
         size_t size = 0;
         size_t capacity = 0;
-
-        void resize();
-        void copy_init_to_back(const T *src, size_t count);
-        void move_init_to_back(T *src, size_t count);
-
-        void delete_back_with_content();
     };
 
     template<typename T>
@@ -56,7 +56,7 @@ namespace kxx {
         size = src_size;
         capacity = size;
         back = alloc_back(capacity);
-        copy_init_to_back(src, size);
+        copy_init(src, size);
     }
 
     template<typename T>
@@ -65,7 +65,7 @@ namespace kxx {
         size = src_size;
         capacity = size;
         back = alloc_back(capacity);
-        move_init_to_back(src, size);
+        move_init(src, size);
     }
 
     template<typename T>
@@ -73,7 +73,7 @@ namespace kxx {
         size = src_size;
         capacity = size;
         back = alloc_back(capacity);
-        copy_init_to_back(src, size);
+        copy_init(src, size);
     }
 
     template<typename T>
@@ -92,7 +92,7 @@ namespace kxx {
         size = other.size;
         capacity = other.capacity;
         back = alloc_back(capacity);
-        copy_init_to_back(other.back, size);
+        copy_init(other.back, size);
     }
 
     template<typename T>
@@ -117,7 +117,7 @@ namespace kxx {
         size = other.size;
         capacity = other.capacity;
         back = alloc_back(capacity);
-        copy_init_to_back(other.back, size);
+        copy_init(other.back, size);
 
         return *this;
     }
@@ -218,13 +218,13 @@ namespace kxx {
             capacity = 2 * capacity - capacity / 2;
             auto old_back = back;
             back = alloc_back(capacity);
-            move_init_to_back(old_back, size);
+            move_init(old_back, size);
             delete_back(old_back);
         }
     }
 
     template<typename T>
-    void Vector<T>::copy_init_to_back(const T *src, const size_t count) {
+    void Vector<T>::copy_init(const T *src, const size_t count) {
         if (count == 0) {
             return;
         }
@@ -238,7 +238,7 @@ namespace kxx {
     }
 
     template<typename T>
-    void Vector<T>::move_init_to_back(T *src, const size_t count) {
+    void Vector<T>::move_init(T *src, const size_t count) {
         if (count == 0) {
             return;
         }

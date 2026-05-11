@@ -72,20 +72,20 @@ namespace Devices::I386 {
 
         if ((left_shift_pressed | right_shift_pressed) ^ caps_locked) {
             ASSERT(scancode < COUNTOF(scancode_map_shifted));
-            char_queue.push_back(scancode_map_shifted[scancode]);
+            char_queue.insert_back(scancode_map_shifted[scancode]);
         } else {
             ASSERT(scancode < COUNTOF(scancode_map_normal));
-            char_queue.push_back(scancode_map_normal[scancode]);
+            char_queue.insert_back(scancode_map_normal[scancode]);
         }
     }
 
-    char I8042::get_last() {
-        const char result = char_queue.get(char_queue.get_size() - 1);
-        char_queue.pop_back();
+    char I8042::get_next() {
+        const char result = char_queue.get(0);
+        char_queue.remove(0);
         return result;
     }
 
-    bool I8042::has_last() {
-        return char_queue.get_size() != 0;
+    bool I8042::has_next() {
+        return !char_queue.is_empty();
     }
 } // namespace Devices::I386

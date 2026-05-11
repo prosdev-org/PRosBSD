@@ -1,4 +1,5 @@
 #include <libkxx/heap.hxx>
+#include <libkxx/linked_list.hxx>
 #include <libkxx/print.hxx>
 #include <libkxx/unique_ptr.hxx>
 #include <machine/cpu.hxx>
@@ -85,7 +86,7 @@ namespace Sys::Kernel {
     void set_output_stream(kxx::UniquePtr<OutputStream> &&new_output_stream) {
         output_stream() = kxx::move(new_output_stream);
         LOG("set new OutputStream (",
-            reinterpret_cast<void *>(&*output_stream()),
+            reinterpret_cast<void *>(output_stream().get_raw()),
             ")");
     }
 
@@ -96,7 +97,7 @@ namespace Sys::Kernel {
     void set_input_stream(kxx::UniquePtr<InputStream> &&new_input_stream) {
         input_stream() = kxx::move(new_input_stream);
         LOG("set new InputStream (",
-            reinterpret_cast<void *>(&*input_stream()),
+            reinterpret_cast<void *>(input_stream().get_raw()),
             ")");
     }
 
@@ -107,7 +108,7 @@ namespace Sys::Kernel {
     void set_timer(kxx::UniquePtr<Timer> &&new_timer) {
         timer() = kxx::move(new_timer);
         LOG("set new Timer (",
-            reinterpret_cast<void *>(&*timer()),
+            reinterpret_cast<void *>(timer().get_raw()),
             ")");
     }
 

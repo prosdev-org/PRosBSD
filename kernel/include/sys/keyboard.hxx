@@ -8,8 +8,8 @@ namespace Sys {
     class Keyboard {
     public:
         virtual ~Keyboard() = default;
-        virtual char get_last() = 0;
-        virtual bool has_last() = 0;
+        virtual char get_next() = 0;
+        virtual bool has_next() = 0;
         kxx::UniquePtr<InputStream> as_input_stream();
     };
 } // namespace Sys

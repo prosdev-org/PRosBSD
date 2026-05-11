@@ -2,6 +2,7 @@
 #define DEVICES_I386_I8042_HXX
 
 #include <devices/device.hxx>
+#include <libkxx/linked_list.hxx>
 #include <machine/interrupts.hxx>
 #include <sys/keyboard.hxx>
 
@@ -14,8 +15,8 @@ namespace Devices::I386 {
                 const AutoConf::DriverHeader &driver_header,
                 const AutoConf::MatchInfo &match_info);
         void handle() override;
-        char get_last() override;
-        bool has_last() override;
+        char get_next() override;
+        bool has_next() override;
 
     private:
         static constexpr uint16_t data_port = 0x60;
@@ -56,7 +57,7 @@ namespace Devices::I386 {
         bool left_shift_pressed = false;
         bool right_shift_pressed = false;
         bool caps_locked = false;
-        kxx::Vector<char> char_queue;
+        kxx::LinkedList<char> char_queue;
     };
 } // namespace Devices::I386
 
