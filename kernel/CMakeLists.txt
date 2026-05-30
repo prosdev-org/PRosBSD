@@ -9,6 +9,7 @@ list(
         multiboot2
         shell
         sys
+        vfs
         vmem
 )
 
@@ -25,6 +26,7 @@ list(
         multiboot2-${PROJECT_TARGET_ARCH}
         shell
         sys
+        vfs
         vmem
         vmem-${PROJECT_TARGET_ARCH}
 )

@@ -1,6 +1,6 @@
 #include <libkxx/heap.hxx>
-#include <libkxx/linked_list.hxx>
 #include <libkxx/print.hxx>
+#include <libkxx/shared_ptr.hxx>
 #include <libkxx/unique_ptr.hxx>
 #include <machine/cpu.hxx>
 #include <machine/init.hxx>
@@ -10,28 +10,36 @@
 #include <sys/dummy_timer.hxx>
 #include <sys/kernel.hxx>
 #include <sys/log.hxx>
+#include <sys/process.hxx>
 #include <unique/extern_c.h>
 #include <unique/log.hxx>
 
 namespace Sys::Kernel {
     struct Storage {
+        kxx::UniquePtr<Process> proc0;
         kxx::UniquePtr<OutputStream> output_stream;
         kxx::UniquePtr<InputStream> input_stream;
         kxx::UniquePtr<Timer> timer;
     };
 
+    static kxx::UniquePtr<Process> &(*proc0)();
     static kxx::UniquePtr<OutputStream> &(*output_stream)();
     static kxx::UniquePtr<InputStream> &(*input_stream)();
     static kxx::UniquePtr<Timer> &(*timer)();
 
     void setup_storage() {
         static Storage storage = {
+                .proc0 = kxx::UniquePtr<Process>(nullptr),
                 .output_stream = kxx::UniquePtr(static_cast<OutputStream *>(
                         new DummyOutputStream)),
                 .input_stream = kxx::UniquePtr(static_cast<InputStream *>(
                         new DummyInputStream)),
                 .timer = kxx::UniquePtr(static_cast<Timer *>(
                         new DummyTimer)),
+        };
+
+        proc0 = []() -> kxx::UniquePtr<Process> & {
+            return storage.proc0;
         };
 
         output_stream = []() -> kxx::UniquePtr<OutputStream> & {
@@ -57,25 +65,22 @@ namespace Sys::Kernel {
     }
 
     void main() {
+        proc0() = kxx::UniquePtr(new Process(Process::init_proc0()));
+
+        Shell::init();
+
         kxx::Heap::log_info();
 
         log("Welcome to PRosBSD v." PROSBSD_VERSION " !\n"
             "Copyright (c) 2025-2026 PRosDev.org. All rights reserved.\n"
+            "Copyright (c) 1986, 1989, 1991\n"
+            "The Regents of the University of California. All rights reserved.\n"
+            "\n"
             "PRosBSD is distributed under the BSD 3-Clause license.\n"
-            ",-.----.                                   ,---,                     ,---, \n"
-            "\\    /  \\   __  ,-.   ,---.              ,---.'|                   ,---.'| \n"
-            "|   :    |,' ,'/ /|  '   ,'\\   .--.--.   |   | :     .--.--.       |   | : \n"
-            "|   | .\\ :'  | |' | /   /   | /  /    '  :   : :    /  /    '      |   | | \n"
-            ".   : |: ||  |   ,'.   ; ,. :|  :  /`./  :     |,-.|  :  /`./    ,--.__| | \n"
-            "|   |  \\ :'  :  /  '   | |: :|  :  ;_    |   : '  ||  :  ;_     /   ,'   | \n"
-            "|   : .  ||  | '   '   | .; : \\  \\    `. |   |  / : \\  \\    `. .   '  /  | \n"
-            ":     |`-';  : |   |   :    |  `----.   \\'   : |: |  `----.   \\'   ; |:  | \n"
-            ":   : :   |  , ;    \\   \\  /  /  /`--'  /|   | '/ : /  /`--'  /|   | '/  ' \n"
-            "|   | :    ---'      `----'  '--'.     / |   :    |'--'.     / |   :    :| \n"
-            "`---'.|                        `--'---'  /    \\  /   `--'---'   \\   \\  /   \n"
-            "  `---`                                  `-'----'                `----'    ");
+            "\n"
+            "This product includes software developed by the University of\n"
+            "California, Berkeley and its contributors.\n");
 
-        Shell::init();
         Shell::loop();
 
         for (;;) {
