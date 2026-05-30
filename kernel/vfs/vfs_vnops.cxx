@@ -43,7 +43,6 @@
 #include <vfs/file.h>
 #include <vfs/mount.h>
 #include <vfs/namei.h>
-#include <vfs/proc.h>
 #include <vfs/vnode.h>
 #include <vfs/vfs_vattr.hxx>
 #include <vfs/vfs_vnops.hxx>
@@ -56,7 +55,7 @@ namespace VFS {
      * Common code for vnode open operations.
      * Check permissions, and call the VOP_OPEN or VOP_CREATE routine.
      */
-    int open(VNode *&vp, Nameidata &ndp, Sys::Process &p, int fmode, int cmode) {
+    int VNode::open(VNode *&vp, Nameidata &ndp, Sys::Process &p, int fmode, int cmode) {
         Sys::UserCredentials cred;
         VAttr vap;
         int error;
@@ -307,7 +306,7 @@ namespace VFS {
         sb->st_uid = vap.va_uid;
         sb->st_gid = vap.va_gid;
         sb->st_rdev = vap.va_rdev;
-        sb->st_size = vap.va_qsize; // vnode.h l:148!
+        sb->st_size = vap.va_qsize;
         sb->st_atime = vap.va_atime.tv_sec;
         sb->st_spare1 = 0;
         sb->st_mtime = vap.va_mtime.tv_sec;
@@ -317,7 +316,7 @@ namespace VFS {
         sb->st_blksize = vap.va_blocksize;
         sb->st_flags = vap.va_flags;
         sb->st_gen = vap.va_gen;
-        sb->st_blocks = vap.va_qbytes / S_BLKSIZE; // still look at 148!
+        sb->st_blocks = vap.va_qbytes / S_BLKSIZE;
         return 0;
     }
 
@@ -336,7 +335,7 @@ namespace VFS {
                     error = ops->getattr(*this, vattr, const_cast<Sys::UserCredentials &>
                         (p.get_user_credentials()));
                     if (error) return error;
-                    *(off_t *) data = vattr.va_qsize - fp->f_offset; //148..
+                    *(off_t *) data = vattr.va_qsize - fp->f_offset;
                     return 0;
                 }
                 if (com == FIONBIO || com == FIOASYNC) /* XXX */

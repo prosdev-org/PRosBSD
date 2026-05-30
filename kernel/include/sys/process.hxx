@@ -30,7 +30,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)proc.h	7.28 (Berkeley) 5/30/91
+ *	@(#)process.hxx
  */
 
 #ifndef SYS_PROCESS_HXX
@@ -40,6 +40,21 @@
 #include <sys/types.h>
 #include <sys/user_credentials.hxx>
 
+#define p_rlimit p_limit->pl_rlimit
+#define p_startzero p_ysptr
+#define p_endzero p_startcopy
+#define p_startcopy p_sigmask
+#define p_endcopy p_wmesg
+#define p_session p_pgrp->pg_session
+#define p_pgid    p_pgrp->pg_id
+
+/*
+ * Description of a process.
+ * This class contains the information needed to manage a thread
+ * of control, known in UN*X as a process; it has references to subclasses
+ * containing descriptions of things that the process uses, but may share
+ * with related processes.
+ */
 namespace Sys {
     class Process {
     public:
@@ -80,5 +95,31 @@ namespace Sys {
         kxx::SharedPtr<FileContext> file_context;
     };
 } // namespace Sys
+
+
+namespace VFS {
+    class VNode;
+} // namespace VFS
+/*
+ * One structure allocated per session.
+ */
+struct session {
+    int s_count; /* ref cnt; pgrps in session */
+    Sys::Process *s_leader; /* session leader */
+    VFS::VNode *s_ttyvp; /* vnode of controlling terminal */
+    // struct	tty *s_ttyp;		/* controlling terminal */
+    char s_login[17]; /* setlogin() name */
+};
+
+/*
+ * One structure allocated per process group.
+ */
+struct pgrp {
+    struct pgrp *pg_hforw; /* forward link in hash bucket */
+    struct proc *pg_mem; /* pointer to pgrp members */
+    struct session *pg_session; /* pointer to session */
+    pid_t pg_id; /* pgrp id */
+    int pg_jobc; /* # procs qualifying pgrp for job control */
+};
 
 #endif

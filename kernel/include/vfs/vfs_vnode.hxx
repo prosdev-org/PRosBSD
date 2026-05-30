@@ -36,6 +36,7 @@
 #ifndef VFS_VNODE_HXX
 #define VFS_VNODE_HXX
 
+#include <sys/process.hxx>
 #include <vfs/vfs_vnops.hxx>
 #include <vfs/vfs_nameidata.hxx>
 #include <sys/types.h>

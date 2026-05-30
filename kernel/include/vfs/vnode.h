@@ -126,24 +126,24 @@ struct vnode {
  * represents a field whose value is unavailable
  * (getattr) or which is not to be changed (setattr).
  */
-struct vattr {
-    enum vtype va_type; /* vnode type (for create) */
-    unsigned short va_mode; /* files access mode and type */
-    short va_nlink; /* number of references to file */
-    uid_t va_uid; /* owner user id */
-    gid_t va_gid; /* owner group id */
-    long va_fsid; /* file system id (dev for now) */
-    long va_fileid; /* file id */
-    unsigned long long int va_qsize; /* file size in bytes */
-    long va_blocksize; /* blocksize preferred for i/o */
-    struct timeval va_atime; /* time of last access */
-    struct timeval va_mtime; /* time of last modification */
-    struct timeval va_ctime; /* time file changed */
-    unsigned long va_gen; /* generation number of file */
-    unsigned long va_flags; /* flags defined for file */
-    dev_t va_rdev; /* device the special file represents */
-    unsigned long long int va_qbytes; /* bytes of disk space held by file */
-};
+// struct vattr {
+//     enum vtype va_type; /* vnode type (for create) */
+//     unsigned short va_mode; /* files access mode and type */
+//     short va_nlink; /* number of references to file */
+//     uid_t va_uid; /* owner user id */
+//     gid_t va_gid; /* owner group id */
+//     long va_fsid; /* file system id (dev for now) */
+//     long va_fileid; /* file id */
+//     unsigned long long int va_qsize; /* file size in bytes */
+//     long va_blocksize; /* blocksize preferred for i/o */
+//     struct timeval va_atime; /* time of last access */
+//     struct timeval va_mtime; /* time of last modification */
+//     struct timeval va_ctime; /* time file changed */
+//     unsigned long va_gen; /* generation number of file */
+//     unsigned long va_flags; /* flags defined for file */
+//     dev_t va_rdev; /* device the special file represents */
+//     unsigned long long int va_qbytes; /* bytes of disk space held by file */
+// };
 
 #ifdef STUBBED // maybe.
 #if BYTE_ORDER == LITTLE_ENDIAN

@@ -33,8 +33,8 @@
  *	@(#)errno.h	7.13 (Berkeley) 2/19/91
  */
 
-#define ERRNO_h
 #ifndef ERRNO_H
+#define ERRNO_H
 extern int errno; /* global error number */
 
 #define EPERM   1 /* Operation not permitted */

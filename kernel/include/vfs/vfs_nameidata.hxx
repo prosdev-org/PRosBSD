@@ -49,8 +49,8 @@ namespace VFS {
 class Nameidata {
 public:
     /*
- * Arguments to namei.
- */
+     * Arguments to namei.
+     */
     void *ni_dirp; /* pathname pointer */
     enum uio_seg ni_segflg; /* location of pathname */
     unsigned long ni_nameiop; /* see below */
