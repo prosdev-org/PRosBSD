@@ -36,10 +36,10 @@
 #ifndef VFS_VNOPS_HXX
 #define VFS_VNOPS_HXX
 
-#include <vfs/vfs_nameidata.hxx>
-#include <vfs/vfs_vattr.hxx>
 #include <sys/process.hxx>
 #include <sys/types.h>
+#include <vfs/vfs_nameidata.hxx>
+#include <vfs/vfs_vattr.hxx>
 
 namespace VFS {
     // So much stubs..

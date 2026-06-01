@@ -36,11 +36,11 @@
 #ifndef VFS_VATTR_HXX
 #define VFS_VATTR_HXX
 
-#include <vfs/vnode.h>
-#include <sys/types.h>
 #include <stdint.h>
+#include <sys/types.h>
+#include <vfs/vnode.h>
 
-namespace  VFS {
+namespace VFS {
     class VAttr {
     public: // yeah, in public. But no choice. So frickin pluralism....
         enum vtype va_type; /* vnode type (for create) */
@@ -60,6 +60,6 @@ namespace  VFS {
         dev_t va_rdev; /* device the special file represents */
         unsigned long long int va_qbytes; /* bytes of disk space held by file */
     };
-}
+} // namespace VFS
 
-#endif //VFS_VATTR_HXX
+#endif // VFS_VATTR_HXX

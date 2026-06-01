@@ -36,11 +36,11 @@
 #ifndef VFS_NAMEIDATA_HXX
 #define VFS_NAMEIDATA_HXX
 
-#include <vfs/vnode.h>
-#include <sys/types.h>
 #include <stdint.h>
+#include <sys/types.h>
 #include <sys/uio.hxx>
 #include <vfs/namei.h>
+#include <vfs/vnode.h>
 
 namespace VFS {
     class VNode;
@@ -81,4 +81,4 @@ public:
 };
 
 
-#endif //VFS_NAMEIDATA_HXX
+#endif // VFS_NAMEIDATA_HXX

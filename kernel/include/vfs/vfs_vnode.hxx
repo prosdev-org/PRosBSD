@@ -37,12 +37,12 @@
 #define VFS_VNODE_HXX
 
 #include <sys/process.hxx>
-#include <vfs/vfs_vnops.hxx>
-#include <vfs/vfs_nameidata.hxx>
 #include <sys/types.h>
-#include <vfs/vnode.h>
-#include <vfs/mount.h>
 #include <sys/uio.hxx>
+#include <vfs/mount.h>
+#include <vfs/vfs_nameidata.hxx>
+#include <vfs/vfs_vnops.hxx>
+#include <vfs/vnode.h>
 
 namespace VFS {
     class VNode {
@@ -55,10 +55,10 @@ namespace VFS {
         unsigned long v_id; /* capability identifier */
         struct mount *v_mount; /* ptr to vfs we are in */
         VNodeOps *ops; /* vnode operations */
-        VNode* v_freef; /* vnode freelist forward */
-        VNode* v_freeb; /* vnode freelist back */
-        VNode* v_mountf; /* vnode mountlist forward */
-        VNode* v_mountb; /* vnode mountlist back */
+        VNode *v_freef; /* vnode freelist forward */
+        VNode *v_freeb; /* vnode freelist back */
+        VNode *v_mountf; /* vnode mountlist forward */
+        VNode *v_mountb; /* vnode mountlist back */
         struct buf *v_cleanblkhd; /* clean blocklist head */
         struct buf *v_dirtyblkhd; /* dirty blocklist head */
         long v_numoutput; /* num of writes in progress */
@@ -73,11 +73,11 @@ namespace VFS {
         int read(struct file *fp, struct uio *uio, Sys::UserCredentials &cred);
         int write(struct file *fp, struct uio *uio, Sys::UserCredentials &cred);
         int stat(struct stat *sb, Sys::Process &p);
-        int ioctl(struct file *fp, unsigned int com, void* data, Sys::Process &p);
+        int ioctl(struct file *fp, unsigned int com, void *data, Sys::Process &p);
         int select(struct file *fp, int which, Sys::Process &p);
         int closefile(struct file *fp, Sys::Process &p);
         int fhtovp(fhandle_t *fhp, int lockflag);
     };
-}
+} // namespace VFS
 
 #endif // VFS_VNODE_HXX

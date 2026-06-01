@@ -73,7 +73,7 @@ namespace Sys::Kernel {
 
         log("Welcome to PRosBSD v." PROSBSD_VERSION " !\n"
             "Copyright (c) 2025-2026 PRosDev.org. All rights reserved.\n"
-            "Copyright (c) 1986, 1989, 1991\n"
+            "Copyright (c) 1982, 1983, 1985, 1986, 1989, 1990, 1991\n"
             "The Regents of the University of California. All rights reserved.\n"
             "\n"
             "PRosBSD is distributed under the BSD 3-Clause license.\n"

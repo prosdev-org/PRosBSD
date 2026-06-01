@@ -37,18 +37,18 @@
 #include <fcntl.h>
 #include <ioctl.h>
 #include <stdint.h>
+#include <sys/process.hxx>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/uio.hxx>
 #include <vfs/file.h>
 #include <vfs/mount.h>
 #include <vfs/namei.h>
-#include <vfs/vnode.h>
-#include <vfs/vfs_vattr.hxx>
-#include <vfs/vfs_vnops.hxx>
-#include <vfs/vfs_vnode.hxx>
 #include <vfs/vfs_nameidata.hxx>
-#include <sys/process.hxx>
+#include <vfs/vfs_vattr.hxx>
+#include <vfs/vfs_vnode.hxx>
+#include <vfs/vfs_vnops.hxx>
+#include <vfs/vnode.h>
 
 namespace VFS {
     /*
@@ -76,17 +76,17 @@ namespace VFS {
                 vp = ndp.ni_vp;
             } else {
                 vp->ops->aborttop(ndp);
-                //if (ndp.ni_dvp == ndp.ni_vp)
-                    // vrele(ndp.ni_dvp);
-                    // release this node
-                //else
-                    // vput(ndp.ni_dvp);
-                    // opposite
+                // if (ndp.ni_dvp == ndp.ni_vp)
+                //  vrele(ndp.ni_dvp);
+                //  release this node
+                // else
+                //  vput(ndp.ni_dvp);
+                //  opposite
                 ndp.ni_dvp = nullptr;
                 vp = ndp.ni_vp;
                 if (fmode & O_EXCL) {
                     error = EEXIST;
-                    //vput(vp);
+                    // vput(vp);
                     return error;
                 }
                 fmode &= ~O_CREAT;
@@ -99,13 +99,12 @@ namespace VFS {
         }
         if (vp->v_type == VSOCK) {
             error = EOPNOTSUPP;
-            //vput(vp);
+            // vput(vp);
             return error;
         }
         if ((fmode & O_CREAT) == 0) {
             if (fmode & FREAD) {
-                if ((error = vp->ops->acess
-                    (*vp, VREAD, cred, p))) {
+                if ((error = vp->ops->acess(*vp, VREAD, cred, p))) {
                     // vput(vp);
                     return error;
                 }
@@ -113,28 +112,25 @@ namespace VFS {
             if (fmode & (FWRITE | O_TRUNC)) {
                 if (vp->v_type == VDIR) {
                     error = EISDIR;
-                    //vput(vp);
+                    // vput(vp);
                     return error;
                 }
                 if (((error = vp->writechk())) ||
-                    ((error = vp->ops->
-                        acess(*vp, VWRITE, cred, p)))) {
-                    //vput(vp);
+                    ((error = vp->ops->acess(*vp, VWRITE, cred, p)))) {
+                    // vput(vp);
                     return error;
                 }
             }
         }
         if (fmode & O_TRUNC) {
             vap.va_qsize = 0;
-            if ((error = vp->ops->
-                setattr(*vp, vap, cred, p))) {
-                //vput(vp);
+            if ((error = vp->ops->setattr(*vp, vap, cred, p))) {
+                // vput(vp);
                 return error;
             }
         }
-        if ((error = vp->ops->
-            open(*vp, fmode, cred, p))) {
-            //vput(vp);
+        if ((error = vp->ops->open(*vp, fmode, cred, p))) {
+            // vput(vp);
             return error;
         }
 
@@ -149,11 +145,11 @@ namespace VFS {
      * Also, prototype text segments cannot be written.
      */
     int VNode::writechk() const {
-    /*
-     * Disallow write attempts on read-only file systems;
-     * unless the file is a socket or a block or character
-     * device resident on the file system.
-     */
+        /*
+         * Disallow write attempts on read-only file systems;
+         * unless the file is a socket or a block or character
+         * device resident on the file system.
+         */
         if (v_mount->mnt_flag & MNT_RDONLY) {
             switch (v_type) {
                 case VREG:
@@ -187,12 +183,12 @@ namespace VFS {
     }
 
     /*
-    * Package up an I/O request on a vnode into a uio and do it.
-    */
+     * Package up an I/O request on a vnode into a uio and do it.
+     */
     int VNode::rdwr(enum uio_rw rw, void *base, int len, off_t offset, enum uio_seg segflg, int ioflg, Sys::UserCredentials &cred, int *aresid, Sys::Process &p) {
         struct iovec aiov{base, len};
         struct uio auio{&aiov, 1, offset,
-            len, segflg, rw, p};
+                        len, segflg, rw, p};
         int error;
 
         if ((ioflg & IO_NODELOCKED) == 0) {
@@ -229,8 +225,7 @@ namespace VFS {
         ops->lock(*this);
         uio->uio_offset = fp->f_offset;
         int count = uio->uio_resid;
-        int error = ops->read(*this, uio, (fp->f_flag & FNONBLOCK)
-            ? IO_NDELAY : 0, cred);
+        int error = ops->read(*this, uio, (fp->f_flag & FNONBLOCK) ? IO_NDELAY : 0, cred);
         fp->f_offset += count - uio->uio_resid;
         ops->unlock(*this);
         return error;
@@ -267,8 +262,9 @@ namespace VFS {
         VAttr vap{};
 
         int error = ops->getattr(*this, vap,
-            const_cast<Sys::UserCredentials &>(p.get_user_credentials()));
-        if (error) return error;
+                                 const_cast<Sys::UserCredentials &>(p.get_user_credentials()));
+        if (error)
+            return error;
 
         /*
          * Copy from vattr table
@@ -323,7 +319,7 @@ namespace VFS {
     /*
      * File table vnode ioctl routine.
      */
-    int VNode::ioctl(struct file *fp, unsigned int com, void* data, Sys::Process &p) {
+    int VNode::ioctl(struct file *fp, unsigned int com, void *data, Sys::Process &p) {
         VAttr vattr;
         int error;
 
@@ -332,9 +328,9 @@ namespace VFS {
             case VREG:
             case VDIR:
                 if (com == FIONREAD) {
-                    error = ops->getattr(*this, vattr, const_cast<Sys::UserCredentials &>
-                        (p.get_user_credentials()));
-                    if (error) return error;
+                    error = ops->getattr(*this, vattr, const_cast<Sys::UserCredentials &>(p.get_user_credentials()));
+                    if (error)
+                        return error;
                     *(off_t *) data = vattr.va_qsize - fp->f_offset;
                     return 0;
                 }
@@ -349,54 +345,55 @@ namespace VFS {
             case VCHR:
             case VBLK:
                 error = ops->ioctl(*this, com, data, fp->f_flag,
-                    const_cast<Sys::UserCredentials &>(p.get_user_credentials()), p);
+                                   const_cast<Sys::UserCredentials &>(p.get_user_credentials()), p);
 
-    #ifdef STUBBED // Cool for init and programs, that can capture tty. Not now.
-                    if (error == 0 && com == TIOCSCTTY) {
-                        p->p_session->s_ttyvp = vp;
-                        v_usecount++;
-                    }
-    #endif // STUBBED
-                    return error;
-            }
+#ifdef STUBBED // Cool for init and programs, that can capture tty. Not now.
+                if (error == 0 && com == TIOCSCTTY) {
+                    p->p_session->s_ttyvp = vp;
+                    v_usecount++;
+                }
+#endif // STUBBED
+                return error;
         }
+    }
 
-        /*
-         * File table vnode select routine.
-         */
-        int VNode::select(struct file *fp, int which, Sys::Process &p) {
+    /*
+     * File table vnode select routine.
+     */
+    int VNode::select(struct file *fp, int which, Sys::Process &p) {
 
-            return ops->select(*this, which, fp->f_flag,
-                               fp->f_cred, p);
-        }
+        return ops->select(*this, which, fp->f_flag,
+                           fp->f_cred, p);
+    }
 
-        /*
-         * File table vnode close routine.
-         */
-        int VNode::closefile(struct file *fp, Sys::Process &p) {
+    /*
+     * File table vnode close routine.
+     */
+    int VNode::closefile(struct file *fp, Sys::Process &p) {
 
-            return close(fp->f_flag, fp->f_cred, p);
-        }
+        return close(fp->f_flag, fp->f_cred, p);
+    }
 
-        /*
-         * vn_fhtovp() - convert a fh to a vnode ptr (optionally locked)
-         * 	- look up fsid in mount list (if not found ret error)
-         *	- get vp by calling VFS_FHTOVP() macro
-         *	- if lockflag lock it with VOP_LOCK()
-         */
-        int VNode::fhtovp(fhandle_t *fhp, int lockflag) {
-            //struct mount *mp;
+    /*
+     * vn_fhtovp() - convert a fh to a vnode ptr (optionally locked)
+     * 	- look up fsid in mount list (if not found ret error)
+     *	- get vp by calling VFS_FHTOVP() macro
+     *	- if lockflag lock it with VOP_LOCK()
+     */
+    int VNode::fhtovp(fhandle_t *fhp, int lockflag) {
+        // struct mount *mp;
 
-            // getvfs -- part of subr
-            // if ((mp = getvfs(&fhp->fh_fsid)) == NULL)
-            //     return (ESTALE);
+        // getvfs -- part of subr
+        // if ((mp = getvfs(&fhp->fh_fsid)) == NULL)
+        //     return (ESTALE);
 
-            // second stub in one function, sigh.
-            // if (VFS_FHTOVP(mp, &fhp->fh_fid, *this))
-            //    return (ESTALE);
-            (void)fhp;
+        // second stub in one function, sigh.
+        // if (VFS_FHTOVP(mp, &fhp->fh_fid, *this))
+        //    return (ESTALE);
+        (void) fhp;
 
-            if (!lockflag) ops->unlock(*this);
-            return 0;
-        }
+        if (!lockflag)
+            ops->unlock(*this);
+        return 0;
+    }
 } // namespace VFS

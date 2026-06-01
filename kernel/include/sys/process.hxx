@@ -40,13 +40,13 @@
 #include <sys/types.h>
 #include <sys/user_credentials.hxx>
 
-#define p_rlimit p_limit->pl_rlimit
+#define p_rlimit    p_limit->pl_rlimit
 #define p_startzero p_ysptr
-#define p_endzero p_startcopy
+#define p_endzero   p_startcopy
 #define p_startcopy p_sigmask
-#define p_endcopy p_wmesg
-#define p_session p_pgrp->pg_session
-#define p_pgid    p_pgrp->pg_id
+#define p_endcopy   p_wmesg
+#define p_session   p_pgrp->pg_session
+#define p_pgid      p_pgrp->pg_id
 
 /*
  * Description of a process.

@@ -38,8 +38,8 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
-#include <sys/user_credentials.hxx>
 #include <sys/uio.hxx>
+#include <sys/user_credentials.hxx>
 
 struct ucred {
     pid_t pid;
