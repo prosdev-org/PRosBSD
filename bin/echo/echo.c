@@ -1,7 +1,7 @@
-#include <string.h>
-#include <stdio.h>
 #include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main(int argc, char **argv) {
     size_t argsc = 0;
@@ -19,7 +19,8 @@ int main(int argc, char **argv) {
     args[0] = '\0';
     for (int i = 1; i < argc; i++) {
         strcat(args, argv[i]);
-        if (argc > i + 1) strcat(args, " ");
+        if (argc > i + 1)
+            strcat(args, " ");
     }
 
     printf("%s\n", args);

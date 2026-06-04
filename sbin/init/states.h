@@ -36,35 +36,35 @@
 #define _POSIX_C_SOURCE 200809L
 #define _GNU_SOURCE
 
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/wait.h>
-#include <sys/time.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <limits.h>
-#include <signal.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <time.h>
-#include <utmp.h>
-#include <pwd.h>
-#include <termios.h>
 #include <crypt.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <pwd.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <termios.h>
+#include <time.h>
+#include <unistd.h>
+#include <utmp.h>
 
 #ifndef TIOCSCTTY
 #define TIOCSCTTY _IO('t', 19)
 #endif
 
 struct ttyent {
-	char *ty_name;
-	char *ty_getty;
-	char *ty_type;
-	int   ty_status;
-	char *ty_window;
+    char *ty_name;
+    char *ty_getty;
+    char *ty_type;
+    int ty_status;
+    char *ty_window;
 };
 
 #define TTY_ON        0x01
@@ -73,51 +73,50 @@ struct ttyent {
 #define TTY_IFCONSOLE 0x08
 #define TTY_SECURE    0x20
 
-#define	SE_SHUTDOWN	0x1
-#define	SE_PRESENT	0x2
-#define	SE_IFEXISTS	0x4
-#define	SE_IFCONSOLE	0x8
+#define SE_SHUTDOWN      0x1
+#define SE_PRESENT       0x2
+#define SE_IFEXISTS      0x4
+#define SE_IFCONSOLE     0x8
 #define SCRIPT_ARGV_SIZE 3
 
-#define	GETTY_SPACING		 5
-#define	GETTY_SLEEP		30
-#define	GETTY_NSPACE		 5
-#define	WINDOW_WAIT		 3
-#define	STALL_TIMEOUT		30
-#define KILL_TIMEOUT 1
-#define	DEATH_WATCH		10
+#define GETTY_SPACING 5
+#define GETTY_SLEEP   30
+#define GETTY_NSPACE  5
+#define WINDOW_WAIT   3
+#define STALL_TIMEOUT 30
+#define KILL_TIMEOUT  1
+#define DEATH_WATCH   10
 
 typedef struct init_session {
-	int se_index;
-	pid_t se_process;
-	struct timeval se_started;
-	int	se_nspace;
-	int	se_flags;
-	char *se_device;
-	char *se_getty;
-	char **se_getty_argv;
-	char *se_window;
-	char **se_window_argv;
-	char *se_type;
-	struct init_session *se_prev;
-	struct init_session *se_next;
+    int se_index;
+    pid_t se_process;
+    struct timeval se_started;
+    int se_nspace;
+    int se_flags;
+    char *se_device;
+    char *se_getty;
+    char **se_getty_argv;
+    char *se_window;
+    char **se_window_argv;
+    char *se_type;
+    struct init_session *se_prev;
+    struct init_session *se_next;
 } session_t;
 
-enum init_log
-{
-	WARNING,
-	EMERGENCY,
-	STALL
+enum init_log {
+    WARNING,
+    EMERGENCY,
+    STALL
 };
 
-enum init_power
-{
-	NONE,
-	SHUTDOWN,
-	REBOOT
+enum init_power {
+    NONE,
+    SHUTDOWN,
+    REBOOT
 };
 
-enum runcom_mode { AUTO, FAST };
+enum runcom_mode { AUTO,
+                   FAST };
 
 typedef long (*state_func_t)(void);
 typedef state_func_t (*state_t)(void);
