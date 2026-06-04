@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 int main(int argc, char **argv) {
     size_t argsc = 0;
@@ -17,19 +18,25 @@ int main(int argc, char **argv) {
         }
 
         args[0] = '\0';
+        char *ptr = args;
         for (int i = 1; i < argc; i++) {
-            strcat(args, argv[i]);
+            size_t len = strlen(argv[i]);
+            memcpy(ptr, argv[i], len);
+            ptr += len;
             if (argc > i + 1)
-                strcat(args, " ");
+                *ptr++ += ' ';
         }
+        *ptr = '\n';
         for (;;) {
-            printf("%s\n", args);
+            if (!write(1, args, argsc))
+                return 0; // closed
         }
 
         free(args); // never reached
     } else {
         for (;;) {
-            printf("y\n");
+            if (!write(1, "y\n", 2))
+                return 0; // closed
         }
     }
     return 0;
