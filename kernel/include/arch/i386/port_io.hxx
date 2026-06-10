@@ -1,5 +1,4 @@
-#ifndef ARCH_I386_PORT_IO_HXX
-#define ARCH_I386_PORT_IO_HXX
+#pragma once
 
 #include <stdint.h>
 
@@ -18,5 +17,3 @@ namespace Arch::I386::PortIO {
         out(0, 0x80);
     }
 } // namespace Arch::I386::PortIO
-
-#endif

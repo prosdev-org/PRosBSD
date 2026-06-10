@@ -1,5 +1,4 @@
-#ifndef ARCH_I386_CPU_HALT_HXX
-#define ARCH_I386_CPU_HALT_HXX
+#pragma once
 
 namespace Arch::I386::Cpu {
     static inline void halt() {
@@ -7,5 +6,3 @@ namespace Arch::I386::Cpu {
         __asm__ volatile("hlt" :);
     }
 } // namespace Arch::I386::Cpu
-
-#endif

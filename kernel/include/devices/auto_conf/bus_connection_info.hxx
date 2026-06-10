@@ -1,5 +1,4 @@
-#ifndef DEVICES_AUTO_CONF_BUS_CONNECTION_INFO_HXX
-#define DEVICES_AUTO_CONF_BUS_CONNECTION_INFO_HXX
+#pragma once
 
 namespace Devices::AutoConf {
     class BusConnectionInfo {
@@ -7,5 +6,3 @@ namespace Devices::AutoConf {
         virtual ~BusConnectionInfo() = default;
     };
 } // namespace Devices::AutoConf
-
-#endif

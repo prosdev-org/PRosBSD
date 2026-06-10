@@ -1,5 +1,4 @@
-#ifndef DEVICES_DUMMY_HXX
-#define DEVICES_DUMMY_HXX
+#pragma once
 
 #include <devices/device.hxx>
 
@@ -12,5 +11,3 @@ namespace Devices {
         }
     };
 } // namespace Devices
-
-#endif

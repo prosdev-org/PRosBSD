@@ -1,5 +1,4 @@
-#ifndef DEVICES_I386_I8253_HXX
-#define DEVICES_I386_I8253_HXX
+#pragma once
 
 #include <devices/device.hxx>
 #include <machine/interrupts.hxx>
@@ -26,5 +25,3 @@ namespace Devices::I386 {
         unsigned long long ticks = 0;
     };
 } // namespace Devices::I386
-
-#endif

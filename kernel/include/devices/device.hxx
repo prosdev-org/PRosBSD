@@ -1,5 +1,4 @@
-#ifndef DEVICES_DEVICE_HXX
-#define DEVICES_DEVICE_HXX
+#pragma once
 
 #include <devices/auto_conf/driver_header.hxx>
 #include <libkxx/unique_ptr.hxx>
@@ -21,5 +20,3 @@ namespace Devices {
         kxx::Vector<kxx::UniquePtr<Device>> children; // empty for non-buses
     };
 } // namespace Devices
-
-#endif

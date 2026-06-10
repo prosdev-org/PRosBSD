@@ -1,5 +1,4 @@
-#ifndef DEVICES_MAIN_BUS_HXX
-#define DEVICES_MAIN_BUS_HXX
+#pragma once
 
 #include <devices/auto_conf/match_info.hxx>
 #include <devices/device.hxx>
@@ -26,5 +25,3 @@ namespace Devices {
         void create_child(DeviceType device_type);
     };
 } // namespace Devices
-
-#endif

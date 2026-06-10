@@ -1,5 +1,4 @@
-#ifndef ARCH_I386_GDT_HXX
-#define ARCH_I386_GDT_HXX
+#pragma once
 
 #define ARCH_I386_GDT_KERN_CODE_SEG 0x08
 #define ARCH_I386_GDT_KERN_DATA_SEG 0x10
@@ -12,7 +11,5 @@
 namespace Arch::I386::Cpu::Gdt {
     void init();
 } // namespace Arch::I386::Cpu::Gdt
-
-#endif
 
 #endif

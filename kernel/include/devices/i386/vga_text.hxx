@@ -1,5 +1,4 @@
-#ifndef DEVICES_I386_VGA_TEXT_HXX
-#define DEVICES_I386_VGA_TEXT_HXX
+#pragma once
 
 #include <devices/auto_conf/match_info.hxx>
 #include <stdint.h>
@@ -39,5 +38,3 @@ namespace Devices::I386 {
         };
     };
 } // namespace Devices::I386
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef ARCH_I386_INVLPG_HXX
-#define ARCH_I386_INVLPG_HXX
+#pragma once
 
 #include <stdint.h>
 
@@ -8,5 +7,3 @@ namespace Arch::I386::Cpu {
         __asm__ volatile("invlpg %0" ::"m"(address));
     }
 } // namespace Arch::I386::Cpu
-
-#endif

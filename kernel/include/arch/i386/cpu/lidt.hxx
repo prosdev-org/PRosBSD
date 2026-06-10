@@ -1,5 +1,4 @@
-#ifndef ARCH_I386_CPU_LIDT_HXX
-#define ARCH_I386_CPU_LIDT_HXX
+#pragma once
 
 #include <stdint.h>
 
@@ -18,5 +17,3 @@ namespace Arch::I386::Cpu {
         __asm__("lidt %0" ::"m"(idtr));
     }
 } // namespace Arch::I386::Cpu
-
-#endif

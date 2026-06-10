@@ -1,5 +1,4 @@
-#ifndef DEVICES_AUTO_CONF_MATCH_INFO_HXX
-#define DEVICES_AUTO_CONF_MATCH_INFO_HXX
+#pragma once
 
 #include <devices/auto_conf/bus_connection_info.hxx>
 
@@ -13,5 +12,3 @@ namespace Devices::AutoConf {
         const BusConnectionInfo *bus_connection_info;
     };
 } // namespace Devices::AutoConf
-
-#endif

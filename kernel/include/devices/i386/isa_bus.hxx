@@ -1,5 +1,4 @@
-#ifndef DEVICES_I386_ISA_BUS_HXX
-#define DEVICES_I386_ISA_BUS_HXX
+#pragma once
 
 #include <devices/auto_conf/bus_connection_info.hxx>
 #include <devices/device.hxx>
@@ -33,5 +32,3 @@ namespace Devices::I386 {
         void create_child(DeviceType device_type);
     };
 } // namespace Devices::I386
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef ARCH_I386_LOAD_CR3_HXX
-#define ARCH_I386_LOAD_CR3_HXX
+#pragma once
 
 #include <stdint.h>
 
@@ -8,5 +7,3 @@ namespace Arch::I386::Cpu {
         __asm__ volatile("mov %0, %%cr3" ::"r"(cr3));
     }
 } // namespace Arch::I386::Cpu
-
-#endif

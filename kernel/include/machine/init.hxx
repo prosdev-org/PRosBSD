@@ -1,5 +1,4 @@
-#ifndef MACHINE_INIT_HXX
-#define MACHINE_INIT_HXX
+#pragma once
 
 #include <unique/noreturn.h>
 
@@ -10,5 +9,3 @@ namespace Machine {
      */
     NORETURN void init();
 } // namespace Machine
-
-#endif

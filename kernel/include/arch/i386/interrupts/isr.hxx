@@ -1,5 +1,4 @@
-#ifndef ARCH_I386_INTERRUPTS_ISR_HXX
-#define ARCH_I386_INTERRUPTS_ISR_HXX
+#pragma once
 
 #include <unique/extern_c.h>
 
@@ -84,5 +83,3 @@ namespace Arch::I386::Interrupts::Isr {
     EXTERN_C void Arch_I386_Interrupts_Isr_Pic8259_14();
     EXTERN_C void Arch_I386_Interrupts_Isr_Pic8259_15();
 } // namespace Arch::I386::Interrupts::Isr
-
-#endif

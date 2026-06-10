@@ -1,5 +1,4 @@
-#ifndef DEVICES_I386_I8042_HXX
-#define DEVICES_I386_I8042_HXX
+#pragma once
 
 #include <devices/device.hxx>
 #include <libkxx/linked_list.hxx>
@@ -61,4 +60,3 @@ namespace Devices::I386 {
     };
 } // namespace Devices::I386
 
-#endif

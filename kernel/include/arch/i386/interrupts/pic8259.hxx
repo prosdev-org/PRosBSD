@@ -1,5 +1,4 @@
-#ifndef ARCH_I386_INTERRUPTS_PIC8259_HXX
-#define ARCH_I386_INTERRUPTS_PIC8259_HXX
+#pragma once
 
 #include <stdint.h>
 
@@ -9,5 +8,3 @@ namespace Arch::I386::Interrupts::Pic8259 {
     void unmask_all();
     void send_end_of_interrupt(uint8_t idx);
 } // namespace Arch::I386::Interrupts::Pic8259
-
-#endif
