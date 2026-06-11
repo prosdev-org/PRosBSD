@@ -1,5 +1,5 @@
 #include <libkxx/print.hxx>
-#include <shell/uname.hxx>
+#include <bin/uname.hxx>
 
 namespace Shell::Uname {
     int exec(const kxx::Vector<kxx::String> &args) {

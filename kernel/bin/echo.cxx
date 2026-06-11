@@ -1,5 +1,5 @@
 #include <libkxx/print.hxx>
-#include <shell/echo.hxx>
+#include <bin/echo.hxx>
 
 namespace Shell::Echo {
     int exec(const kxx::Vector<kxx::String> &args) {

@@ -10,6 +10,7 @@ list(
         shell
         sys
         vmem
+        bin
 )
 
 list(
@@ -27,6 +28,7 @@ list(
         sys
         vmem
         vmem-${PROJECT_TARGET_ARCH}
+        bin
 )
 
 add_library(kernel-flags INTERFACE)

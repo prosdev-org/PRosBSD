@@ -3,9 +3,9 @@
 #include <libkxx/print.hxx>
 #include <libkxx/string.hxx>
 #include <shell/command.hxx>
-#include <shell/echo.hxx>
+#include <bin/echo.hxx>
 #include <shell/shell.hxx>
-#include <shell/uname.hxx>
+#include <bin/uname.hxx>
 #include <unique/log.hxx>
 
 namespace Shell {
