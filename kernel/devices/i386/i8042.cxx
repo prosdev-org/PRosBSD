@@ -27,7 +27,8 @@ namespace Devices::I386 {
 
     I8042::I8042(
             const AutoConf::DriverHeader &driver_header,
-            const AutoConf::MatchInfo &match_info) : Device(driver_header, match_info.parent) {
+            const AutoConf::MatchInfo &match_info) :
+        Device(driver_header, match_info.parent) {
         LOG("initializing");
         // TODO: init I8042
 

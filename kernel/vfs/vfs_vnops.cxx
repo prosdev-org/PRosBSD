@@ -17,7 +17,7 @@
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
-//  *
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,114 +30,197 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)vfs_vnops.cxx
  */
 
 #include <errno.h>
 #include <fcntl.h>
 #include <ioctl.h>
-#include <stdint.h>
+#include <string.h>
 #include <sys/process.hxx>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/uio.hxx>
-#include <vfs/file.h>
-#include <vfs/mount.h>
-#include <vfs/namei.h>
+#include <unique/log.hxx>
+#include <vfs/file.hxx>
+#include <vfs/mount.hxx>
+#include <vfs/vfs_lookup.hxx>
 #include <vfs/vfs_nameidata.hxx>
+#include <vfs/vfs_subr.hxx>
 #include <vfs/vfs_vattr.hxx>
 #include <vfs/vfs_vnode.hxx>
 #include <vfs/vfs_vnops.hxx>
-#include <vfs/vnode.h>
 
 namespace VFS {
     /*
      * Common code for vnode open operations.
      * Check permissions, and call the VOP_OPEN or VOP_CREATE routine.
      */
-    int VNode::open(VNode *&vp, Nameidata &ndp, Sys::Process &p, int fmode, int cmode) {
-        Sys::UserCredentials cred;
+    int VNode::vn_open(Nameidata &ndp, Sys::Process &p, int fmode, int cmode) {
+        VNode *vp;
         VAttr vap;
         int error;
-        // No namei caching right now.....
+
+        if ((fmode & (FREAD | FWRITE)) == 0) {
+            return EINVAL;
+        }
 
         if (fmode & O_CREAT) {
             ndp.ni_nameiop = CREATE | LOCKPARENT | LOCKLEAF;
-            if ((fmode & O_EXCL) == 0)
+
+            if ((fmode & O_EXCL) == 0) {
                 ndp.ni_nameiop |= FOLLOW;
-            // if (error = namei(ndp, p))
-            //     return (error);
+            }
+
+            error = namei(ndp, p);
+            if (error != 0) {
+                return error;
+            }
+
             if (ndp.ni_vp == nullptr) {
+                // create file
+                vattr_null(&vap);
                 vap.va_type = VREG;
-                vap.va_mode = cmode;
-                if ((error = vp->ops->create(ndp, vap, p)))
-                    return error;
-                fmode &= ~O_TRUNC;
-                vp = ndp.ni_vp;
-            } else {
-                vp->ops->aborttop(ndp);
-                // if (ndp.ni_dvp == ndp.ni_vp)
-                //  vrele(ndp.ni_dvp);
-                //  release this node
-                // else
-                //  vput(ndp.ni_dvp);
-                //  opposite
-                ndp.ni_dvp = nullptr;
-                vp = ndp.ni_vp;
-                if (fmode & O_EXCL) {
-                    error = EEXIST;
-                    // vput(vp);
+                vap.va_mode = static_cast<unsigned short>(cmode);
+
+                error = ndp.ni_dvp->ops->create(ndp, vap, p);
+                if (error != 0) {
+                    vput(ndp.ni_dvp);
+                    ndp.ni_dvp = nullptr;
                     return error;
                 }
+
+                vp = ndp.ni_vp;
+                if (vp == nullptr) {
+                    vput(ndp.ni_dvp);
+                    ndp.ni_dvp = nullptr;
+                    return EINVAL;
+                }
+
+                // no need to save parent directory
+                if (ndp.ni_dvp != vp) {
+                    vput(ndp.ni_dvp);
+                } else {
+                    vrele(ndp.ni_dvp);
+                }
+
+                ndp.ni_dvp = nullptr;
+
+                fmode &= ~O_CREAT;
+                fmode &= ~O_TRUNC;
+            } else {
+                // EXIsts
+                ndp.ni_dvp->ops->abortop(ndp);
+
+                if (ndp.ni_dvp == ndp.ni_vp) {
+                    vrele(ndp.ni_dvp);
+                } else {
+                    vput(ndp.ni_dvp);
+                }
+
+                ndp.ni_dvp = nullptr;
+
+                vp = ndp.ni_vp;
+
+                if (fmode & O_EXCL) {
+                    vput(vp);
+                    return EEXIST;
+                }
+
                 fmode &= ~O_CREAT;
             }
         } else {
             ndp.ni_nameiop = LOOKUP | FOLLOW | LOCKLEAF;
-            // if (error = namei(ndp, p))
-            //     return (error);
+
+            error = namei(ndp, p);
+            if (error != 0) {
+                return error;
+            }
+
             vp = ndp.ni_vp;
         }
+
         if (vp->v_type == VSOCK) {
-            error = EOPNOTSUPP;
-            // vput(vp);
-            return error;
+            vput(vp);
+            return EOPNOTSUPP;
         }
+
         if ((fmode & O_CREAT) == 0) {
             if (fmode & FREAD) {
-                if ((error = vp->ops->acess(*vp, VREAD, cred, p))) {
-                    // vput(vp);
+                error = vp->ops->access(
+                        *vp,
+                        VREAD,
+                        p.get_user_credentials(),
+                        p);
+
+                if (error != 0) {
+                    vput(vp);
                     return error;
                 }
             }
+
             if (fmode & (FWRITE | O_TRUNC)) {
                 if (vp->v_type == VDIR) {
-                    error = EISDIR;
-                    // vput(vp);
+                    vput(vp);
+                    return EISDIR;
+                }
+
+                error = vp->writechk();
+                if (error != 0) {
+                    vput(vp);
                     return error;
                 }
-                if (((error = vp->writechk())) ||
-                    ((error = vp->ops->acess(*vp, VWRITE, cred, p)))) {
-                    // vput(vp);
+
+                error = vp->ops->access(
+                        *vp,
+                        VWRITE,
+                        p.get_user_credentials(),
+                        p);
+
+                if (error != 0) {
+                    vput(vp);
                     return error;
                 }
             }
         }
+
         if (fmode & O_TRUNC) {
+            vattr_null(&vap);
             vap.va_qsize = 0;
-            if ((error = vp->ops->setattr(*vp, vap, cred, p))) {
-                // vput(vp);
+
+            error = vp->ops->setattr(
+                    *vp,
+                    vap,
+                    p.get_user_credentials(),
+                    p);
+
+            if (error != 0) {
+                vput(vp);
                 return error;
             }
         }
-        if ((error = vp->ops->open(*vp, fmode, cred, p))) {
-            // vput(vp);
+
+        error = vp->ops->open(
+                *vp,
+                fmode,
+                p.get_user_credentials(),
+                p);
+
+        if (error != 0) {
+            vput(vp);
             return error;
         }
 
-        if (fmode & FWRITE)
+        if (fmode & FWRITE) {
             vp->v_writecount++;
+        }
+
+        ndp.ni_vp = vp;
+
+        if (vp->ops != nullptr) {
+            vp->ops->unlock(*vp);
+        }
+
         return 0;
-    };
+    }
 
     /*
      * Check for write permissions on the specified vnode.
@@ -145,12 +228,7 @@ namespace VFS {
      * Also, prototype text segments cannot be written.
      */
     int VNode::writechk() const {
-        /*
-         * Disallow write attempts on read-only file systems;
-         * unless the file is a socket or a block or character
-         * device resident on the file system.
-         */
-        if (v_mount->mnt_flag & MNT_RDONLY) {
+        if (v_mount != nullptr && (v_mount->mnt_flag & MNT_RDONLY)) {
             switch (v_type) {
                 case VREG:
                 case VDIR:
@@ -158,74 +236,72 @@ namespace VFS {
                     return EROFS;
                 default:
                     break;
-            };
+            }
         }
-
-        /*
-         * If there's shared text associated with
-         * the vnode, try to free it up once.  If
-         * we fail, we can't allow writing.
-         */
-        if ((v_flag & VTEXT) /* &&  !vnode_pager_uncache() */) { // from vnode pager!!!
+        if (v_flag & VTEXT) {
             return ETXTBSY;
-        };
+        }
         return 0;
-    };
+    }
 
-    // vnode close call
-    int VNode::close(int flags, Sys::UserCredentials &cred, Sys::Process &p) {
+    /*
+     * Vnode close call.
+     */
+    int VNode::vn_close(int flags, const Sys::UserCredentials &cred,
+                        Sys::Process &p) {
         if (flags & FWRITE) {
             v_writecount--;
         }
         int error = ops->close(*this, flags, cred, p);
-        // TODO: release 'this'.
+        vrele(this);
         return error;
     }
 
     /*
      * Package up an I/O request on a vnode into a uio and do it.
      */
-    int VNode::rdwr(enum uio_rw rw, void *base, int len, off_t offset, enum uio_seg segflg, int ioflg, Sys::UserCredentials &cred, int *aresid, Sys::Process &p) {
-        struct iovec aiov{base, len};
-        struct uio auio{&aiov, 1, offset,
-                        len, segflg, rw, p};
+    int VNode::rdwr(enum uio_rw rw, void *base, int len, off_t offset,
+                    enum uio_seg segflg, int ioflg,
+                    const Sys::UserCredentials &cred, int *aresid,
+                    Sys::Process &p) {
+        struct iovec aiov = {base, len};
+        struct uio auio = {&aiov, 1, offset, len, segflg, rw, p};
         int error;
 
         if ((ioflg & IO_NODELOCKED) == 0) {
             ops->lock(*this);
         }
-
         if (rw == UIO_READ) {
             error = ops->read(*this, &auio, ioflg, cred);
         } else {
             error = ops->write(*this, &auio, ioflg, cred);
         }
-
-        if (aresid) {
+        if (aresid != nullptr) {
             *aresid = auio.uio_resid;
         } else {
-            if (auio.uio_resid && error == 0) {
+            if (auio.uio_resid != 0 && error == 0) {
                 error = EIO;
             }
         }
-
         if ((ioflg & IO_NODELOCKED) == 0) {
             ops->unlock(*this);
         }
-
         return error;
     }
 
     /*
      * File table vnode read routine.
      */
-    int VNode::read(struct file *fp, struct uio *uio, Sys::UserCredentials &cred) {
-        // struct vnode *vp = (struct vnode *)fp->f_data;,
-        // use for future, when sockets are added
+    int VNode::vn_read(File *fp, struct uio *uio,
+                       const Sys::UserCredentials &cred) {
+        if ((fp->f_flag & FREAD) == 0) {
+            return EBADF;
+        }
         ops->lock(*this);
         uio->uio_offset = fp->f_offset;
         int count = uio->uio_resid;
-        int error = ops->read(*this, uio, (fp->f_flag & FNONBLOCK) ? IO_NDELAY : 0, cred);
+        int error = ops->read(*this, uio,
+                              (fp->f_flag & FNONBLOCK) ? IO_NDELAY : 0, cred);
         fp->f_offset += count - uio->uio_resid;
         ops->unlock(*this);
         return error;
@@ -234,14 +310,22 @@ namespace VFS {
     /*
      * File table vnode write routine.
      */
-    int VNode::write(struct file *fp, struct uio *uio, Sys::UserCredentials &cred) {
-        // struct vnode *vp = (struct vnode *) fp->f_data;
-        int count, error, ioflag = 0;
+    int VNode::vn_write(File *fp, struct uio *uio,
+                        const Sys::UserCredentials &cred) {
+        if ((fp->f_flag & FWRITE) == 0) {
+            return EBADF;
+        }
+        int count;
+        int error;
+        int ioflag = 0;
 
-        if (v_type == VREG && (fp->f_flag & O_APPEND))
+        if (v_type == VREG && (fp->f_flag & O_APPEND)) {
             ioflag |= IO_APPEND;
-        if (fp->f_flag & FNONBLOCK)
+        }
+        if (fp->f_flag & FNONBLOCK) {
             ioflag |= IO_NDELAY;
+        }
+
         ops->lock(*this);
         uio->uio_offset = fp->f_offset;
         count = uio->uio_resid;
@@ -258,20 +342,18 @@ namespace VFS {
     /*
      * File table vnode stat routine.
      */
-    int VNode::stat(struct stat *sb, Sys::Process &p) {
-        VAttr vap{};
-
-        int error = ops->getattr(*this, vap,
-                                 const_cast<Sys::UserCredentials &>(p.get_user_credentials()));
-        if (error)
+    int VNode::vn_stat(struct stat *sb, Sys::Process &p) {
+        VAttr vap;
+        int error = ops->getattr(*this, vap, p.get_user_credentials());
+        if (error != 0) {
             return error;
+        }
 
-        /*
-         * Copy from vattr table
-         */
+        memset(sb, 0, sizeof(*sb));
         sb->st_dev = vap.va_fsid;
         sb->st_ino = vap.va_fileid;
-        uint16_t mode = vap.va_mode;
+
+        mode_t mode = vap.va_mode;
         switch (v_type) {
             case VREG:
                 mode |= S_IFREG;
@@ -296,7 +378,7 @@ namespace VFS {
                 break;
             default:
                 return EBADF;
-        };
+        }
         sb->st_mode = mode;
         sb->st_nlink = vap.va_nlink;
         sb->st_uid = vap.va_uid;
@@ -304,55 +386,46 @@ namespace VFS {
         sb->st_rdev = vap.va_rdev;
         sb->st_size = vap.va_qsize;
         sb->st_atime = vap.va_atime.tv_sec;
-        sb->st_spare1 = 0;
         sb->st_mtime = vap.va_mtime.tv_sec;
-        sb->st_spare2 = 0;
         sb->st_ctime = vap.va_ctime.tv_sec;
-        sb->st_spare3 = 0;
         sb->st_blksize = vap.va_blocksize;
+        sb->st_blocks = vap.va_qbytes / S_BLKSIZE;
         sb->st_flags = vap.va_flags;
         sb->st_gen = vap.va_gen;
-        sb->st_blocks = vap.va_qbytes / S_BLKSIZE;
         return 0;
     }
 
     /*
      * File table vnode ioctl routine.
      */
-    int VNode::ioctl(struct file *fp, unsigned int com, void *data, Sys::Process &p) {
+    int VNode::vn_ioctl(File *fp, unsigned int com, void *data,
+                        Sys::Process &p) {
         VAttr vattr;
         int error;
 
         switch (v_type) {
-
             case VREG:
             case VDIR:
                 if (com == FIONREAD) {
-                    error = ops->getattr(*this, vattr, const_cast<Sys::UserCredentials &>(p.get_user_credentials()));
-                    if (error)
+                    error = ops->getattr(*this, vattr, p.get_user_credentials());
+                    if (error != 0) {
                         return error;
-                    *(off_t *) data = vattr.va_qsize - fp->f_offset;
+                    }
+                    *static_cast<off_t *>(data) =
+                            static_cast<off_t>(vattr.va_qsize) - fp->f_offset;
                     return 0;
                 }
-                if (com == FIONBIO || com == FIOASYNC) /* XXX */
-                    return 0; /* XXX */
-                /* fall into ... */
-
+                if (com == FIONBIO || com == FIOASYNC) {
+                    return 0;
+                }
+                [[fallthrough]];
             default:
                 return ENOTTY;
-
             case VFIFO:
             case VCHR:
             case VBLK:
                 error = ops->ioctl(*this, com, data, fp->f_flag,
-                                   const_cast<Sys::UserCredentials &>(p.get_user_credentials()), p);
-
-#ifdef STUBBED // Cool for init and programs, that can capture tty. Not now.
-                if (error == 0 && com == TIOCSCTTY) {
-                    p->p_session->s_ttyvp = vp;
-                    v_usecount++;
-                }
-#endif // STUBBED
+                                   p.get_user_credentials(), p);
                 return error;
         }
     }
@@ -360,40 +433,86 @@ namespace VFS {
     /*
      * File table vnode select routine.
      */
-    int VNode::select(struct file *fp, int which, Sys::Process &p) {
-
-        return ops->select(*this, which, fp->f_flag,
-                           fp->f_cred, p);
+    int VNode::vn_select(File *fp, int which, Sys::Process &p) {
+        return ops->select(*this, which, fp->f_flag, fp->f_cred, p);
     }
 
     /*
      * File table vnode close routine.
      */
-    int VNode::closefile(struct file *fp, Sys::Process &p) {
-
-        return close(fp->f_flag, fp->f_cred, p);
+    int VNode::vn_closefile(File *fp, Sys::Process &p) {
+        return vn_close(fp->f_flag, fp->f_cred, p);
     }
 
-    /*
-     * vn_fhtovp() - convert a fh to a vnode ptr (optionally locked)
-     * 	- look up fsid in mount list (if not found ret error)
-     *	- get vp by calling VFS_FHTOVP() macro
-     *	- if lockflag lock it with VOP_LOCK()
-     */
+    // Convert a file handle to a vnode pointer.
     int VNode::fhtovp(fhandle_t *fhp, int lockflag) {
-        // struct mount *mp;
-
-        // getvfs -- part of subr
-        // if ((mp = getvfs(&fhp->fh_fsid)) == NULL)
-        //     return (ESTALE);
-
-        // second stub in one function, sigh.
-        // if (VFS_FHTOVP(mp, &fhp->fh_fid, *this))
-        //    return (ESTALE);
         (void) fhp;
-
-        if (!lockflag)
+        if (!lockflag) {
             ops->unlock(*this);
+        }
         return 0;
     }
+
+    class VNodeFileOps final : public FileOps {
+    public:
+        int read(File &fp, struct uio &uio, const Sys::UserCredentials &cred) override {
+            if (fp.f_type != DTYPE_VNODE || fp.f_data == nullptr) {
+                return EINVAL;
+            }
+
+            auto *vp = static_cast<VNode *>(fp.f_data);
+            return vp->vn_read(&fp, &uio, cred);
+        }
+
+        int write(File &fp, struct uio &uio, const Sys::UserCredentials &cred) override {
+            if (fp.f_type != DTYPE_VNODE || fp.f_data == nullptr) {
+                return EINVAL;
+            }
+
+            auto *vp = static_cast<VNode *>(fp.f_data);
+            return vp->vn_write(&fp, &uio, cred);
+        }
+
+        int ioctl(File &fp, const unsigned int com, void *data, Sys::Process &p) override {
+            if (fp.f_type != DTYPE_VNODE || fp.f_data == nullptr) {
+                return EINVAL;
+            }
+
+            auto *vp = static_cast<VNode *>(fp.f_data);
+            return vp->vn_ioctl(&fp, com, data, p);
+        }
+
+        int select(File &fp, const int which, Sys::Process &p) override {
+            if (fp.f_type != DTYPE_VNODE || fp.f_data == nullptr) {
+                return EINVAL;
+            }
+
+            auto *vp = static_cast<VNode *>(fp.f_data);
+            return vp->vn_select(&fp, which, p);
+        }
+
+        int close(File &fp, Sys::Process &p) override {
+            if (fp.f_data == nullptr) {
+                return 0;
+            }
+
+            if (fp.f_type != DTYPE_VNODE) {
+                fp.f_data = nullptr;
+                return EINVAL;
+            }
+
+            auto *vp = static_cast<VNode *>(fp.f_data);
+
+            const int error = vp->vn_closefile(&fp, p);
+
+            fp.f_data = nullptr;
+
+            return error;
+        }
+    };
+
+    VNodeFileOps vnode_fileops_instance;
+
+    FileOps &vn_fileops = vnode_fileops_instance;
+
 } // namespace VFS

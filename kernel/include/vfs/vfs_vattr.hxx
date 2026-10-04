@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 1982, 1986, 1989 Regents of the University of California.
+ * Copyright (c) 1982, 1986, 1989 Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -17,7 +17,7 @@
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
-//  *
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,27 +30,26 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)vfs_vattr.hxx
  */
 
 #ifndef VFS_VATTR_HXX
 #define VFS_VATTR_HXX
 
-#include <stdint.h>
 #include <sys/types.h>
-#include <vfs/vnode.h>
+#include <vfs/vfs_types.hxx>
 
 namespace VFS {
+
     class VAttr {
-    public: // yeah, in public. But no choice. So frickin pluralism....
+    public:
         enum vtype va_type; /* vnode type (for create) */
-        unsigned short va_mode; /* files access mode and type */
-        short va_nlink; /* number of references to file */
+        mode_t va_mode; /* file access mode and type */
+        nlink_t va_nlink; /* number of references to file */
         uid_t va_uid; /* owner user id */
         gid_t va_gid; /* owner group id */
-        long va_fsid; /* file system id (dev for now) */
+        long va_fsid; /* file system id */
         long va_fileid; /* file id */
-        unsigned long long int va_qsize; /* file size in bytes */
+        unsigned long long va_qsize; /* file size in bytes */
         long va_blocksize; /* blocksize preferred for i/o */
         struct timeval va_atime; /* time of last access */
         struct timeval va_mtime; /* time of last modification */
@@ -58,8 +57,15 @@ namespace VFS {
         unsigned long va_gen; /* generation number of file */
         unsigned long va_flags; /* flags defined for file */
         dev_t va_rdev; /* device the special file represents */
-        unsigned long long int va_qbytes; /* bytes of disk space held by file */
+        unsigned long long va_qbytes; /* bytes of disk space held by file */
     };
+
+    struct open_args {
+        char *fname;
+        int mode;
+        int crtmode;
+    };
+
 } // namespace VFS
 
 #endif // VFS_VATTR_HXX

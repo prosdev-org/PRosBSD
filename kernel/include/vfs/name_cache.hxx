@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1982, 1986, 1989 Regents of the University of California.
+ * Copyright (c) 1989 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,58 +30,58 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)file.h	7.10 (Berkeley) 6/4/91
  */
 
-#ifndef FILE_H
-#define FILE_H
+#ifndef VFS_NAME_CACHE_HXX
+#define VFS_NAME_CACHE_HXX
 
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/uio.hxx>
-#include <sys/user_credentials.hxx>
+#include <vfs/mount.hxx>
 
-struct ucred {
-    pid_t pid;
-    uid_t uid;
-    gid_t gid;
-};
+#define NCHNAMLEN 31
 
-/*
- * Kernel descriptor table.
- * One entry for each open kernel vnode and socket.
- */
-struct file {
-    struct file *f_filef; /* list of active files */
-    struct file **f_fileb; /* list of active files */
-    short f_flag; /* see fcntl.h */
-#define DTYPE_VNODE  1 /* file */
-#define DTYPE_SOCKET 2 /* communications endpoint */
-    short f_type; /* descriptor type */
-    short f_count; /* reference count */
-    short f_msgcount; /* references from message queue */
-    Sys::UserCredentials f_cred; /* credentials associated with descriptor */
-    struct fileops {
-#ifdef STUBBED
-        int (*fo_read)(struct file *fp, struct uio *uio,
-                       struct ucred *cred);
-        int (*fo_write)(struct file *fp, struct uio *uio,
-                        struct ucred *cred);
-        int (*fo_ioctl)(struct file *fp, int com,
-                        char *data, struct proc *p);
-        int (*fo_select)(struct file *fp, int which,
-                         struct proc *p);
-        int (*fo_close)(struct file *fp, struct proc *p);
-#endif
-    } *f_ops;
-    off_t f_offset;
-    void *f_data; /* vnode or socket */
-};
+namespace VFS {
 
-#ifdef STUBBED // i think, things are going so fast for this to implement
-extern struct file *filehead; /* head of list of open files */
-extern int maxfiles; /* kernel limit on number of open files */
-extern int nfiles; /* actual number of open files */
-#endif
+    class VNode;
+    class Nameidata;
 
-#endif /* FILE_H */
+    struct NameCacheEntry {
+        NameCacheEntry *hash_next = nullptr;
+        NameCacheEntry **hash_prev = nullptr;
+        NameCacheEntry *lru_next = nullptr;
+        NameCacheEntry **lru_prev = nullptr;
+
+        VNode *dvp = nullptr;
+        unsigned long dvpid = 0;
+
+        VNode *vp = nullptr;
+        unsigned long vpid = 0;
+
+        char nlen = 0;
+        char name[NCHNAMLEN] = {};
+    };
+
+    struct NchStats {
+        long ncs_goodhits = 0;
+        long ncs_neghits = 0;
+        long ncs_badhits = 0;
+        long ncs_falsehits = 0;
+        long ncs_miss = 0;
+        long ncs_long = 0;
+        long ncs_pass2 = 0;
+        long ncs_2passes = 0;
+    };
+
+    namespace NameCache {
+
+        void init();
+        int lookup(Nameidata &ndp);
+        void enter(Nameidata &ndp);
+        void purge(VNode &vp);
+        void purge_vfs(Mount &mp);
+        void invalidate_vp(VNode &vp);
+
+    } // namespace NameCache
+
+} // namespace VFS
+
+#endif // VFS_NAME_CACHE_HXX

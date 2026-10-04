@@ -22,7 +22,8 @@ namespace Devices::I386 {
 
     IsaBus::IsaBus(
             const AutoConf::DriverHeader &driver_header,
-            const AutoConf::MatchInfo &match_info) : Device(driver_header, match_info.parent) {
+            const AutoConf::MatchInfo &match_info) :
+        Device(driver_header, match_info.parent) {
         LOG("initializing");
 
         ASSERT(parent != nullptr);

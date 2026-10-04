@@ -36,7 +36,9 @@
 #ifndef UIO_HXX
 #define UIO_HXX
 
-#include <sys/process.hxx>
+namespace Sys {
+    class Process;
+}
 
 struct iovec {
     void *iov_base;

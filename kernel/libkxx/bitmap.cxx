@@ -4,17 +4,20 @@
 #include <unique/assert.h>
 
 namespace kxx {
-    Bitmap::Bitmap(const size_t size) : size(size) {
+    Bitmap::Bitmap(const size_t size) :
+        size(size) {
         bytes = kxx::UniquePtr<Byte[]>(new Byte[get_nbytes()]);
         set_all(false);
     }
 
-    Bitmap::Bitmap(const Bitmap &other) : size(other.size) {
+    Bitmap::Bitmap(const Bitmap &other) :
+        size(other.size) {
         bytes = kxx::UniquePtr<Byte[]>(new Byte[get_nbytes()]);
         memmove(&bytes[0], &other.bytes[0], size);
     }
 
-    Bitmap::Bitmap(Bitmap &&other) : size(other.size) {
+    Bitmap::Bitmap(Bitmap &&other) :
+        size(other.size) {
         bytes = move(other.bytes);
     }
 

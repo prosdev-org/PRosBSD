@@ -13,7 +13,8 @@ namespace Devices {
 
     MainBus::MainBus(
             const AutoConf::DriverHeader &device_header,
-            const AutoConf::MatchInfo &match_info) : Device(device_header, match_info.parent) {
+            const AutoConf::MatchInfo &match_info) :
+        Device(device_header, match_info.parent) {
         LOG("initializing");
 
         ASSERT(match_info.parent == nullptr);

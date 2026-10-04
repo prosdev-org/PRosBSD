@@ -4,6 +4,7 @@
 #include <libkxx/unique_ptr.hxx>
 #include <sys/input_stream.hxx>
 #include <sys/output_stream.hxx>
+#include <sys/process.hxx>
 #include <sys/timer.hxx>
 #include <unique/noreturn.h>
 
@@ -19,6 +20,8 @@ namespace Sys::Kernel {
 
     void set_input_stream(kxx::UniquePtr<InputStream> &&new_input_stream);
     InputStream &get_input_stream();
+
+    kxx::UniquePtr<Process> &proc0_ref();
 
     void set_timer(kxx::UniquePtr<Timer> &&new_timer);
     Timer &get_timer();

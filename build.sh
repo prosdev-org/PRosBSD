@@ -1,43 +1,35 @@
-#!/bin/bash
+#!/bin/sh
 
-
-
-function delete {
+delete() {
     echo "[BUILD SCRIPT] Delete build directory"
     rm -rf build
 }
 
-
 build=1
-function nobuild {
+nobuild() {
     echo "[BUILD SCRIPT] Running without build"
     build=
 }
 
-
 run=1
-function norun {
+norun() {
     echo "[BUILD SCRIPT] Building without run"
     run=
 }
 
 gdb=
-function gdb {
+gdb() {
     echo "[BUILD SCRIPT] Running with GDB"
     gdb=1
 }
 
-
 hdd=
-function hdd {
+hdd() {
     echo "[BUILD SCRIPT] Building HDD image"
     hdd=1
 }
 
-
-
-
-function help {
+help() {
     printf \
 "Usage: ./build.sh [ARGUMENT ...]\n"\
 "Arguments:\n"\
@@ -53,6 +45,35 @@ function help {
 "    ./build.sh -d -R   - Delete and build without run\n"
 }
 
+os=$(uname -s)
+case "$os" in
+    Linux*)
+        GRUB2_BOOT_IMG="/usr/lib/grub/i386-pc/boot.img"
+        GRUB2_MKRESCUE="/usr/bin/grub-mkrescue"
+        GRUB2_MKIMAGE="/usr/bin/grub-mkimage"
+        ;;
+    FreeBSD*|OpenBSD*|NetBSD*|DragonFly*)
+        GRUB2_BOOT_IMG="/usr/local/lib/grub/i386-pc/boot.img"
+        GRUB2_MKRESCUE="/usr/local/bin/grub-mkrescue"
+        GRUB2_MKIMAGE="/usr/local/bin/grub-mkimage"
+        ;;
+    *)
+        echo "[BUILD SCRIPT] Unknown OS: $os – using default GRUB paths (may fail)"
+        GRUB2_BOOT_IMG="/usr/lib/grub/i386-pc/boot.img"
+        GRUB2_MKRESCUE="/usr/bin/grub-mkrescue"
+        GRUB2_MKIMAGE="/usr/bin/grub-mkimage"
+        ;;
+esac
+
+if [ ! -f "$GRUB2_BOOT_IMG" ]; then
+    echo "[BUILD SCRIPT] Warning: $GRUB2_BOOT_IMG not found"
+fi
+if ! command -v "$GRUB2_MKRESCUE" >/dev/null 2>&1; then
+    echo "[BUILD SCRIPT] Warning: $GRUB2_MKRESCUE not found in PATH"
+fi
+if ! command -v "$GRUB2_MKIMAGE" >/dev/null 2>&1; then
+    echo "[BUILD SCRIPT] Warning: $GRUB2_MKIMAGE not found in PATH"
+fi
 
 while [ -n "$1" ]; do
     case "$1" in
@@ -64,7 +85,7 @@ while [ -n "$1" ]; do
         -g) gdb ;;
         -h | --hdd) hdd ;;
         --help) help
-                     exit ;;
+                exit ;;
         *) echo "[BUILD SCRIPT] Unknown argument: $1"
            help
            exit ;;
@@ -72,14 +93,14 @@ while [ -n "$1" ]; do
     shift
 done
 
-
-
-
-
-if [[ $build ]]; then
+if [ -n "$build" ]; then
     echo "[BUILD SCRIPT] Building PRosBSD"
-    cmake -DCMAKE_TOOLCHAIN_FILE=toolchain/llvm-i686-pc-none-elf.cmake -S . -B build
-    if [[ $hdd ]]; then
+    cmake -DCMAKE_TOOLCHAIN_FILE=toolchain/llvm-i686-pc-none-elf.cmake \
+          -DGRUB2_BOOT_IMG="$GRUB2_BOOT_IMG" \
+          -DGRUB2_MKRESCUE="$GRUB2_MKRESCUE" \
+          -DGRUB2_MKIMAGE="$GRUB2_MKIMAGE" \
+          -S . -B build
+    if [ -n "$hdd" ]; then
         cmake --build build --target grub2_hdd_image
     else
         cmake --build build --target grub2_iso_image
@@ -89,10 +110,10 @@ if [[ $build ]]; then
     fi
 fi
 
-if [[ $run ]]; then
+if [ -n "$run" ]; then
     echo "[BUILD SCRIPT] Running PRosBSD"
-    if [[ $gdb ]]; then
-        if [[ $hdd ]]; then
+    if [ -n "$gdb" ]; then
+        if [ -n "$hdd" ]; then
             qemu-system-i386 -drive file=build/prosbsd-hdd.img,format=raw,if=ide,index=0 \
             -d int -no-shutdown -no-reboot -monitor stdio -s -S
         else
@@ -100,7 +121,7 @@ if [[ $run ]]; then
             -d int -no-shutdown -no-reboot -monitor stdio -s -S
         fi
     else
-        if [[ $hdd ]]; then
+        if [ -n "$hdd" ]; then
             qemu-system-i386 -drive file=build/prosbsd-hdd.img,format=raw,if=ide,index=0
         else
             qemu-system-i386 -cdrom build/prosbsd.iso

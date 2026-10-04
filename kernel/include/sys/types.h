@@ -1,6 +1,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+// 32-BIT ONLY. TODO: MAKE IT cross-platform
+
 typedef long int off_t;
 typedef int pid_t;
 typedef unsigned int uid_t;

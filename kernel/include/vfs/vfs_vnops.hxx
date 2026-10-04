@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 1982, 1986, 1989 Regents of the University of California.
+ * Copyright (c) 1982, 1986, 1989 Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -17,7 +17,7 @@
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
-//  *
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,6 +39,7 @@
 #include <sys/process.hxx>
 #include <sys/types.h>
 #include <vfs/vfs_nameidata.hxx>
+#include <vfs/vfs_types.hxx>
 #include <vfs/vfs_vattr.hxx>
 
 namespace VFS {
@@ -51,34 +52,34 @@ namespace VFS {
     // TODO: Fill the stubs
 
     class VNode;
-    class VNodeOps { // add consts, when needed
+    class VNodeOps {
     public:
         virtual ~VNodeOps() = default;
 
         virtual int lookup(VNode &vp, Nameidata &ndp, Sys::Process &p) = 0;
         virtual int create(Nameidata &ndp, VAttr &vap, Sys::Process &p) = 0;
-        virtual int mknod(Nameidata &ndp, VAttr &vap, Sys::UserCredentials &cred, Sys::Process &p) = 0;
-        virtual int open(VNode &vp, int mode, Sys::UserCredentials &cred, Sys::Process &p) = 0;
-        virtual int close(VNode &vp, int fflag, Sys::UserCredentials &cred, Sys::Process &p) = 0;
-        virtual int acess(VNode &vp, int mode, Sys::UserCredentials &cred, Sys::Process &p) = 0;
-        virtual int getattr(VNode &vp, VAttr &vap, Sys::UserCredentials &cred) = 0;
-        virtual int setattr(VNode &vp, VAttr &vap, Sys::UserCredentials &cred, Sys::Process &p) = 0;
-        virtual int read(VNode &vp, struct uio *uio, int ioflag, Sys::UserCredentials &cred) = 0;
-        virtual int write(VNode vp, struct uio *uio, int ioflag, Sys::UserCredentials &cred) = 0;
-        virtual int ioctl(VNode &vp, unsigned int command, void *data, int fflag, Sys::UserCredentials &cred, Sys::Process &p) = 0;
-        virtual int select(VNode &vp, int which, int fflag, Sys::UserCredentials &cred, Sys::Process &p) = 0;
-        virtual int mmap(VNode &vp, int fflags, Sys::UserCredentials &cred, Sys::Process &p) = 0;
-        virtual int fsync(VNode &vp, int fflags, Sys::UserCredentials &cred, int waitfor, Sys::Process &p) = 0;
-        virtual int seek(VNode &vp, off_t oldoff, off_t newoff, Sys::UserCredentials &cred) = 0;
+        virtual int mknod(Nameidata &ndp, VAttr &vap, const Sys::UserCredentials &cred, Sys::Process &p) = 0;
+        virtual int open(VNode &vp, int mode, const Sys::UserCredentials &cred, Sys::Process &p) = 0;
+        virtual int close(VNode &vp, int fflag, const Sys::UserCredentials &cred, Sys::Process &p) = 0;
+        virtual int access(VNode &vp, int mode, const Sys::UserCredentials &cred, Sys::Process &p) = 0;
+        virtual int getattr(VNode &vp, VAttr &vap, const Sys::UserCredentials &cred) = 0;
+        virtual int setattr(VNode &vp, VAttr &vap, const Sys::UserCredentials &cred, Sys::Process &p) = 0;
+        virtual int read(VNode &vp, struct uio *uio, int ioflag, const Sys::UserCredentials &cred) = 0;
+        virtual int write(VNode &vp, struct uio *uio, int ioflag, const Sys::UserCredentials &cred) = 0;
+        virtual int ioctl(VNode &vp, unsigned int command, void *data, int fflag, const Sys::UserCredentials &cred, Sys::Process &p) = 0;
+        virtual int select(VNode &vp, int which, int fflag, const Sys::UserCredentials &cred, Sys::Process &p) = 0;
+        virtual int mmap(VNode &vp, int fflags, const Sys::UserCredentials &cred, Sys::Process &p) = 0;
+        virtual int fsync(VNode &vp, int fflags, const Sys::UserCredentials &cred, int waitfor, Sys::Process &p) = 0;
+        virtual int seek(VNode &vp, off_t oldoff, off_t newoff, const Sys::UserCredentials &cred) = 0;
         virtual int remove(Nameidata &ndp, Sys::Process &p) = 0;
         virtual int link(VNode &vp, Nameidata &ndp, Sys::Process &p) = 0;
         virtual int rename(Nameidata &fndp, Nameidata &tndp, Sys::Process &p) = 0;
         virtual int mkdir(Nameidata &ndp, VAttr &vap, Sys::Process &p) = 0;
         virtual int rmdir(Nameidata &ndp, Sys::Process &p) = 0;
-        virtual int symlink(Nameidata &ndp, VAttr &vap, char *target, Sys::Process &p) = 0;
-        virtual int readdir(VNode &vp, struct uio *uio, Sys::UserCredentials &cred, int *eofflagp) = 0;
-        virtual int readlink(VNode &vp, struct uio *uio, Sys::UserCredentials &cred) = 0;
-        virtual int aborttop(Nameidata &ndp) = 0;
+        virtual int symlink(Nameidata &ndp, VAttr &vap, const char *target, Sys::Process &p) = 0;
+        virtual int readdir(VNode &vp, struct uio *uio, const Sys::UserCredentials &cred, int *eofflagp) = 0;
+        virtual int readlink(VNode &vp, struct uio *uio, const Sys::UserCredentials &cred) = 0;
+        virtual int abortop(Nameidata &ndp) = 0;
         virtual int inactive(VNode &vp, Sys::Process &p) = 0;
         virtual int reclaim(VNode &vp) = 0;
         virtual int lock(VNode &vp) = 0;

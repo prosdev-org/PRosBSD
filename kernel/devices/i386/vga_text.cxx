@@ -40,7 +40,8 @@ namespace Devices::I386 {
 
     VgaText::VgaText(
             const AutoConf::DriverHeader &driver_header,
-            const AutoConf::MatchInfo &match_info) : Device(driver_header, match_info.parent) {
+            const AutoConf::MatchInfo &match_info) :
+        Device(driver_header, match_info.parent) {
         LOG("initializing");
 
         ensure_init();

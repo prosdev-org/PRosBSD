@@ -5,7 +5,7 @@ find_program(GRUB2_MKRESCUE
 )
 
 if (NOT GRUB2_MKRESCUE)
-    message(FATAL_ERROR "Cound not find grub2-mkrescue")
+    message(FATAL_ERROR "Could not find grub2-mkrescue")
 endif ()
 
 find_program(GRUB2_MKIMAGE
@@ -14,8 +14,8 @@ find_program(GRUB2_MKIMAGE
         grub-mkimage
 )
 
-if (NOT GRUB2_MKRESCUE)
-    message(FATAL_ERROR "Cound not find grub2-mkimage")
+if (NOT GRUB2_MKIMAGE)
+    message(FATAL_ERROR "Could not find grub2-mkimage")
 endif ()
 
 find_file(GRUB2_BOOT_IMG
@@ -24,11 +24,21 @@ find_file(GRUB2_BOOT_IMG
         /usr/lib/grub/i386-pc
         /usr/share/grub/i386-pc
         /lib/grub/i386-pc
+        /usr/local/lib/grub/i386-pc
 )
 
 if (NOT GRUB2_BOOT_IMG)
-    message(FATAL_ERROR "Cound not find grub boot.img")
+    message(FATAL_ERROR "Could not find grub boot.img")
 endif ()
+
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    set(MKFS_FAT_COMMAND mkfs.fat -F 16)
+elseif (CMAKE_HOST_SYSTEM_NAME MATCHES "FreeBSD|OpenBSD|NetBSD|DragonFly")
+    set(MKFS_FAT_COMMAND newfs_msdos -F 16)
+else()
+    message(WARNING "Unknown host OS ${CMAKE_HOST_SYSTEM_NAME}, defaulting to mkfs.fat")
+    set(MKFS_FAT_COMMAND mkfs.fat -F 16)
+endif()
 
 add_custom_target(grub2_iso_image
         DEPENDS kernel.elf
@@ -53,10 +63,10 @@ ${CMAKE_BINARY_DIR}/${HDD_IMAGE_NAME} : start=2048, type=ef, bootable"
 
 add_custom_target(grub2_hdd_image
         DEPENDS kernel.elf
-        COMMAND truncate -s 10M ${CMAKE_BINARY_DIR}/${HDD_IMAGE_NAME}
+        COMMAND truncate -s 32M ${CMAKE_BINARY_DIR}/${HDD_IMAGE_NAME}
         COMMAND sfdisk ${CMAKE_BINARY_DIR}/${HDD_IMAGE_NAME} < ${SFDISK_INPUT}
-        COMMAND truncate -s 9M ${CMAKE_CURRENT_BINARY_DIR}/part.img
-        COMMAND mkfs.fat -F16 ${CMAKE_CURRENT_BINARY_DIR}/part.img
+        COMMAND truncate -s 31M ${CMAKE_CURRENT_BINARY_DIR}/part.img
+        COMMAND ${MKFS_FAT_COMMAND} ${CMAKE_CURRENT_BINARY_DIR}/part.img
         COMMAND ${GRUB2_MKIMAGE} -O i386-pc
         -o ${CMAKE_CURRENT_BINARY_DIR}/grub2_core.img
         -c ${CMAKE_CURRENT_SOURCE_DIR}/bootstrap.cfg
@@ -65,7 +75,7 @@ add_custom_target(grub2_hdd_image
         COMMAND dd
         if=${GRUB2_BOOT_IMG} of=${CMAKE_BINARY_DIR}/${HDD_IMAGE_NAME}
         bs=446 count=1 conv=notrunc
-        COMMAND printf '\\x01\\x00\\x00\\x00' |
+        COMMAND printf '\\x80\\x00\\x00\\x00' |
         dd of=${CMAKE_BINARY_DIR}/${HDD_IMAGE_NAME} bs=1 seek=92 conv=notrunc
         COMMAND dd
         if=${CMAKE_CURRENT_BINARY_DIR}/grub2_core.img of=${CMAKE_BINARY_DIR}/${HDD_IMAGE_NAME}

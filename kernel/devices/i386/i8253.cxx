@@ -36,7 +36,8 @@ namespace Devices::I386 {
 
     I8253::I8253(
             const AutoConf::DriverHeader &driver_header,
-            const AutoConf::MatchInfo &match_info) : Device(driver_header, match_info.parent) {
+            const AutoConf::MatchInfo &match_info) :
+        Device(driver_header, match_info.parent) {
         constexpr uint8_t command_port = 0x43;
         constexpr uint8_t channel0_data_port = 0x40;
 

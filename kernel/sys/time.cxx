@@ -1,7 +1,8 @@
 #include <sys/time.hxx>
 
 namespace Sys::Time {
-    Duration::Duration(const unsigned long long nanos) : nanos(nanos) {
+    Duration::Duration(const unsigned long long nanos) :
+        nanos(nanos) {
     }
 
     unsigned long long Duration::as_nanos() const {

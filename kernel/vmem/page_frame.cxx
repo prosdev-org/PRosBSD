@@ -3,7 +3,8 @@
 #include <vmem/page_frame.hxx>
 
 namespace VMem {
-    PageFrame::PageFrame(const size_t idx) : idx(idx) {
+    PageFrame::PageFrame(const size_t idx) :
+        idx(idx) {
     }
 
     PageFrame::PageFrame(const PhysAddr phys_addr) :

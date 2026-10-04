@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 1982, 1986, 1989 Regents of the University of California.
+ * Copyright (c) 1982, 1986, 1989 Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -17,7 +17,7 @@
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
-//  *
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)vfs_nameidata.hxx
  */
 
 #ifndef VFS_NAMEIDATA_HXX
@@ -39,46 +38,73 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <sys/uio.hxx>
-#include <vfs/namei.h>
-#include <vfs/vnode.h>
+#include <sys/user_credentials.hxx>
+#include <vfs/vfs_types.hxx>
 
 namespace VFS {
     class VNode;
 }
 
-class Nameidata {
-public:
-    /*
-     * Arguments to namei.
-     */
-    void *ni_dirp; /* pathname pointer */
-    enum uio_seg ni_segflg; /* location of pathname */
-    unsigned long ni_nameiop; /* see below */
-    /*
-     * Arguments to lookup.
-     */
-    Sys::Process &ni_cred; /* credentials */
-    VFS::VNode &ni_startdir; /* starting directory */
-    VFS::VNode &ni_rootdir; /* logical root directory */
-    /*
-     * Results
-     */
-    VFS::VNode *ni_vp; /* vnode of result */
-    VFS::VNode *ni_dvp; /* vnode of intermediate directory */
-    /*
-     * Shared between namei, lookup routines, and commit routines.
-     */
-    char *ni_pnbuf; /* pathname buffer */
-    long ni_pathlen; /* remaining chars in path */
-    char *ni_ptr; /* current location in pathname */
-    long ni_namelen; /* length of current component */
-    char *ni_next; /* next location in pathname */
-    unsigned long ni_hash; /* hash value of current component */
-    unsigned char ni_loopcnt; /* count of symlinks encountered */
-    unsigned char ni_makeentry; /* 1 => add entry to name cache */
-    unsigned char ni_isdotdot; /* 1 => current component name is .. */
-    unsigned char ni_more; /* 1 => symlink needs interpretation */
-};
+namespace Sys {
+    class Process;
+}
 
+/*
+ * namei operations
+ */
+#define LOOKUP 0
+#define CREATE 1
+#define DELETE 2
+#define RENAME 3
+#define OPMASK 3
+
+/* namei operational modifiers */
+#define LOCKLEAF   0x0004
+#define LOCKPARENT 0x0008
+#define WANTPARENT 0x0010
+#define NOCACHE    0x0020
+#define FOLLOW     0x0040
+#define NOFOLLOW   0x0000
+#define MODMASK    0x00fc
+
+/* Namei parameter descriptors */
+#define NOCROSSMOUNT 0x0100
+#define REMOTE       0x0200
+#define HASBUF       0x0400
+#define SAVENAME     0x0800
+#define SAVESTART    0x1000
+#define PARAMASK     0xff00
+
+#define MAXSYMLINKS 8
+#define MAXPATHLEN  1024
+
+namespace VFS {
+
+    class Nameidata {
+    public:
+        void *ni_dirp = nullptr;
+        enum uio_seg ni_segflg = UIO_SYSSPACE;
+        unsigned long ni_nameiop = 0;
+        Sys::UserCredentials ni_cred = {};
+        VFS::VNode *ni_startdir = nullptr;
+        VFS::VNode *ni_rootdir = nullptr;
+        VFS::VNode *ni_vp = nullptr;
+        VFS::VNode *ni_dvp = nullptr;
+        char *ni_pnbuf = nullptr;
+        bool ni_pnbuf_owned = false;
+        long ni_pathlen = 0;
+        char *ni_ptr = nullptr;
+        long ni_namelen = 0;
+        char *ni_next = nullptr;
+        unsigned long ni_hash = 0;
+        unsigned char ni_loopcnt = 0;
+        unsigned char ni_makeentry = 0;
+        unsigned char ni_isdotdot = 0;
+        unsigned char ni_more = 0;
+
+        Nameidata() = default;
+        ~Nameidata();
+    };
+} // namespace VFS
 
 #endif // VFS_NAMEIDATA_HXX

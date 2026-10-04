@@ -8,7 +8,8 @@ namespace Devices {
     public:
         explicit Dummy(
                 const AutoConf::DriverHeader &driver_header,
-                const AutoConf::MatchInfo &match_info) : Device(driver_header, match_info.parent) {
+                const AutoConf::MatchInfo &match_info) :
+            Device(driver_header, match_info.parent) {
         }
     };
 } // namespace Devices

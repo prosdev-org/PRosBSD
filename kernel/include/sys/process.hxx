@@ -39,6 +39,7 @@
 #include <libkxx/shared_ptr.hxx>
 #include <sys/types.h>
 #include <sys/user_credentials.hxx>
+#include <vfs/file.hxx>
 
 #define p_rlimit    p_limit->pl_rlimit
 #define p_startzero p_ysptr
@@ -71,9 +72,7 @@ namespace Sys {
             bool system : 1;
         };
 
-        // stub
-        struct FileContext {
-        };
+        using FileContext = VFS::FileContext;
 
         static Process init_proc0();
 

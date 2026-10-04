@@ -4,6 +4,7 @@
 #include <libkxx/string.hxx>
 #include <shell/command.hxx>
 #include <shell/echo.hxx>
+#include <shell/fs.hxx>
 #include <shell/shell.hxx>
 #include <shell/uname.hxx>
 #include <unique/log.hxx>
@@ -99,6 +100,17 @@ namespace Shell {
         setup_storage();
         register_command(Echo::get_command());
         register_command(Uname::get_command());
+        register_command(Fs::get_mkdir_command());
+        register_command(Fs::get_touch_command());
+        register_command(Fs::get_cat_command());
+        register_command(Fs::get_write_command());
+        register_command(Fs::get_rm_command());
+        register_command(Fs::get_rmdir_command());
+        register_command(Fs::get_mv_command());
+        register_command(Fs::get_cd_command());
+        register_command(Fs::get_pwd_command());
+        register_command(Fs::get_ls_command());
+        register_command(Fs::get_stat_command());
     }
 
     void loop() {

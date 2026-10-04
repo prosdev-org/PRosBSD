@@ -7,9 +7,9 @@ list(
         libkxx
         machine
         multiboot2
+        vfs
         shell
         sys
-        vfs
         vmem
 )
 
@@ -24,9 +24,9 @@ list(
         libkxx
         machine-${PROJECT_TARGET_ARCH}
         multiboot2-${PROJECT_TARGET_ARCH}
+        vfs
         shell
         sys
-        vfs
         vmem
         vmem-${PROJECT_TARGET_ARCH}
 )
@@ -47,6 +47,7 @@ target_compile_options(
         -Wall
         -Wextra
         -Werror
+        -ferror-limit=999
         $<$<COMPILE_LANGUAGE:CXX>:
         -fno-exceptions
         -fno-rtti

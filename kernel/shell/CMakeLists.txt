@@ -3,4 +3,5 @@ add_library(
         echo.cxx
         shell.cxx
         uname.cxx
+        fs.cxx
 )
